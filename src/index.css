@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #060814;
+    color: #E8ECF8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+  }
+
+  /* Custom celestial scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0B0E1E;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #232D5F;
+    border-radius: 9999px;
+    border: 2px solid #0B0E1E;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #754ED0;
+  }
+}
+
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(16, 22, 47, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(186, 171, 245, 0.15);
+}
+
+.glass-panel-subtle {
+  background: rgba(22, 29, 62, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-glow {
+  background: rgba(20, 26, 56, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(186, 171, 245, 0.28);
+  box-shadow: 0 0 30px -5px rgba(142, 108, 229, 0.25);
+}
+
+.text-glow {
+  text-shadow: 0 0 16px rgba(255, 232, 163, 0.65);
+}
+
+.text-glow-lavender {
+  text-shadow: 0 0 16px rgba(186, 171, 245, 0.65);
+}
+
+/* Accessibility: Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.reduced-motion *, .reduced-motion ::before, .reduced-motion ::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Shagun Anime Welcome Experience Animations */
+@keyframes shagunBreathe {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.003);
+  }
+}
+
+@keyframes shagunBookGlow {
+  0%, 100% {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 15px rgba(255, 230, 140, 0.5));
+  }
+  50% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 35px rgba(255, 215, 100, 0.8));
+  }
+}
+
+@keyframes shagunCameraDrift {
+  0% {
+    transform: scale(1.0);
+  }
+  100% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes floatingMote {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120px) translateX(30px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes fairyFlicker {
+  0%, 100% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 8px rgba(255, 225, 130, 0.4));
+  }
+  50% {
+    opacity: 0.95;
+    filter: drop-shadow(0 0 18px rgba(255, 235, 160, 0.8));
+  }
+}
+
+@keyframes speechPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+.animate-shagun-breathe {
+  animation: shagunBreathe 4.5s ease-in-out infinite;
+}
+
+.animate-shagun-book-glow {
+  animation: shagunBookGlow 3s ease-in-out infinite;
+}
+
+.animate-camera-drift {
+  animation: shagunCameraDrift 16s ease-out forwards;
+}
+
+.animate-fairy-flicker {
+  animation: fairyFlicker 2.5s ease-in-out infinite;
+}
+
+.animate-speech-pulse {
+  animation: speechPulse 0.45s ease-in-out infinite;
+}
+

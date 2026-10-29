@@ -1,0 +1,736 @@
+{
+  "notes": [
+    {
+      "id": "note-1",
+      "title": "🌙 Corporate Finance: DCF Modeling & WACC Formulae",
+      "content": "# Discounted Cash Flow (DCF) & Capital Cost\n\n## Key Valuation Philosophy\nThe intrinsic value of an enterprise is the present value of its future unlevered free cash flows discounted at the firm's Weighted Average Cost of Capital (WACC).\n\n### Unlevered Free Cash Flow (UFCF):\n`\text\nUFCF = EBIT * (1 - Tax Rate) + D&A - CapEx - Change in Net Working Capital\n`\n\n### Weighted Average Cost of Capital (WACC):\n`\text\nWACC = (E / V) * Re + (D / V) * Rd * (1 - Tc)\n`\nWhere:\n- **E**: Market value of equity\n- **D**: Market value of debt\n- **V**: E + D (Total firm enterprise value)\n- **Re**: Cost of equity (via CAPM: Rf + Beta * ERP)\n- **Rd**: Pre-tax cost of debt\n- **Tc**: Corporate marginal tax rate\n\n### Terminal Value Methods:\n1. **Gordon Growth Model**: TV = FCF_{n+1} / (WACC - g), where long-term perpetual growth rate g <= GDP growth (usually 2-3%).\n2. **Exit Multiple**: TV = Multiple * EBITDA_{n}.\n\n> *Note to self: Always run sensitivity analysis tables on WACC (+/- 0.5%) vs Terminal Growth Rate (+/- 0.25%).*",
+      "subject": "Corporate Finance",
+      "tags": [
+        "Valuation",
+        "DCF",
+        "WACC",
+        "Exam Prep"
+      ],
+      "createdAt": "2026-10-24T21:15:00.000Z",
+      "updatedAt": "2026-10-28T22:30:00.000Z",
+      "isBookmarked": true,
+      "bookmarkColor": "#FFE8A3",
+      "bookmarkNote": "Core DCF equations for mid-term finance exam",
+      "needsRevision": true,
+      "wordCount": 185,
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "note-2",
+      "title": "✨ Marketing Strategy: Blue Ocean & Porter's 5 Forces",
+      "content": "# Competitive Strategy & Market Creation\n\n## Porter's Five Forces Framework\n1. Threat of New Entrants\n2. Bargaining Power of Buyers\n3. Bargaining Power of Suppliers\n4. Threat of Substitutes\n5. Industry Rivalry\n\n## Blue Ocean Strategy (Chan Kim & Mauborgne)\n- Red Oceans vs Blue Oceans\n- The ERRC Grid: Eliminate, Reduce, Raise, Create",
+      "subject": "Marketing Strategy",
+      "tags": [
+        "Strategy",
+        "Blue Ocean",
+        "Porter",
+        "Frameworks"
+      ],
+      "createdAt": "2026-10-25T19:00:00.000Z",
+      "updatedAt": "2026-10-27T18:45:00.000Z",
+      "isBookmarked": true,
+      "bookmarkColor": "#F4ABC4",
+      "bookmarkNote": "ERRC Grid examples for pitch deck",
+      "needsRevision": false,
+      "wordCount": 172,
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "note-welcome-1793299114704",
+      "userId": "usr_1793299114703_7d0eg",
+      "title": "🌙 Welcome to your Moonlit Library, Bob Starlight!",
+      "content": "# Welcome to Your Personal Universe of Learning 📖✨\n\nEvery great journey begins under quiet starlight. Here, your notes, files, assignments, and quizzes belong entirely to you.\n\n### Quick tips to begin:\n- **Upload study files** in the My Files section.\n- **Organize your thoughts** with markdown notes and moon-shaped bookmarks.\n- **Complete tasks** to illuminate your personal constellation.\n- **Track your progress** as the moon waxes through your study weeks.\n\nMay your curiosity shine bright! 🐾",
+      "subject": "Library Orientation",
+      "tags": [
+        "Welcome",
+        "Getting Started",
+        "Starlight"
+      ],
+      "createdAt": "2026-10-29T18:38:34.704Z",
+      "updatedAt": "2026-10-29T18:38:34.704Z",
+      "isBookmarked": true,
+      "bookmarkColor": "#FFE8A3",
+      "bookmarkNote": "Welcome note from Luna the Moon Cat",
+      "needsRevision": false,
+      "wordCount": 78
+    },
+    {
+      "id": "note-welcome-1793299861084",
+      "userId": "usr_1793299861083_fbtsb",
+      "title": "🌙 Welcome to your Moonlit Library, Clara Moonlit!",
+      "content": "# Welcome to Your Personal Universe of Learning 📖✨\n\nEvery great journey begins under quiet starlight. Here, your notes, files, assignments, and quizzes belong entirely to you.\n\n### Quick tips to begin:\n- **Upload study files** in the My Files section.\n- **Organize your thoughts** with markdown notes and moon-shaped bookmarks.\n- **Complete tasks** to illuminate your personal constellation.\n- **Track your progress** as the moon waxes through your study weeks.\n\nMay your curiosity shine bright! 🐾",
+      "subject": "Library Orientation",
+      "tags": [
+        "Welcome",
+        "Getting Started",
+        "Starlight"
+      ],
+      "createdAt": "2026-10-29T18:51:01.084Z",
+      "updatedAt": "2026-10-29T18:51:01.084Z",
+      "isBookmarked": true,
+      "bookmarkColor": "#FFE8A3",
+      "bookmarkNote": "Welcome note from Luna the Moon Cat",
+      "needsRevision": false,
+      "wordCount": 78
+    },
+    {
+      "id": "note-1793299861918",
+      "userId": "usr_1793299861083_fbtsb",
+      "title": "Clara Private Astral Notes",
+      "content": "Secret starlight research",
+      "subject": "Astronomy",
+      "tags": [
+        "Study Notes"
+      ],
+      "createdAt": "2026-10-29T18:51:01.918Z",
+      "updatedAt": "2026-10-29T18:51:01.918Z",
+      "isBookmarked": false,
+      "bookmarkColor": "#FFE8A3",
+      "bookmarkNote": "",
+      "needsRevision": false,
+      "wordCount": 3
+    },
+    {
+      "id": "note-welcome-1793301313514",
+      "userId": "usr_1793301313514_x5rcl",
+      "title": "🌙 Welcome to your Moonlit Library, Celeste Reader!",
+      "content": "# Welcome to Your Personal Universe of Learning 📖✨\n\nEvery great journey begins under quiet starlight. Here, your notes, files, assignments, and quizzes belong entirely to you.\n\n### Quick tips to begin:\n- **Upload study files** in the My Files section.\n- **Organize your thoughts** with markdown notes and moon-shaped bookmarks.\n- **Complete tasks** to illuminate your personal constellation.\n- **Track your progress** as the moon waxes through your study weeks.\n\nMay your curiosity shine bright! 🐾",
+      "subject": "Library Orientation",
+      "tags": [
+        "Welcome",
+        "Getting Started",
+        "Starlight"
+      ],
+      "createdAt": "2026-10-29T19:15:13.514Z",
+      "updatedAt": "2026-10-29T19:15:13.514Z",
+      "isBookmarked": true,
+      "bookmarkColor": "#FFE8A3",
+      "bookmarkNote": "Welcome note from Luna the Moon Cat",
+      "needsRevision": false,
+      "wordCount": 78
+    },
+    {
+      "id": "note-welcome-1793301313747",
+      "userId": "usr_1793301313745_asrf5",
+      "title": "🌙 Welcome to your Moonlit Library, Starlight Observer!",
+      "content": "# Welcome to Your Personal Universe of Learning 📖✨\n\nEvery great journey begins under quiet starlight. Here, your notes, files, assignments, and quizzes belong entirely to you.\n\n### Quick tips to begin:\n- **Upload study files** in the My Files section.\n- **Organize your thoughts** with markdown notes and moon-shaped bookmarks.\n- **Complete tasks** to illuminate your personal constellation.\n- **Track your progress** as the moon waxes through your study weeks.\n\nMay your curiosity shine bright! 🐾",
+      "subject": "Library Orientation",
+      "tags": [
+        "Welcome",
+        "Getting Started",
+        "Starlight"
+      ],
+      "createdAt": "2026-10-29T19:15:13.747Z",
+      "updatedAt": "2026-10-29T19:15:13.747Z",
+      "isBookmarked": true,
+      "bookmarkColor": "#FFE8A3",
+      "bookmarkNote": "Welcome note from Luna the Moon Cat",
+      "needsRevision": false,
+      "wordCount": 78
+    }
+  ],
+  "assignments": [
+    {
+      "id": "asg-1",
+      "title": "Case Analysis: Apple's Capital Allocation Strategy",
+      "subject": "Corporate Finance",
+      "description": "Evaluate Apple's share buybacks, dividend yield, and cash repatriation post-2017 TCJA. Compute optimal debt-to-equity ratio.",
+      "dueDate": "2026-11-04T23:59:00.000Z",
+      "priority": "high",
+      "status": "in-progress",
+      "weightage": "25% of Term Grade",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "asg-2",
+      "title": "Brand Repositioning Memo: Tesla vs Luxury EVs",
+      "subject": "Marketing Strategy",
+      "description": "Synthesize perceptual mapping and recommend pricing/segmentation strategy for an emerging luxury EV line.",
+      "dueDate": "2026-11-08T18:00:00.000Z",
+      "priority": "medium",
+      "status": "pending",
+      "weightage": "20% of Term Grade",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "asg-3",
+      "title": "Zara Fast Fashion Supply Chain Process Flow Analysis",
+      "subject": "Operations & Supply Chain",
+      "description": "Calculate cycle time and capacity utilization of La Coruña distribution hub.",
+      "dueDate": "2026-10-28T23:59:00.000Z",
+      "priority": "high",
+      "status": "submitted",
+      "weightage": "20% of Term Grade",
+      "grade": "A+ (97/100)",
+      "submissionNotes": "Submitted ahead of schedule with full Monte Carlo model.",
+      "submittedFileName": "Zara_Supply_Chain_MonteCarlo_Analysis.pdf",
+      "submittedAt": "2026-10-28T19:30:00.000Z",
+      "userId": "user_demo_seraphina"
+    }
+  ],
+  "lectures": [
+    {
+      "id": "lec-1",
+      "title": "Lecture 07: Mergers, Acquisitions & LBO Mechanics",
+      "subject": "Corporate Finance",
+      "professor": "Prof. Julian Vance",
+      "date": "2026-10-27",
+      "durationMinutes": 75,
+      "videoUrl": "",
+      "attachedFileName": "Lecture07_LBO_Debt_Schedules.pdf",
+      "keyTakeaways": [
+        "Senior bank debt vs Mezzanine debt vs Sponsor equity breakdown in modern buyouts",
+        "Sources and Uses table must always equate balance sheet transfers cleanly",
+        "Target IRR for private equity sponsors remains 20-25% threshold"
+      ],
+      "notesMarkdown": "### Key Discussion Points:\n1. Deleveraging effect expands equity.\n2. Working capital covenants.",
+      "isWatched": true,
+      "rating": 5,
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "lec-2",
+      "title": "Lecture 09: Behavioral Economics in Consumer Pricing",
+      "subject": "Marketing Strategy",
+      "professor": "Dr. Evelyn Rousseau",
+      "date": "2026-10-29",
+      "durationMinutes": 60,
+      "videoUrl": "",
+      "attachedFileName": "Lec09_Decoy_Effect_Prospect_Theory.pdf",
+      "keyTakeaways": [
+        "Prospect Theory: Loss aversion is ~2.25x stronger than equivalent gain appreciation",
+        "Asymmetric dominance (The Decoy Effect) shifts buyer choices towards target high-margin bundles"
+      ],
+      "notesMarkdown": "Construct 3-tier SaaS pricing matrix demonstrating decoy theory.",
+      "isWatched": false,
+      "rating": 4,
+      "userId": "user_demo_seraphina"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-1",
+      "subject": "Corporate Finance",
+      "topic": "WACC & Capital Structure",
+      "question": "When corporate income taxes are introduced into the Modigliani-Miller framework without bankruptcy costs, how does increasing leverage affect a firm's Weighted Average Cost of Capital (WACC)?",
+      "options": [
+        "WACC increases monotonically due to higher default risk premium",
+        "WACC remains strictly constant regardless of leverage",
+        "WACC decreases continuously because debt interest payments are tax-deductible",
+        "WACC forms a U-shaped curve that bottoms out at 50% debt"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "With corporate taxes and no financial distress costs (MM Proposition II with taxes), the interest tax shield lowers the effective after-tax cost of debt [Rd * (1 - Tc)]. Hence, WACC decreases continuously as leverage increases towards 100%.",
+      "difficulty": "Medium",
+      "isBookmarked": true,
+      "timesPracticed": 3,
+      "timesCorrect": 3,
+      "timesIncorrect": 0,
+      "lastAnsweredCorrectly": true,
+      "lastPracticed": "2026-10-28T20:15:00.000Z",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "q-2",
+      "subject": "Marketing Strategy",
+      "topic": "Segmentation & Positioning",
+      "question": "In Kim & Mauborgne's Blue Ocean Strategy, what does the Four Actions Framework (ERRC) primarily aim to achieve simultaneously?",
+      "options": [
+        "High market share and aggressive price cutting",
+        "Differentiation and low cost (Value Innovation)",
+        "Vertical integration and supplier dominance",
+        "Rapid patent filings and regulatory barriers"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "Blue Ocean Strategy breaks the traditional trade-off between differentiation and low cost by pursuing Value Innovation.",
+      "difficulty": "Easy",
+      "isBookmarked": false,
+      "timesPracticed": 2,
+      "timesCorrect": 2,
+      "timesIncorrect": 0,
+      "lastAnsweredCorrectly": true,
+      "lastPracticed": "2026-10-27T17:00:00.000Z",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "q-3",
+      "subject": "Operations & Supply Chain",
+      "topic": "Little's Law",
+      "question": "A customer support queue has an average of 45 tickets in process at any time, and the team resolves 15 tickets per hour. According to Little's Law, what is the average flow time of a ticket?",
+      "options": [
+        "1.5 hours",
+        "3.0 hours",
+        "0.33 hours (20 minutes)",
+        "6.0 hours"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "By Little's Law: WIP = R * T. Hence 45 = 15 * T => T = 3 hours.",
+      "difficulty": "Easy",
+      "isBookmarked": true,
+      "timesPracticed": 4,
+      "timesCorrect": 4,
+      "timesIncorrect": 0,
+      "lastAnsweredCorrectly": true,
+      "lastPracticed": "2026-10-29T10:10:00.000Z",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "q-4",
+      "subject": "Corporate Finance",
+      "topic": "CAPM & Beta",
+      "question": "Company Alpha has an unlevered asset beta of 0.8. If the company shifts to a capital structure with Debt-to-Equity (D/E) ratio of 0.5 and corporate tax rate is 20%, what is its levered equity beta (assuming debt beta is zero)?",
+      "options": [
+        "0.80",
+        "1.12",
+        "1.20",
+        "1.45"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "Hamada equation: Beta_L = Beta_U * [1 + (1 - T) * (D / E)] = 0.8 * [1 + 0.40] = 1.12.",
+      "difficulty": "Hard",
+      "isBookmarked": true,
+      "timesPracticed": 3,
+      "timesCorrect": 1,
+      "timesIncorrect": 2,
+      "lastAnsweredCorrectly": false,
+      "lastPracticed": "2026-10-28T21:40:00.000Z",
+      "userId": "user_demo_seraphina"
+    }
+  ],
+  "customQuizzes": [
+    {
+      "id": "quiz-def-1",
+      "title": "Corporate Finance Valuation Mastery Test",
+      "subject": "Corporate Finance",
+      "description": "Comprehensive timed evaluation covering MM Proposition II, WACC interest tax shield, and Hamada levered beta mechanics.",
+      "timeLimitMinutes": 10,
+      "passingScorePercent": 75,
+      "questionIds": [
+        "q-1",
+        "q-4"
+      ],
+      "createdAt": "2026-10-28T21:00:00.000Z",
+      "isCustom": true,
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "quiz-def-2",
+      "title": "Strategy & Operations Sprint Exam",
+      "subject": "Marketing Strategy",
+      "description": "Timed assessment evaluating Blue Ocean Value Innovation (ERRC) and Little's Law queuing bottlenecks.",
+      "timeLimitMinutes": 12,
+      "passingScorePercent": 70,
+      "questionIds": [
+        "q-2",
+        "q-3"
+      ],
+      "createdAt": "2026-10-27T18:00:00.000Z",
+      "isCustom": true,
+      "userId": "user_demo_seraphina"
+    }
+  ],
+  "planner": [
+    {
+      "id": "task-1",
+      "title": "Review Corporate Valuation Chapter 8",
+      "subject": "Corporate Finance",
+      "day": "Monday",
+      "timeSlot": "08:00 PM - 09:30 PM",
+      "durationMinutes": 90,
+      "completed": true,
+      "isExamPrep": true,
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "task-2",
+      "title": "Prepare Tesla Luxury EV Positioning Memo",
+      "subject": "Marketing Strategy",
+      "day": "Tuesday",
+      "timeSlot": "09:00 PM - 10:30 PM",
+      "durationMinutes": 90,
+      "completed": true,
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "task-3",
+      "title": "Practice Question Bank: Hamada Beta & CAPM",
+      "subject": "Corporate Finance",
+      "day": "Wednesday",
+      "timeSlot": "08:30 PM - 09:30 PM",
+      "durationMinutes": 60,
+      "completed": true,
+      "isExamPrep": true,
+      "userId": "user_demo_seraphina"
+    }
+  ],
+  "constellations": [
+    {
+      "id": "star-1",
+      "title": "Mastered Little's Law (Operations)",
+      "category": "quiz",
+      "x": 22,
+      "y": 35,
+      "size": 6,
+      "glowColor": "#FFE8A3",
+      "unlockedAt": "2026-10-24T18:00:00.000Z",
+      "magnitude": 1,
+      "notes": "Scored 100% on Queuing Theory quiz",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "star-2",
+      "title": "Completed Zara Supply Chain Case",
+      "category": "assignment",
+      "x": 38,
+      "y": 22,
+      "size": 7,
+      "glowColor": "#B8A7EA",
+      "unlockedAt": "2026-10-26T20:15:00.000Z",
+      "magnitude": 2,
+      "notes": "Grade A+ earned under the moonlight",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "star-1793299979519-mqwy",
+      "userId": "user_demo_seraphina",
+      "title": "Uploaded Tome: DSM_FRESH_FOOD_ANNUAL_REPORT.pdf",
+      "category": "file",
+      "x": 40,
+      "y": 79,
+      "size": 7,
+      "glowColor": "#99F6E4",
+      "unlockedAt": "2026-10-29T18:52:59.539Z",
+      "magnitude": 1,
+      "notes": "Stored in PDF library"
+    },
+    {
+      "id": "star-1793300099834-c7mb",
+      "userId": "user_demo_seraphina",
+      "title": "Uploaded Tome: Amazon_Design_Thinking_Assignment1_5slides.pptx",
+      "category": "file",
+      "x": 20,
+      "y": 13,
+      "size": 5,
+      "glowColor": "#99F6E4",
+      "unlockedAt": "2026-10-29T18:54:59.849Z",
+      "magnitude": 2,
+      "notes": "Stored in Slides library"
+    },
+    {
+      "id": "star-1793300132637-g8xe",
+      "userId": "user_demo_seraphina",
+      "title": "Uploaded Tome: Anime Heroine Transformation Collage.png",
+      "category": "file",
+      "x": 30,
+      "y": 16,
+      "size": 5,
+      "glowColor": "#99F6E4",
+      "unlockedAt": "2026-10-29T18:55:32.645Z",
+      "magnitude": 2,
+      "notes": "Stored in Image library"
+    }
+  ],
+  "garden": [
+    {
+      "id": "garden-1",
+      "name": "Moonlit Bonsai",
+      "type": "plant",
+      "description": "A miniature ancient juniper tree that glows silver when you finish a daily study goal.",
+      "icon": "bonsai",
+      "rarity": "rare",
+      "unlocked": true,
+      "unlockedAt": "2026-10-24T18:00:00.000Z",
+      "unlockCondition": "Complete your first study session",
+      "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "garden-2",
+      "name": "Amethyst Crystal Cluster",
+      "type": "crystal",
+      "description": "A radiant purple geode that resonates with calm focus during midnight study hours.",
+      "icon": "crystal",
+      "rarity": "rare",
+      "unlocked": true,
+      "unlockedAt": "2026-10-26T20:15:00.000Z",
+      "unlockCondition": "Submit an assignment with high priority",
+      "userId": "user_demo_seraphina"
+    }
+  ],
+  "stats": {
+    "user_demo_seraphina": {
+      "totalStudyMinutes": 540,
+      "tasksCompleted": 14,
+      "quizzesTaken": 6,
+      "quizAverageScore": 92,
+      "starsCollected": 8,
+      "currentStreakDays": 6,
+      "weeklyLogs": [
+        {
+          "date": "2026-10-24",
+          "dayName": "Fri",
+          "minutes": 75,
+          "tasksCount": 2,
+          "phase": "waxing-crescent"
+        },
+        {
+          "date": "2026-10-25",
+          "dayName": "Sat",
+          "minutes": 90,
+          "tasksCount": 3,
+          "phase": "first-quarter"
+        },
+        {
+          "date": "2026-10-26",
+          "dayName": "Sun",
+          "minutes": 120,
+          "tasksCount": 3,
+          "phase": "waxing-gibbous"
+        },
+        {
+          "date": "2026-10-27",
+          "dayName": "Mon",
+          "minutes": 80,
+          "tasksCount": 2,
+          "phase": "waxing-gibbous"
+        },
+        {
+          "date": "2026-10-28",
+          "dayName": "Tue",
+          "minutes": 110,
+          "tasksCount": 3,
+          "phase": "full-moon"
+        },
+        {
+          "date": "2026-10-29",
+          "dayName": "Wed",
+          "minutes": 65,
+          "tasksCount": 1,
+          "phase": "waning-gibbous"
+        }
+      ]
+    },
+    "usr_1793299114703_7d0eg": {
+      "totalStudyMinutes": 0,
+      "tasksCompleted": 0,
+      "quizzesTaken": 0,
+      "quizAverageScore": 0,
+      "starsCollected": 0,
+      "currentStreakDays": 1,
+      "weeklyLogs": [
+        {
+          "date": "2026-10-29",
+          "dayName": "Today",
+          "minutes": 0,
+          "tasksCount": 0,
+          "phase": "waxing-crescent"
+        }
+      ]
+    },
+    "usr_1793299861083_fbtsb": {
+      "totalStudyMinutes": 0,
+      "tasksCompleted": 0,
+      "quizzesTaken": 0,
+      "quizAverageScore": 0,
+      "starsCollected": 0,
+      "currentStreakDays": 1,
+      "weeklyLogs": [
+        {
+          "date": "2026-10-29",
+          "dayName": "Today",
+          "minutes": 0,
+          "tasksCount": 0,
+          "phase": "waxing-crescent"
+        }
+      ]
+    },
+    "usr_1793301313514_x5rcl": {
+      "totalStudyMinutes": 0,
+      "tasksCompleted": 0,
+      "quizzesTaken": 0,
+      "quizAverageScore": 0,
+      "starsCollected": 0,
+      "currentStreakDays": 1,
+      "weeklyLogs": [
+        {
+          "date": "2026-10-29",
+          "dayName": "Today",
+          "minutes": 0,
+          "tasksCount": 0,
+          "phase": "waxing-crescent"
+        }
+      ]
+    },
+    "usr_1793301313745_asrf5": {
+      "totalStudyMinutes": 0,
+      "tasksCompleted": 0,
+      "quizzesTaken": 0,
+      "quizAverageScore": 0,
+      "starsCollected": 0,
+      "currentStreakDays": 1,
+      "weeklyLogs": [
+        {
+          "date": "2026-10-29",
+          "dayName": "Today",
+          "minutes": 0,
+          "tasksCount": 0,
+          "phase": "waxing-crescent"
+        }
+      ]
+    }
+  },
+  "settings": {
+    "user_demo_seraphina": {
+      "reduceMotion": true,
+      "soundEnabled": true,
+      "ambientSound": "none",
+      "volume": 0.4,
+      "openingSkipped": false,
+      "studentName": "Seraphina",
+      "targetDegree": "MBA Candidate (Class of 2027)"
+    },
+    "usr_1793299114703_7d0eg": {
+      "reduceMotion": false,
+      "soundEnabled": true,
+      "ambientSound": "none",
+      "volume": 0.4,
+      "openingSkipped": false,
+      "studentName": "Bob Starlight",
+      "targetDegree": "Student Scholar"
+    },
+    "usr_1793299861083_fbtsb": {
+      "reduceMotion": false,
+      "soundEnabled": true,
+      "ambientSound": "none",
+      "volume": 0.4,
+      "openingSkipped": false,
+      "studentName": "Clara Moonlit",
+      "targetDegree": "Student Scholar"
+    },
+    "usr_1793301313514_x5rcl": {
+      "reduceMotion": false,
+      "soundEnabled": true,
+      "ambientSound": "none",
+      "volume": 0.4,
+      "openingSkipped": false,
+      "studentName": "Celeste Reader",
+      "targetDegree": "Student Scholar"
+    },
+    "usr_1793301313745_asrf5": {
+      "reduceMotion": false,
+      "soundEnabled": true,
+      "ambientSound": "none",
+      "volume": 0.4,
+      "openingSkipped": false,
+      "studentName": "Starlight Observer",
+      "targetDegree": "Student Scholar"
+    }
+  },
+  "files": [
+    {
+      "id": "file-1793300132562",
+      "userId": "user_demo_seraphina",
+      "name": "Anime Heroine Transformation Collage.png",
+      "serverFilename": "1793300132413-781684-Anime_Heroine_Transformation_Collage.png",
+      "serverUrl": "/api/files/download/1793300132413-781684-Anime_Heroine_Transformation_Collage.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyX2RlbW9fc2VyYXBoaW5hIiwiZW1haWwiOiJkZW1vQG1vb25saXQubGlicmFyeSIsIm5hbWUiOiJTZXJhcGhpbmEgTW9vbiIsImlhdCI6MTc5MzI5OTU5NiwiZXhwIjoxNzk1ODkxNTk2fQ.ZbeMDZPXO3Fv8Iz1byDEk9TxxpbIkD2FOeVmEmVON1Y",
+      "size": 2664614,
+      "type": "image/png",
+      "category": "Image",
+      "tags": [
+        "Anime"
+      ],
+      "description": "",
+      "uploadedAt": "2026-10-29T18:55:32.562Z",
+      "isFavorite": false
+    },
+    {
+      "id": "file-1793301313852",
+      "userId": "usr_1793301313514_x5rcl",
+      "name": "study_metrics.csv",
+      "serverFilename": "1793301313815-252224-study_metrics.csv",
+      "serverUrl": "/api/files/download/1793301313815-252224-study_metrics.csv?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c3JfMTc5MzMwMTMxMzUxNF94NXJjbCIsImVtYWlsIjoidXNlcl9hXzE3OTMzMDEzMTMyMzNAbW9vbmxpdC50ZXN0IiwibmFtZSI6IkNlbGVzdGUgUmVhZGVyIiwiaWF0IjoxNzkzMzAxMzEzLCJleHAiOjE3OTU4OTMzMTN9.UTrGeOCqPHzbioNB0SOQtUoYkJ7dAXeLYbxtpswOPrE",
+      "size": 94,
+      "type": "text/csv",
+      "category": "Notes",
+      "folder": "Astronomy Decks",
+      "tags": [
+        "Astronomy",
+        "MBA"
+      ],
+      "description": "Course study metrics and mastery ratings",
+      "uploadedAt": "2026-10-29T19:15:13.852Z",
+      "isFavorite": false,
+      "lastReadPage": 1,
+      "totalPages": 1,
+      "readingProgress": 0,
+      "bookmarks": [],
+      "zoomLevel": 100
+    }
+  ],
+  "users": [
+    {
+      "id": "user_demo_seraphina",
+      "email": "demo@moonlit.library",
+      "passwordHash": "$2b$10$m1YYSK9MNCWxNH.fD6uWfOSvch6z/t7a86HCJC8Fp7XKb7mkGGWMe",
+      "name": "Seraphina Moon",
+      "avatar": "cat-luna",
+      "phone": "+1 (555) 839-2026",
+      "phoneVerified": true,
+      "emailVerified": true,
+      "createdAt": "2026-10-24T20:00:00.000Z",
+      "updatedAt": "2026-10-29T18:38:09.805Z"
+    },
+    {
+      "id": "usr_1793299114703_7d0eg",
+      "email": "bob@university.edu",
+      "name": "Bob Starlight",
+      "passwordHash": "$2b$10$IQvsX66X23oQVAX7v5FDTuMv4Jks3wvD29O7.oh7UUsPxT6diwl7G",
+      "avatar": "cat-luna",
+      "phone": "",
+      "phoneVerified": false,
+      "emailVerified": true,
+      "createdAt": "2026-10-29T18:38:34.704Z",
+      "updatedAt": "2026-10-29T18:38:34.704Z"
+    },
+    {
+      "id": "usr_1793299861083_fbtsb",
+      "email": "clara@moonlit.library",
+      "name": "Clara Moonlit",
+      "passwordHash": "$2b$10$inMQU7P5prbnG8Dn7ibnLOLK90A54QRxe1i1czxJg2NwePI1h1l5C",
+      "avatar": "cat-luna",
+      "phone": "+1555123456",
+      "phoneVerified": false,
+      "emailVerified": true,
+      "createdAt": "2026-10-29T18:51:01.083Z",
+      "updatedAt": "2026-10-29T18:51:03.137Z"
+    },
+    {
+      "id": "usr_1793301313514_x5rcl",
+      "email": "user_a_1793301313233@moonlit.test",
+      "name": "Celeste Reader",
+      "passwordHash": "$2b$10$hHrhCtwfXNETZAiqhdYvQ.lm7VkkjdKweq3/zeYfpp9UpWO7n2bui",
+      "avatar": "cat-luna",
+      "phone": "",
+      "phoneVerified": false,
+      "emailVerified": true,
+      "createdAt": "2026-10-29T19:15:13.514Z",
+      "updatedAt": "2026-10-29T19:15:13.514Z"
+    },
+    {
+      "id": "usr_1793301313745_asrf5",
+      "email": "user_b_1793301313539@moonlit.test",
+      "name": "Starlight Observer",
+      "passwordHash": "$2b$10$Y0Lvp8sPh3qvvfs14/BtRe1pN0QN.M4.BYmDXu0bRPdWdF5bfCvYS",
+      "avatar": "cat-luna",
+      "phone": "",
+      "phoneVerified": false,
+      "emailVerified": true,
+      "createdAt": "2026-10-29T19:15:13.746Z",
+      "updatedAt": "2026-10-29T19:15:13.746Z"
+    }
+  ]
+}
