@@ -1510,36 +1510,68 @@ ${docContextSnippet}`;
         parts: [{ text: m.content }]
       }));
 
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
-      const apiRes = await fetch(geminiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{ text: systemPrompt }]
-          },
-          contents,
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1200
-          }
-        })
-      });
+      // 1. Query available models for this specific API key via ListModels
+      let modelCandidates = [
+        'models/gemini-1.5-flash-latest',
+        'models/gemini-2.0-flash',
+        'models/gemini-1.5-flash-002',
+        'models/gemini-pro'
+      ];
 
-      const data = await apiRes.json();
-      if (!apiRes.ok) {
-        console.error('Gemini API Error:', data);
-        return res.status(apiRes.status).json({
-          error: data.error?.message || 'Gemini API encountered an error.',
-          details: data
-        });
+      try {
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`);
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          const contentModels = (listData.models || []).filter(m => 
+            Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent')
+          );
+          if (contentModels.length > 0) {
+            const preferred = contentModels.find(m => m.name?.includes('flash') && !m.name?.includes('8b') && !m.name?.includes('thinking'))
+              || contentModels.find(m => m.name?.includes('flash'))
+              || contentModels.find(m => m.name?.includes('gemini'))
+              || contentModels[0];
+            if (preferred?.name) {
+              const fullPath = preferred.name.startsWith('models/') ? preferred.name : `models/${preferred.name}`;
+              modelCandidates = [fullPath, ...modelCandidates.filter(c => c !== fullPath)];
+            }
+          }
+        }
+      } catch (e) {
+        // Fallback to predefined candidate list
       }
 
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not generate an answer right now. Please try again.';
-      return res.json({
-        reply,
-        provider: 'gemini',
-        retrievedNotesCount: relevantNotes.length
+      let lastErrorData = null;
+      for (const target of modelCandidates) {
+        try {
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/${target}:generateContent?key=${geminiKey}`;
+          const apiRes = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: systemPrompt }] },
+              contents,
+              generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
+            })
+          });
+
+          const data = await apiRes.json();
+          if (apiRes.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            return res.json({
+              reply: data.candidates[0].content.parts[0].text,
+              provider: 'gemini',
+              model: target,
+              retrievedNotesCount: relevantNotes.length
+            });
+          }
+          lastErrorData = data;
+        } catch (e) {
+          // try next candidate
+        }
+      }
+
+      return res.status(400).json({
+        error: lastErrorData?.error?.message || 'Could not generate content with available Gemini models.',
+        details: lastErrorData
       });
     } else {
       const openAiMessages = [

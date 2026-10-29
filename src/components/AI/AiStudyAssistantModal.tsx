@@ -143,7 +143,7 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
     }
   }, [isOpen, customApiKey]);
 
-  // Test and save custom Gemini API key
+  // Test and save custom Gemini API key with dynamic model discovery
   const handleSaveApiKey = async () => {
     const cleanKey = keyInputVal.trim();
     if (!cleanKey) {
@@ -155,8 +155,44 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
     setKeyFeedback(null);
 
     try {
-      // Verify key directly against Google Gemini
-      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
+      // 1. Query available models for this specific API key via ListModels
+      const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${cleanKey}`);
+      if (!listRes.ok) {
+        const errData = await listRes.json();
+        setKeyFeedback({
+          type: 'error',
+          message: errData.error?.message || 'Invalid Gemini API key. Please check your key from Google AI Studio.'
+        });
+        setIsVerifyingKey(false);
+        return;
+      }
+
+      const listData = await listRes.json();
+      const contentModels = (listData.models || []).filter((m: any) => 
+        Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent')
+      );
+
+      if (contentModels.length === 0) {
+        setKeyFeedback({
+          type: 'error',
+          message: 'No models supporting content generation found for this key. Please create a key in Google AI Studio.'
+        });
+        setIsVerifyingKey(false);
+        return;
+      }
+
+      // Select best model (prefer flash, then gemini-2.0, then any gemini)
+      const preferred = contentModels.find((m: any) => m.name?.includes('flash') && !m.name?.includes('8b') && !m.name?.includes('thinking'))
+        || contentModels.find((m: any) => m.name?.includes('flash'))
+        || contentModels.find((m: any) => m.name?.includes('gemini'))
+        || contentModels[0];
+
+      const modelPath: string = preferred.name.startsWith('models/') ? preferred.name : `models/${preferred.name}`;
+      const cleanModelName = modelPath.replace(/^models\//, '');
+      const displayName = preferred.displayName || cleanModelName;
+
+      // 2. Perform test ping with discovered model
+      const testUrl = `https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent?key=${cleanKey}`;
       const res = await fetch(testUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -170,25 +206,26 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
       if (!res.ok) {
         setKeyFeedback({
           type: 'error',
-          message: data.error?.message || 'Invalid Gemini API key. Please check your key from Google AI Studio.'
+          message: data.error?.message || `Ping to ${cleanModelName} failed.`
         });
         setIsVerifyingKey(false);
         return;
       }
 
-      // Key is verified!
+      // Key & Model are verified!
       sound.playCelestialChime();
       localStorage.setItem(API_KEY_STORAGE, cleanKey);
+      localStorage.setItem('moonlit_gemini_model', cleanModelName);
       setCustomApiKey(cleanKey);
       setApiConfigured(true);
-      setKeyFeedback({ type: 'success', message: '✨ Gemini API Key verified successfully! Luna is online.' });
+      setKeyFeedback({ type: 'success', message: `✨ Connected to ${displayName}! Luna is online.` });
       
       setMessages(prev => [
         ...prev,
         {
           id: `sys-${Date.now()}`,
           role: 'assistant',
-          content: '✨ **Google Gemini 1.5 Flash Connected!**\n\nAapka API key verify ho chuka hai. Ab aap mujhse koi bhi study question Hindi ya English mein poochh sakte hain!',
+          content: `✨ **Google Gemini (${displayName}) Connected!**\n\nAapka API key verify ho chuka hai. Ab aap mujhse koi bhi study question Hindi ya English mein poochh sakte hain!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
@@ -340,30 +377,47 @@ Help the student understand academic concepts step-by-step with intuitive explan
 Bilingual Capability: Answer questions comfortably and naturally in simple Hindi and English (Hinglish or English).
 Be encouraging, clear, and structured with markdown formatting.`;
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`;
-        const res = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            contents,
-            generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
-          })
-        });
+        const savedModel = (typeof window !== 'undefined' ? localStorage.getItem('moonlit_gemini_model') : null) || 'gemini-1.5-flash-latest';
+        const primaryTarget = savedModel.startsWith('models/') ? savedModel : `models/${savedModel}`;
+        const candidateModels = [
+          primaryTarget,
+          'models/gemini-1.5-flash-latest',
+          'models/gemini-2.0-flash',
+          'models/gemini-1.5-flash-002',
+          'models/gemini-pro'
+        ];
 
-        const data = await res.json();
-        if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          sound.playCelestialChime();
-          setApiConfigured(true);
-          const replyText = data.candidates[0].content.parts[0].text;
-          const assistantReply: ChatMessage = {
-            id: `ai-${Date.now()}`,
-            role: 'assistant',
-            content: replyText,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-          setMessages(prev => [...prev, assistantReply]);
-          replySuccess = true;
+        for (const target of candidateModels) {
+          try {
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/${target}:generateContent?key=${activeKey}`;
+            const res = await fetch(geminiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents,
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
+              })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              sound.playCelestialChime();
+              setApiConfigured(true);
+              const replyText = data.candidates[0].content.parts[0].text;
+              const assistantReply: ChatMessage = {
+                id: `ai-${Date.now()}`,
+                role: 'assistant',
+                content: replyText,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              };
+              setMessages(prev => [...prev, assistantReply]);
+              replySuccess = true;
+              break;
+            }
+          } catch (e) {
+            // try next candidate
+          }
         }
       } catch (directErr) {
         // Direct call failed
