@@ -43,12 +43,29 @@ export const OpeningExperience: React.FC<OpeningExperienceProps> = ({
   const [audioPromptVisible, setAudioPromptVisible] = useState(true);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [isSpeakingActive, setIsSpeakingActive] = useState(false);
+  const [portraitAvailable, setPortraitAvailable] = useState(true);
+  const [hasImageError, setHasImageError] = useState(false);
 
   // Audio references
   const voiceAudioRef = useRef<HTMLAudioElement | null>(null);
   const melodyRef = useRef<{ stop: () => void } | null>(null);
   const speechRef = useRef<{ stop: () => void; isSupported: boolean } | null>(null);
   const speechTriggeredRef = useRef(false);
+
+  // Check portrait and landscape asset availability
+  useEffect(() => {
+    const testImg = new Image();
+    testImg.src = '/shagun/shagun_speaking_portrait.jpg';
+    testImg.onerror = () => {
+      // Portrait asset failed to load, fall back to landscape with focal offset
+      setPortraitAvailable(false);
+      const testLandscape = new Image();
+      testLandscape.src = '/shagun/shagun_speaking.jpg';
+      testLandscape.onerror = () => {
+        setHasImageError(true);
+      };
+    };
+  }, []);
 
   // Character stage based on elapsed time
   const isLookingUp = elapsed >= 3.4;
@@ -300,9 +317,21 @@ export const OpeningExperience: React.FC<OpeningExperienceProps> = ({
       {/* ---------------- 1. BACKGROUND ANIME CINEMATIC ARTWORK ---------------- */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         
-        {/* Layer A: Shagun Reading Her Tome (0s to 3.5s) */}
+        {/* Layer A: Shagun Reading Her Tome (0s to 3.5s) - Mobile View (Face & Tome Focused) */}
         <div 
-          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
+          className={`md:hidden absolute inset-0 bg-cover transition-opacity duration-1000 ease-in-out ${
+            reduceMotion ? '' : 'animate-camera-drift'
+          } ${isLookingUp ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}
+          style={{
+            backgroundImage: portraitAvailable 
+              ? `url('/shagun/shagun_reading_portrait.jpg')` 
+              : `url('/shagun/shagun_reading.jpg')`,
+            backgroundPosition: portraitAvailable ? 'center 18%' : '68% 22%'
+          }}
+        />
+        {/* Layer A: Shagun Reading Her Tome - Desktop View (Cinematic Widescreen) */}
+        <div 
+          className={`hidden md:block absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
             reduceMotion ? '' : 'animate-camera-drift'
           } ${isLookingUp ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}
           style={{
@@ -311,9 +340,21 @@ export const OpeningExperience: React.FC<OpeningExperienceProps> = ({
           }}
         />
 
-        {/* Layer B: Shagun Looking Up, Smiling & Welcoming (3.5s to 15s) */}
+        {/* Layer B: Shagun Looking Up, Smiling & Welcoming (3.5s to 15s) - Mobile View (Full Face Visible) */}
         <div 
-          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
+          className={`md:hidden absolute inset-0 bg-cover transition-opacity duration-1000 ease-in-out ${
+            reduceMotion ? '' : 'animate-camera-drift'
+          } ${isLookingUp ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+          style={{
+            backgroundImage: portraitAvailable 
+              ? `url('/shagun/shagun_speaking_portrait.jpg')` 
+              : `url('/shagun/shagun_speaking.jpg')`,
+            backgroundPosition: portraitAvailable ? 'center 18%' : '68% 22%'
+          }}
+        />
+        {/* Layer B: Shagun Looking Up, Smiling & Welcoming - Desktop View (Cinematic Widescreen) */}
+        <div 
+          className={`hidden md:block absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
             reduceMotion ? '' : 'animate-camera-drift'
           } ${isLookingUp ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
           style={{
@@ -325,9 +366,22 @@ export const OpeningExperience: React.FC<OpeningExperienceProps> = ({
         {/* Breathing & Gentle Sway Overlay */}
         <div className={`absolute inset-0 ${reduceMotion ? '' : 'animate-shagun-breathe'}`} />
 
-        {/* Vignette & Moonlight Ambience Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-midnight-950 via-midnight-950/30 to-midnight-950/80 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-midnight-950/60 via-transparent to-midnight-950/60 pointer-events-none" />
+        {/* Fallback Graceful Anime Character Card (if images fail to load) */}
+        {hasImageError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-midnight-950 via-midnight-900 to-midnight-950 p-6 text-center z-10 pointer-events-none">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-lavender-500 via-rosemoon-400 to-stargold-300 p-1 shadow-[0_0_50px_rgba(168,85,247,0.5)] animate-pulse mb-3">
+              <div className="w-full h-full rounded-full bg-midnight-950 flex items-center justify-center text-3xl">
+                🌙
+              </div>
+            </div>
+            <h2 className="text-lg font-serif font-bold text-cream-100 mb-1">Shagun's Moonlit Sanctuary</h2>
+            <p className="text-xs text-lavender-300 max-w-xs">Welcome to your personal universe of learning...</p>
+          </div>
+        )}
+
+        {/* Vignette & Moonlight Ambience Gradients - Softened on mobile for bright facial visibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-midnight-950 via-midnight-950/20 to-midnight-950/35 sm:to-midnight-950/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-midnight-950/30 via-transparent to-midnight-950/30 sm:from-midnight-950/60 sm:to-midnight-950/60 pointer-events-none" />
 
         {/* Book Glow Shimmer Effect */}
         <div 
@@ -430,19 +484,19 @@ export const OpeningExperience: React.FC<OpeningExperienceProps> = ({
         </div>
       </header>
 
-      {/* ---------------- 3. FLOATING AUDIO AUTOPLAY PROMPT (IF BLOCKED OR WAITING) ---------------- */}
+      {/* ---------------- 3. FLOATING AUDIO AUTOPLAY PROMPT (POSITIONED SAFELY AWAY FROM FACE) ---------------- */}
       {audioPromptVisible && (
-        <div className="relative z-30 mx-auto animate-bounce px-4">
+        <div className="relative z-30 mx-auto px-4 mt-auto mb-3 sm:my-auto animate-bounce pointer-events-auto">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleUserActivateAudio();
               playVoice();
             }}
-            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-stargold-400 via-rosemoon-400 to-lavender-500 text-midnight-950 font-serif font-bold text-xs sm:text-sm shadow-[0_0_35px_rgba(254,224,71,0.7)] flex items-center gap-2.5 hover:scale-105 active:scale-95 transition-transform border border-stargold-200"
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-stargold-400 via-rosemoon-400 to-lavender-500 text-midnight-950 font-serif font-bold text-xs sm:text-sm shadow-[0_0_35px_rgba(254,224,71,0.7)] flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform border border-stargold-200"
           >
-            <Volume2 className="w-4 h-4 text-midnight-950 animate-pulse" />
-            <span>Click to Hear Shagun Speak Her Welcome 🔊</span>
+            <Volume2 className="w-4 h-4 text-midnight-950 animate-pulse shrink-0" />
+            <span className="whitespace-nowrap">Click to Hear Shagun Speak Her Welcome 🔊</span>
           </button>
         </div>
       )}
@@ -458,12 +512,20 @@ export const OpeningExperience: React.FC<OpeningExperienceProps> = ({
           {/* Header Row: Host Profile & Status Indicator */}
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-lavender-500/20">
             <div className="flex items-center gap-2.5">
-              {/* Cute Shagun Avatar Thumbnail */}
-              <div className="relative w-8 h-8 rounded-full overflow-hidden border border-stargold-300/80 shadow-sm shrink-0">
+              {/* Cute Shagun Avatar Thumbnail - Centered directly on Shagun's smiling face */}
+              <div className="relative w-8 h-8 rounded-full overflow-hidden border border-stargold-300/80 shadow-sm shrink-0 bg-lavender-900/60 flex items-center justify-center">
                 <img 
-                  src="/shagun/shagun_speaking.jpg" 
+                  src={portraitAvailable ? "/shagun/shagun_speaking_portrait.jpg" : "/shagun/shagun_speaking.jpg"} 
                   alt="Shagun" 
-                  className="w-full h-full object-cover object-top"
+                  className={`w-full h-full object-cover ${portraitAvailable ? 'object-[center_20%]' : 'object-[68%_25%]'}`}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.dataset.failed) {
+                      target.dataset.failed = 'true';
+                      target.src = '/shagun/shagun_speaking.jpg';
+                      target.className = 'w-full h-full object-cover object-[68%_25%]';
+                    }
+                  }}
                 />
               </div>
 
