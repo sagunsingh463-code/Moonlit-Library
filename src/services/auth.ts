@@ -104,7 +104,7 @@ class AuthService {
     });
   }
 
-  // --- SAFE API HELPER (NEVER THROWS "Failed to fetch") ---
+  // --- SAFE NETWORK & JSON HELPERS (NEVER THROWS SyntaxError OR "Failed to fetch") ---
   private async safeFetch(url: string, options: RequestInit = {}): Promise<Response | null> {
     try {
       const controller = new AbortController();
@@ -116,12 +116,29 @@ class AuthService {
       clearTimeout(timeoutId);
       return res;
     } catch {
-      // Backend offline, unreachable on mobile/Vercel, or CORS/Mixed Content blocked
       return null;
     }
   }
 
-  // --- API CALLS WITH CLIENT FALLBACK ---
+  private async safeJson<T>(res: Response | null): Promise<T | null> {
+    if (!res) return null;
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      // Avoid parsing HTML (e.g. index.html from SPA rewrites or 404 HTML pages)
+      return null;
+    }
+    try {
+      const text = await res.text();
+      if (!text || text.trim().startsWith('<')) {
+        return null;
+      }
+      return JSON.parse(text) as T;
+    } catch {
+      return null;
+    }
+  }
+
+  // --- API CALLS WITH BULLETPROOF CLIENT FALLBACK ---
 
   public async register(name: string, email: string, password: string, phone?: string): Promise<{ user: UserProfile; token: string }> {
     const apiBase = getApiBase();
@@ -131,10 +148,10 @@ class AuthService {
       body: JSON.stringify({ name, email, password, phone })
     });
 
-    if (res && res.ok) {
-      const data = await res.json();
+    const data = await this.safeJson<{ user: UserProfile; token: string; error?: string }>(res);
+    if (res && res.ok && data?.user && data?.token) {
       this.setSession(data.token, data.user);
-      return data;
+      return { user: data.user, token: data.token };
     }
 
     // Client-side fallback registration (for Vercel / offline)
@@ -192,13 +209,12 @@ class AuthService {
       body: JSON.stringify({ email: trimmedEmail, password: trimmedPassword })
     });
 
-    if (res) {
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Invalid credentials');
-      }
+    const data = await this.safeJson<{ user: UserProfile; token: string; error?: string }>(res);
+    if (res && res.ok && data?.user && data?.token) {
       this.setSession(data.token, data.user);
-      return data;
+      return { user: data.user, token: data.token };
+    } else if (res && !res.ok && data?.error) {
+      throw new Error(data.error);
     }
 
     // 4. Client-side fallback check (stored in localStorage)
@@ -221,10 +237,10 @@ class AuthService {
       body: JSON.stringify({ email: 'demo@moonlit.library', password: 'Moonlight123!' })
     });
 
-    if (res && res.ok) {
-      const data = await res.json();
+    const data = await this.safeJson<{ user: UserProfile; token: string }>(res);
+    if (res && res.ok && data?.user && data?.token) {
       this.setSession(data.token, data.user);
-      return data;
+      return { user: data.user, token: data.token };
     }
 
     const token = `moonlit_demo_${Date.now()}`;
@@ -240,18 +256,20 @@ class AuthService {
     const token = this.getToken();
     if (!token) return null;
 
-    const apiBase = getApiBase();
-    const res = await this.safeFetch(`${apiBase}/auth/me`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try {
+      const apiBase = getApiBase();
+      const res = await this.safeFetch(`${apiBase}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
-    if (res && res.ok) {
-      const data = await res.json();
-      if (data.user) {
+      const data = await this.safeJson<{ user: UserProfile }>(res);
+      if (res && res.ok && data?.user) {
         localStorage.setItem(USER_KEY, JSON.stringify(data.user));
         this.notify(data.user);
         return data.user;
       }
+    } catch {
+      // Fall through to cached user
     }
     return this.getUser();
   }
@@ -265,7 +283,7 @@ class AuthService {
     const token = this.getToken();
     const apiBase = getApiBase();
     if (token) {
-      await this.safeFetch(`${apiBase}/auth/profile`, {
+      const res = await this.safeFetch(`${apiBase}/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -273,6 +291,12 @@ class AuthService {
         },
         body: JSON.stringify(updates)
       });
+      const data = await this.safeJson<{ user: UserProfile }>(res);
+      if (data && data.user) {
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        this.notify(data.user);
+        return data.user;
+      }
     }
 
     localStorage.setItem(USER_KEY, JSON.stringify(updated));
@@ -292,9 +316,9 @@ class AuthService {
         },
         body: JSON.stringify({ currentPassword, newPassword })
       });
-      if (res && res.ok) {
-        const data = await res.json();
-        return data.message || 'Password changed successfully 🌙';
+      const data = await this.safeJson<{ message: string }>(res);
+      if (data && data.message) {
+        return data.message;
       }
     }
     return 'Password updated in Moonlit session 🌙';
@@ -318,14 +342,15 @@ class AuthService {
       body: JSON.stringify({ email: trimmed })
     });
 
-    if (res && res.ok) {
-      return await res.json();
+    const data = await this.safeJson<{ success: boolean; message: string; resetToken?: string; configured: boolean }>(res);
+    if (data && data.message) {
+      return data;
     }
 
     return {
       success: true,
       configured: true,
-      message: `Reset token created for ${trimmed}. Enter your new password below! 🌙`,
+      message: `Reset instructions created for ${trimmed}. Enter your new password below! 🌙`,
       resetToken: `reset_${Date.now()}`
     };
   }
@@ -338,9 +363,9 @@ class AuthService {
       body: JSON.stringify({ token, newPassword })
     });
 
-    if (res && res.ok) {
-      const data = await res.json();
-      return data.message || 'Password reset successfully 🌙';
+    const data = await this.safeJson<{ message: string }>(res);
+    if (data && data.message) {
+      return data.message;
     }
 
     return 'Password updated successfully! You can now sign in 🌙';
@@ -355,17 +380,16 @@ class AuthService {
       body: JSON.stringify({ phone })
     });
 
-    if (res && res.ok) {
-      const data = await res.json();
+    const data = await this.safeJson<{ message?: string; otpCode?: string }>(res);
+    if (data && data.message) {
       return {
         configured: true,
         success: true,
-        message: data.message || `OTP sent to ${phone}! (Code: 123456 🌙)`,
-        otpCode: '123456'
+        message: data.message,
+        otpCode: data.otpCode || '123456'
       };
     }
 
-    // Client fallback: always succeed with clear code for mobile users
     return {
       configured: true,
       success: true,
@@ -394,21 +418,24 @@ class AuthService {
       body: JSON.stringify({ phone, otp: trimmedOtp })
     });
 
+    const data = await this.safeJson<{ token?: string; user?: UserProfile }>(res);
     let token = `moonlit_phone_${Date.now()}`;
-    if (res && res.ok) {
-      const data = await res.json();
-      token = data.token || token;
+    let finalUser = userWithPhone;
+    if (data) {
+      if (data.token) token = data.token;
+      if (data.user) finalUser = data.user;
     }
 
-    this.setSession(token, userWithPhone);
-    return { user: userWithPhone, token };
+    this.setSession(token, finalUser);
+    return { user: finalUser, token };
   }
 
   public async getGoogleAuthStatus(): Promise<{ configured: boolean; message?: string; authUrl?: string; requiredSettings?: string[] }> {
     const apiBase = getApiBase();
     const res = await this.safeFetch(`${apiBase}/auth/google/url`);
-    if (res && res.ok) {
-      return await res.json();
+    const data = await this.safeJson<{ configured: boolean; message?: string; authUrl?: string; requiredSettings?: string[] }>(res);
+    if (data) {
+      return data;
     }
     return {
       configured: false,

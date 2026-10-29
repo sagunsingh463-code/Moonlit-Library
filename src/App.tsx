@@ -18,6 +18,18 @@ import {
 import { db } from './services/db';
 import { sound } from './services/audio';
 import { authService } from './services/auth';
+import { 
+  initialSettings, 
+  initialStats,
+  initialNotes,
+  initialAssignments,
+  initialLectures,
+  initialQuestions,
+  initialCustomQuizzes,
+  initialConstellations,
+  initialPlannerTasks,
+  initialGardenItems
+} from './services/seedData';
 
 import { OpeningExperience } from './components/OpeningExperience';
 import { SkyBackground } from './components/SkyBackground';
@@ -66,19 +78,20 @@ export function App() {
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
   const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
 
-  // App Data State
-  const [settings, setSettings] = useState<AppSettings | null>(null);
+  // App Data State (Defaults initialized to prevent loading screen freeze)
+  const [settings, setSettings] = useState<AppSettings>(initialSettings);
   const [files, setFiles] = useState<FileItem[]>([]);
-  const [notes, setNotes] = useState<NoteItem[]>([]);
-  const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
-  const [lectures, setLectures] = useState<LectureItem[]>([]);
-  const [questions, setQuestions] = useState<QuestionItem[]>([]);
-  const [customQuizzes, setCustomQuizzes] = useState<QuizDefinition[]>([]);
+  const [notes, setNotes] = useState<NoteItem[]>(initialNotes);
+  const [assignments, setAssignments] = useState<AssignmentItem[]>(initialAssignments);
+  const [lectures, setLectures] = useState<LectureItem[]>(initialLectures);
+  const [questions, setQuestions] = useState<QuestionItem[]>(initialQuestions);
+  const [customQuizzes, setCustomQuizzes] = useState<QuizDefinition[]>(initialCustomQuizzes);
   const [quizHistory, setQuizHistory] = useState<QuizSession[]>([]);
-  const [constellations, setConstellations] = useState<ConstellationStar[]>([]);
-  const [plannerTasks, setPlannerTasks] = useState<StudyPlanTask[]>([]);
-  const [gardenItems, setGardenItems] = useState<GardenItem[]>([]);
-  const [stats, setStats] = useState<UserStudyStats | null>(null);
+  const [constellations, setConstellations] = useState<ConstellationStar[]>(initialConstellations);
+  const [plannerTasks, setPlannerTasks] = useState<StudyPlanTask[]>(initialPlannerTasks);
+  const [gardenItems, setGardenItems] = useState<GardenItem[]>(initialGardenItems);
+  const [stats, setStats] = useState<UserStudyStats>(initialStats);
+  const [isAwakening, setIsAwakening] = useState<boolean>(true);
 
   // Load all initial persistent data for the current authenticated user
   const loadData = async () => {
@@ -97,61 +110,90 @@ export function App() {
         loadedGarden,
         loadedStats
       ] = await Promise.all([
-        db.getSettings(),
-        db.getAllFiles(),
-        db.getAllNotes(),
-        db.getAllAssignments(),
-        db.getAllLectures(),
-        db.getAllQuestions(),
-        db.getCustomQuizzes(),
-        db.getQuizHistory(),
-        db.getConstellationStars(),
-        db.getPlannerTasks(),
-        db.getGardenItems(),
-        db.getStats()
+        db.getSettings().catch(() => initialSettings),
+        db.getAllFiles().catch(() => []),
+        db.getAllNotes().catch(() => initialNotes),
+        db.getAllAssignments().catch(() => initialAssignments),
+        db.getAllLectures().catch(() => initialLectures),
+        db.getAllQuestions().catch(() => initialQuestions),
+        db.getCustomQuizzes().catch(() => initialCustomQuizzes),
+        db.getQuizHistory().catch(() => []),
+        db.getConstellationStars().catch(() => initialConstellations),
+        db.getPlannerTasks().catch(() => initialPlannerTasks),
+        db.getGardenItems().catch(() => initialGardenItems),
+        db.getStats().catch(() => initialStats)
       ]);
 
-      setSettings(loadedSettings);
-      setFiles(loadedFiles);
-      setNotes(loadedNotes);
-      setAssignments(loadedAssignments);
-      setLectures(loadedLectures);
-      setQuestions(loadedQuestions);
-      setCustomQuizzes(loadedCustomQuizzes);
-      setQuizHistory(loadedQuizHistory);
-      setConstellations(loadedConstellations);
-      setPlannerTasks(loadedPlanner);
-      setGardenItems(loadedGarden);
-      setStats(loadedStats);
+      if (loadedSettings) setSettings(loadedSettings);
+      if (loadedFiles) setFiles(loadedFiles);
+      if (loadedNotes) setNotes(loadedNotes);
+      if (loadedAssignments) setAssignments(loadedAssignments);
+      if (loadedLectures) setLectures(loadedLectures);
+      if (loadedQuestions) setQuestions(loadedQuestions);
+      if (loadedCustomQuizzes) setCustomQuizzes(loadedCustomQuizzes);
+      if (loadedQuizHistory) setQuizHistory(loadedQuizHistory);
+      if (loadedConstellations) setConstellations(loadedConstellations);
+      if (loadedPlanner) setPlannerTasks(loadedPlanner);
+      if (loadedGarden) setGardenItems(loadedGarden);
+      if (loadedStats) setStats(loadedStats);
 
-      sound.setMuted(!loadedSettings.soundEnabled);
-      sound.setVolume(loadedSettings.volume || 0.35);
+      sound.setMuted(!loadedSettings?.soundEnabled);
+      sound.setVolume(loadedSettings?.volume || 0.35);
     } catch (err) {
-      console.error('Failed to load data:', err);
+      console.warn('Data sync notice:', err);
+    } finally {
+      setIsAwakening(false);
     }
   };
 
   useEffect(() => {
-    // If not authenticated, set default demo user session for instant seamless preview
-    if (!authService.isAuthenticated()) {
-      authService.loginDemo().then(({ user }) => {
-        setCurrentUser(user);
-        loadData();
-      }).catch(() => {
-        loadData();
-      });
-    } else {
-      authService.refreshUser().then(user => {
-        if (user) setCurrentUser(user);
-        loadData();
-      });
-    }
+    let mounted = true;
+
+    // Safety watchdog: Guarantee awakening screen unlocks within 1200ms
+    const safetyTimer = setTimeout(() => {
+      if (mounted) {
+        setIsAwakening(false);
+      }
+    }, 1200);
+
+    const initUserAndData = async () => {
+      try {
+        if (!authService.isAuthenticated()) {
+          try {
+            const { user } = await authService.loginDemo();
+            if (mounted) setCurrentUser(user);
+          } catch {
+            // Demo fallback
+          }
+        } else {
+          try {
+            const user = await authService.refreshUser();
+            if (mounted && user) setCurrentUser(user);
+          } catch {
+            // Offline fallback
+          }
+        }
+      } catch (e) {
+        console.warn('Init auth notice:', e);
+      } finally {
+        if (mounted) {
+          await loadData();
+          setIsAwakening(false);
+        }
+      }
+    };
+
+    initUserAndData();
 
     const unsubscribe = authService.subscribe((user) => {
-      setCurrentUser(user);
+      if (mounted) setCurrentUser(user);
     });
 
-    return () => unsubscribe();
+    return () => {
+      mounted = false;
+      clearTimeout(safetyTimer);
+      unsubscribe();
+    };
   }, []);
 
   // Update Settings
@@ -521,7 +563,7 @@ export function App() {
     setIsAuthModalOpen(true);
   };
 
-  if (!settings || !stats) {
+  if (isAwakening && (!settings || !stats)) {
     return (
       <div className="min-h-screen bg-midnight-950 flex flex-col items-center justify-center text-stargold-200 font-serif text-lg gap-3">
         <div className="text-4xl animate-pulse">🌙</div>

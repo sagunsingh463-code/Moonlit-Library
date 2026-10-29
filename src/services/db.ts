@@ -53,8 +53,14 @@ class MoonlitDatabase {
       clearTimeout(timeoutId);
 
       if (res.ok) {
-        this.backendAvailable = true;
-        return (await res.json()) as T;
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const text = await res.text();
+          if (text && !text.trim().startsWith('<')) {
+            this.backendAvailable = true;
+            return JSON.parse(text) as T;
+          }
+        }
       }
     } catch {
       this.backendAvailable = false;
@@ -244,10 +250,16 @@ class MoonlitDatabase {
       });
 
       if (res.ok) {
-        const uploadedItem = (await res.json()) as FileItem;
-        uploadedItem.blob = file;
-        await this.putInStore('files', uploadedItem);
-        return uploadedItem;
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const text = await res.text();
+          if (text && !text.trim().startsWith('<')) {
+            const uploadedItem = JSON.parse(text) as FileItem;
+            uploadedItem.blob = file;
+            await this.putInStore('files', uploadedItem);
+            return uploadedItem;
+          }
+        }
       }
     } catch {}
 
