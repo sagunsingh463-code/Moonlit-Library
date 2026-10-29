@@ -12,6 +12,40 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var pref = localStorage.getItem('moonlit_theme_preference');
+          var isLight = false;
+          if (pref === 'light') {
+            isLight = true;
+          } else if (pref === 'dark') {
+            isLight = false;
+          } else {
+            // Default: Automatic local daytime schedule (7 AM to 6 PM)
+            var hour = new Date().getHours();
+            var start = 7;
+            var end = 18;
+            var savedSchedule = localStorage.getItem('moonlit_theme_schedule');
+            if (savedSchedule) {
+              try {
+                var s = JSON.parse(savedSchedule);
+                if (typeof s.dayStartHour === 'number') start = s.dayStartHour;
+                if (typeof s.dayEndHour === 'number') end = s.dayEndHour;
+              } catch(e) {}
+            }
+            isLight = (hour >= start && hour < end);
+          }
+          if (isLight) {
+            document.documentElement.classList.add('light-theme');
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.remove('light-theme');
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="bg-midnight-950 text-moonlight-silver selection:bg-lavender-500/40 selection:text-white overflow-x-hidden">
     <div id="root"></div>

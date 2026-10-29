@@ -167,3 +167,131 @@
   animation: speechPulse 0.45s ease-in-out infinite;
 }
 
+/* ========================================================= */
+/* LIGHT MODE THEME OVERRIDES (Anime Celestial Daylight)     */
+/* ========================================================= */
+html.light-theme,
+html.light-theme body {
+  background-color: #F4F6FC !important;
+  color: #1A1F36 !important;
+}
+
+html.light-theme ::-webkit-scrollbar-track {
+  background: #EAF0FB;
+}
+
+html.light-theme ::-webkit-scrollbar-thumb {
+  background: #C4B5FD;
+  border: 2px solid #EAF0FB;
+}
+
+html.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: #8B5CF6;
+}
+
+/* Glass Panels in Light Mode */
+html.light-theme .glass-panel {
+  background: rgba(255, 255, 255, 0.90) !important;
+  border-color: rgba(167, 139, 250, 0.25) !important;
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.08) !important;
+}
+
+html.light-theme .glass-panel-subtle {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(167, 139, 250, 0.18) !important;
+}
+
+html.light-theme .glass-panel-glow {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(139, 92, 246, 0.35) !important;
+  box-shadow: 0 12px 35px rgba(124, 58, 237, 0.12) !important;
+}
+
+/* Midnight & Navy Background Overrides */
+html.light-theme .bg-midnight-950 {
+  background-color: #F4F6FC !important;
+}
+
+html.light-theme .bg-midnight-900 {
+  background-color: #FFFFFF !important;
+}
+
+html.light-theme .bg-midnight-850,
+html.light-theme .bg-midnight-800,
+html.light-theme .bg-midnight-700 {
+  background-color: #F8F9FE !important;
+}
+
+html.light-theme .bg-navy-950,
+html.light-theme .bg-navy-950\/70,
+html.light-theme .bg-navy-950\/80 {
+  background-color: #F1F4FB !important;
+}
+
+html.light-theme .bg-navy-900,
+html.light-theme .bg-navy-900\/60,
+html.light-theme .bg-navy-900\/70,
+html.light-theme .bg-navy-900\/80 {
+  background-color: #FFFFFF !important;
+}
+
+html.light-theme .bg-white\/5 {
+  background-color: rgba(124, 58, 237, 0.06) !important;
+}
+
+html.light-theme .bg-white\/10 {
+  background-color: rgba(124, 58, 237, 0.1) !important;
+}
+
+/* High-contrast Text in Light Mode */
+html.light-theme .text-white {
+  color: #11162B !important;
+}
+
+html.light-theme .text-cream-50,
+html.light-theme .text-cream-100 {
+  color: #171D33 !important;
+}
+
+html.light-theme .text-moonlight-silver {
+  color: #272E46 !important;
+}
+
+html.light-theme .text-lavender-100 {
+  color: #3B2E63 !important;
+}
+
+html.light-theme .text-lavender-200,
+html.light-theme .text-lavender-200\/90,
+html.light-theme .text-lavender-200\/80 {
+  color: #4A3A7C !important;
+}
+
+html.light-theme .text-lavender-300,
+html.light-theme .text-lavender-300\/80,
+html.light-theme .text-lavender-300\/90 {
+  color: #58468E !important;
+}
+
+html.light-theme .text-lavender-400 {
+  color: #6A56A3 !important;
+}
+
+/* Border Adaptations */
+html.light-theme .border-lavender-400\/20,
+html.light-theme .border-lavender-400\/25,
+html.light-theme .border-lavender-400\/30,
+html.light-theme .border-lavender-400\/40,
+html.light-theme .border-lavender-500\/15,
+html.light-theme .border-lavender-500\/20,
+html.light-theme .border-lavender-500\/25,
+html.light-theme .border-lavender-500\/30 {
+  border-color: rgba(142, 108, 229, 0.22) !important;
+}
+
+/* Text glow adjustment in light mode */
+html.light-theme .text-glow {
+  text-shadow: 0 0 12px rgba(142, 108, 229, 0.3);
+}
+
+

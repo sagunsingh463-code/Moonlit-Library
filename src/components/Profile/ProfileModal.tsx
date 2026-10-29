@@ -12,10 +12,14 @@ import {
   AlertTriangle,
   Calendar,
   Sparkles,
-  Save
+  Save,
+  Sun,
+  Moon,
+  Clock
 } from 'lucide-react';
 import { authService } from '../../services/auth';
 import { db } from '../../services/db';
+import { themeService, ThemePreference, ThemeSchedule } from '../../services/theme';
 import { UserProfile } from '../../types';
 
 interface ProfileModalProps {
@@ -61,6 +65,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
   const [introEnabled, setIntroEnabled] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('moonlit_skip_intro') !== 'true' : true);
+  const [themePref, setThemePref] = useState<ThemePreference>(() => themeService.getPreference());
+  const [themeSchedule, setThemeSchedule] = useState<ThemeSchedule>(() => themeService.getSchedule());
 
   if (!isOpen) return null;
 
@@ -388,6 +394,111 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           >
             {introEnabled ? 'Enabled' : 'Skipped'}
           </button>
+        </div>
+
+        {/* Day / Night Theme Schedule & Override Settings */}
+        <div className="mt-4 p-4 rounded-2xl bg-white/5 border border-lavender-500/20 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sun className="w-4 h-4 text-amber-400" />
+              <Moon className="w-4 h-4 text-lavender-300" />
+              <div>
+                <p className="text-xs font-medium text-cream-100">Theme & Lighting Schedule</p>
+                <p className="text-[10px] text-lavender-300">Automatic daytime light mode with nighttime dark mode</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Theme Mode Selector */}
+          <div className="grid grid-cols-3 gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                setThemePref('auto');
+                themeService.setPreference('auto');
+              }}
+              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+                themePref === 'auto'
+                  ? 'bg-lavender-600 text-white shadow-sm'
+                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+              }`}
+            >
+              <Clock className="w-3 h-3 text-moon-gold" />
+              <span>Auto Schedule</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setThemePref('light');
+                themeService.setPreference('light');
+              }}
+              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+                themePref === 'light'
+                  ? 'bg-amber-500/30 text-amber-200 border border-amber-400/50 shadow-sm'
+                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+              }`}
+            >
+              <Sun className="w-3 h-3 text-amber-400" />
+              <span>Always Light</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setThemePref('dark');
+                themeService.setPreference('dark');
+              }}
+              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+                themePref === 'dark'
+                  ? 'bg-midnight-950 text-stargold-200 border border-stargold-400/40 shadow-sm'
+                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+              }`}
+            >
+              <Moon className="w-3 h-3 text-lavender-300" />
+              <span>Always Dark</span>
+            </button>
+          </div>
+
+          {/* Configurable Daytime Hours when Auto is selected */}
+          {themePref === 'auto' && (
+            <div className="pt-2 border-t border-lavender-500/15 flex items-center justify-between text-xs text-lavender-300">
+              <span className="text-[11px]">Daytime Light Hours:</span>
+              <div className="flex items-center gap-2">
+                <select
+                  value={themeSchedule.dayStartHour}
+                  onChange={(e) => {
+                    const start = Number(e.target.value);
+                    const updated = { ...themeSchedule, dayStartHour: start };
+                    setThemeSchedule(updated);
+                    themeService.setSchedule(updated);
+                  }}
+                  className="px-2 py-1 rounded-lg bg-navy-950 border border-lavender-500/30 text-[11px] text-white focus:outline-none"
+                >
+                  <option value={6}>6:00 AM</option>
+                  <option value={7}>7:00 AM (Default)</option>
+                  <option value={8}>8:00 AM</option>
+                  <option value={9}>9:00 AM</option>
+                </select>
+                <span className="text-[11px]">to</span>
+                <select
+                  value={themeSchedule.dayEndHour}
+                  onChange={(e) => {
+                    const end = Number(e.target.value);
+                    const updated = { ...themeSchedule, dayEndHour: end };
+                    setThemeSchedule(updated);
+                    themeService.setSchedule(updated);
+                  }}
+                  className="px-2 py-1 rounded-lg bg-navy-950 border border-lavender-500/30 text-[11px] text-white focus:outline-none"
+                >
+                  <option value={17}>5:00 PM</option>
+                  <option value={18}>6:00 PM (Default)</option>
+                  <option value={19}>7:00 PM</option>
+                  <option value={20}>8:00 PM</option>
+                </select>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sign Out & Delete Zone */}

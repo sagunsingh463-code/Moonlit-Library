@@ -1430,6 +1430,163 @@ app.post('/api/seed', requireAuth, (req, res) => {
   res.json({ success: true, message: 'User workspace initialized' });
 });
 
+// ============================================
+// AI STUDY ASSISTANT ENDPOINTS
+// ============================================
+app.get('/api/ai/status', (req, res) => {
+  const geminiKey = process.env.GEMINI_API_KEY;
+  const openAiKey = process.env.OPENAI_API_KEY;
+  const configured = Boolean(geminiKey || openAiKey);
+  const provider = geminiKey ? 'gemini' : (openAiKey ? 'openai' : 'none');
+  
+  res.json({
+    configured,
+    provider,
+    model: geminiKey ? 'gemini-1.5-flash' : (openAiKey ? 'gpt-4o-mini' : null)
+  });
+});
+
+app.post('/api/ai/chat', requireAuth, async (req, res) => {
+  const { messages, subject } = req.body;
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'Messages array is required.' });
+  }
+
+  const geminiKey = process.env.GEMINI_API_KEY;
+  const openAiKey = process.env.OPENAI_API_KEY;
+
+  if (!geminiKey && !openAiKey) {
+    return res.status(503).json({
+      configured: false,
+      error: 'AI_KEY_NOT_CONFIGURED',
+      message: 'Online AI Study Assistant requires a free Google Gemini API key (or OpenAI API key). Please configure GEMINI_API_KEY in your .env file or Vercel Environment Variables. Get a free key at https://aistudio.google.com/app/apikey'
+    });
+  }
+
+  // Retrieve relevant study notes and file metadata belonging to this user
+  const db = getDB();
+  const userId = req.userId;
+  const userNotes = (db.notes || []).filter(n => n.userId === userId || n.userId === DEMO_USER_ID);
+  const userFiles = (db.files || []).filter(f => f.userId === userId || f.userId === DEMO_USER_ID);
+
+  const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+  const keywords = lastUserMsg.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+
+  // Score notes based on matching keywords or subject
+  const relevantNotes = userNotes.filter(n => {
+    const text = `${n.title} ${n.subject} ${n.content} ${(n.tags || []).join(' ')}`.toLowerCase();
+    return keywords.some(k => text.includes(k)) || (subject && n.subject && n.subject.toLowerCase() === subject.toLowerCase());
+  }).slice(0, 3);
+
+  let docContextSnippet = '';
+  if (relevantNotes.length > 0) {
+    docContextSnippet += '\n\n=== RELEVANT STUDY NOTES FOUND IN USER LIBRARY ===\n';
+    relevantNotes.forEach(note => {
+      docContextSnippet += `\n[Note: ${note.title} (Subject: ${note.subject})]\n${note.content.substring(0, 1000)}\n`;
+    });
+  }
+
+  if (userFiles.length > 0) {
+    docContextSnippet += `\n\n=== USER UPLOADED FILES IN LIBRARY ===\nUser has ${userFiles.length} uploaded files in library: ` +
+      userFiles.map(f => `"${f.name}" (${f.subject || f.category || 'General'})`).slice(0, 8).join(', ') + 
+      '\n(Note: Full text of binary PDF uploads is stored in document storage; only refer to full contents if provided in study notes above).';
+  }
+
+  const systemPrompt = `You are Luna, the Moonlit Anime Library AI Study Assistant — a knowledgeable, warm, and supportive academic mentor.
+Your goals:
+1. Help the student understand academic concepts step-by-step with intuitive explanations, analogies, and practical examples.
+2. Bilingual Capability: Answer questions comfortably and naturally in simple Hindi and English (Hinglish or English), matching whatever language the student communicates in or asking to explain in Hindi/English.
+3. Be encouraging, clear, and structured (use bullet points, bold key terms, and code/math formatting).
+4. Support follow-up questions within the active study dialogue.
+5. Truthfulness & Retrieval: If the student asks about their notes or library, refer to the provided context below. Truthfully acknowledge what files exist in their library. Do not fabricate or pretend to have read contents that are not included here.
+${docContextSnippet}`;
+
+  try {
+    if (geminiKey) {
+      const contents = messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }));
+
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+      const apiRes = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemPrompt }]
+          },
+          contents,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1200
+          }
+        })
+      });
+
+      const data = await apiRes.json();
+      if (!apiRes.ok) {
+        console.error('Gemini API Error:', data);
+        return res.status(apiRes.status).json({
+          error: data.error?.message || 'Gemini API encountered an error.',
+          details: data
+        });
+      }
+
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I could not generate an answer right now. Please try again.';
+      return res.json({
+        reply,
+        provider: 'gemini',
+        retrievedNotesCount: relevantNotes.length
+      });
+    } else {
+      const openAiMessages = [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: m.content
+        }))
+      ];
+
+      const apiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openAiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: openAiMessages,
+          temperature: 0.7,
+          max_tokens: 1200
+        })
+      });
+
+      const data = await apiRes.json();
+      if (!apiRes.ok) {
+        console.error('OpenAI API Error:', data);
+        return res.status(apiRes.status).json({
+          error: data.error?.message || 'OpenAI API encountered an error.',
+          details: data
+        });
+      }
+
+      const reply = data.choices?.[0]?.message?.content || 'I could not generate an answer right now. Please try again.';
+      return res.json({
+        reply,
+        provider: 'openai',
+        retrievedNotesCount: relevantNotes.length
+      });
+    }
+  } catch (err) {
+    console.error('AI chat endpoint error:', err);
+    return res.status(500).json({
+      error: 'Network error communicating with AI provider.',
+      message: err.message
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🌙 Moonlit Library Core Backend listening on port ${PORT}`);
   console.log(`📂 Uploads directory: ${uploadsDir}`);

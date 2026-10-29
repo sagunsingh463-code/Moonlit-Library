@@ -10,17 +10,21 @@ import {
   Music,
   Maximize2,
   User,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { AppSettings, MoonPhaseType, UserProfile } from '../../types';
 import { sound } from '../../services/audio';
+import { themeService, ThemePreference, EffectiveTheme } from '../../services/theme';
 
 interface TopHeaderProps {
   onOpenSearch: () => void;
   onOpenBookmarks: () => void;
   onOpenFocusMode: () => void;
-  onReopenOpening: () => void;
   onOpenProfile: () => void;
+  onReopenOpening: () => void;
+  onOpenAiAssistant?: () => void;
   currentUser: UserProfile | null;
   settings: AppSettings;
   onUpdateSettings: (updater: (prev: AppSettings) => AppSettings) => void;
@@ -33,11 +37,27 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onOpenFocusMode,
   onReopenOpening,
   onOpenProfile,
+  onOpenAiAssistant,
   currentUser,
   settings,
   onUpdateSettings,
   currentMoonPhase = 'waning-gibbous'
 }) => {
+  const [effectiveTheme, setEffectiveTheme] = React.useState<EffectiveTheme>(() => themeService.getEffectiveTheme());
+  const [themePref, setThemePref] = React.useState<ThemePreference>(() => themeService.getPreference());
+
+  React.useEffect(() => {
+    const unsubscribe = themeService.subscribe((theme, pref) => {
+      setEffectiveTheme(theme);
+      setThemePref(pref);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleToggleTheme = () => {
+    sound.playSparkle();
+    themeService.toggleTheme();
+  };
   const toggleSound = () => {
     onUpdateSettings(prev => {
       const nextSound = !prev.soundEnabled;
@@ -127,6 +147,18 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <span className="hidden md:inline">Bookmarks</span>
         </button>
 
+        {/* Luna AI Study Assistant Button */}
+        {onOpenAiAssistant && (
+          <button
+            onClick={onOpenAiAssistant}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-lavender-600/30 to-indigo-600/30 hover:from-lavender-600/50 hover:to-indigo-600/50 border border-lavender-400/30 text-stargold-200 text-xs transition-colors shadow-sm"
+            title="Open Luna AI Study Assistant (Hindi & English)"
+          >
+            <Sparkles className="w-4 h-4 text-stargold-300 shrink-0" />
+            <span className="hidden md:inline font-medium">Ask AI</span>
+          </button>
+        )}
+
         {/* Ambient Sound Dropdown */}
         <div className="relative group">
           <button 
@@ -167,6 +199,35 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Visible Light Mode / Dark Mode Toggle Button */}
+        <button
+          onClick={handleToggleTheme}
+          className={`min-h-[44px] min-w-[44px] relative flex items-center justify-center p-2 rounded-xl border transition-all ${
+            effectiveTheme === 'light'
+              ? 'bg-amber-100/90 border-amber-400/60 text-amber-600 hover:text-amber-700 shadow-sm'
+              : 'bg-midnight-900/60 border-lavender-400/25 text-stargold-300 hover:text-white'
+          }`}
+          title={
+            themePref === 'auto'
+              ? `Current: ${effectiveTheme === 'light' ? 'Light Mode (Daytime ☀️)' : 'Dark Mode (Nighttime 🌙)'} [Automatic 7 AM-6 PM Schedule]. Click to toggle.`
+              : `Current: ${effectiveTheme === 'light' ? 'Light Mode (Daytime ☀️)' : 'Dark Mode (Nighttime 🌙)'} [Manual Override]. Click to toggle.`
+          }
+        >
+          {effectiveTheme === 'light' ? (
+            <Sun className="w-4 h-4 text-amber-500 fill-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-lavender-300 fill-lavender-300/30" />
+          )}
+          {themePref === 'auto' && (
+            <span 
+              className="absolute -top-1 -right-1 text-[8px] font-mono px-1 rounded-full bg-lavender-600 text-white font-bold"
+              title="Auto Day/Night Mode Active"
+            >
+              A
+            </span>
+          )}
+        </button>
 
         {/* Master Sound FX Toggle */}
         <button

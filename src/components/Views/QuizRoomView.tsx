@@ -20,7 +20,9 @@ import {
   FileCheck2,
   Layers,
   History,
-  X
+  X,
+  Pause,
+  Timer
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sound } from '../../services/audio';
@@ -62,8 +64,13 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
   const [quizFinished, setQuizFinished] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(600); // 10 mins default
   const [totalTimeSeconds, setTotalTimeSeconds] = useState(600);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0); // Elapsed practice timer
+  const [isTimerPaused, setIsTimerPaused] = useState(false); // Interruption & pause state
+  const [timeExpiredNotice, setTimeExpiredNotice] = useState(false); // Timeout alert
+  const [finalTimeTakenSeconds, setFinalTimeTakenSeconds] = useState(0); // Exact time taken
   const [flaggedIndices, setFlaggedIndices] = useState<number[]>([]);
   const [showReview, setShowReview] = useState(false);
+  const elapsedRef = React.useRef(0);
 
   // Create Quiz form state
   const [createTitle, setCreateTitle] = useState('');
@@ -115,6 +122,11 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
     setShowReview(false);
     setTotalTimeSeconds(timeLimitMins * 60);
     setSecondsRemaining(timeLimitMins * 60);
+    elapsedRef.current = 0;
+    setElapsedSeconds(0);
+    setIsTimerPaused(false);
+    setTimeExpiredNotice(false);
+    setFinalTimeTakenSeconds(0);
     setInQuiz(true);
   };
 
@@ -134,27 +146,37 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
     setFlaggedIndices([]);
     setQuizFinished(false);
     setShowReview(false);
-    setTotalTimeSeconds(Math.max(5, incorrectQuestions.length * 2) * 60);
-    setSecondsRemaining(Math.max(5, incorrectQuestions.length * 2) * 60);
+    const timeSecs = Math.max(5, incorrectQuestions.length * 2) * 60;
+    setTotalTimeSeconds(timeSecs);
+    setSecondsRemaining(timeSecs);
+    elapsedRef.current = 0;
+    setElapsedSeconds(0);
+    setIsTimerPaused(false);
+    setTimeExpiredNotice(false);
+    setFinalTimeTakenSeconds(0);
     setInQuiz(true);
   };
 
-  // Timer Countdown Effect
+  // Practice & Assessment Timer Effect
+  // Starts strictly when user enters the quiz, pauses/resumes cleanly, handles timeouts
   useEffect(() => {
-    let interval: number | undefined;
-    if (inQuiz && !quizFinished && secondsRemaining > 0) {
-      interval = window.setInterval(() => {
-        setSecondsRemaining(prev => {
-          if (prev <= 1) {
-            handleFinalizeQuiz();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [inQuiz, quizFinished, secondsRemaining]);
+    if (!inQuiz || quizFinished || isTimerPaused) return;
+
+    const timer = window.setInterval(() => {
+      elapsedRef.current += 1;
+      setElapsedSeconds(elapsedRef.current);
+
+      setSecondsRemaining(prev => {
+        if (prev <= 1) {
+          handleFinalizeQuiz(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [inQuiz, quizFinished, isTimerPaused, activeQuestions, userAnswers]);
 
   const toggleFlag = (idx: number) => {
     setFlaggedIndices(prev => 
@@ -170,8 +192,15 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
     }));
   };
 
-  const handleFinalizeQuiz = async () => {
+  const handleFinalizeQuiz = async (wasTimeout: boolean | any = false) => {
+    const isTimeout = wasTimeout === true;
     setQuizFinished(true);
+    setIsTimerPaused(false);
+    const durationSecs = elapsedRef.current;
+    setFinalTimeTakenSeconds(durationSecs);
+    if (isTimeout) {
+      setTimeExpiredNotice(true);
+    }
     let calculatedScore = 0;
     const answersRecord: {
       questionId: string;
@@ -650,6 +679,16 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
             </p>
           </div>
 
+          {/* Time Expired Notice */}
+          {timeExpiredNotice && (
+            <div className="p-3.5 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center gap-3 text-amber-200 text-xs">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 text-amber-300" />
+              <div>
+                <span className="font-bold">Time's Up!</span> The quiz practice timer reached 0:00 and your answers were submitted automatically.
+              </div>
+            </div>
+          )}
+
           {/* Score breakdown metrics */}
           {(() => {
             let correctCount = 0;
@@ -660,22 +699,26 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
             const passed = percent >= 70;
 
             return (
-              <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/30 flex items-center justify-around">
-                <div className="text-center">
+              <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/30 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                <div>
                   <span className="text-[10px] uppercase text-lavender-300">Raw Score</span>
                   <p className="text-xl font-serif font-bold text-stargold-200">
                     {correctCount} / {activeQuestions.length}
                   </p>
                 </div>
-                <div className="h-8 w-px bg-lavender-400/20" />
-                <div className="text-center">
+                <div>
                   <span className="text-[10px] uppercase text-lavender-300">Accuracy</span>
                   <p className={`text-xl font-serif font-bold ${passed ? 'text-emerald-400' : 'text-amber-300'}`}>
                     {percent}%
                   </p>
                 </div>
-                <div className="h-8 w-px bg-lavender-400/20" />
-                <div className="text-center">
+                <div>
+                  <span className="text-[10px] uppercase text-lavender-300">Time Taken</span>
+                  <p className="text-xl font-serif font-bold text-lavender-200">
+                    {formatTime(finalTimeTakenSeconds || elapsedSeconds)}
+                  </p>
+                </div>
+                <div>
                   <span className="text-[10px] uppercase text-lavender-300">Result</span>
                   <p className={`text-base font-serif font-bold uppercase ${passed ? 'text-emerald-400' : 'text-red-400'}`}>
                     {passed ? 'Passed ✓' : 'Needs Practice'}
@@ -767,8 +810,8 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
       ) : (
         /* Active Timed Quiz Runner */
         <div className="max-w-3xl mx-auto rounded-3xl glass-panel-glow border border-lavender-400/30 p-6 md:p-8 space-y-6">
-          {/* Header Status & Countdown Clock */}
-          <div className="flex items-center justify-between pb-3 border-b border-lavender-400/20">
+          {/* Header Status, Elapsed Timer & Countdown Clock */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-lavender-400/20">
             <div>
               <span className="text-[10px] uppercase font-semibold text-stargold-300">
                 {activeQuizTitle}
@@ -778,7 +821,44 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+              {/* Elapsed Practice Timer */}
+              <div 
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-lavender-400/30 font-mono text-xs text-lavender-200 bg-midnight-900/90"
+                title="Elapsed practice time"
+              >
+                <Timer className="w-3.5 h-3.5 text-lavender-400" />
+                <span className="text-[11px] text-lavender-400 hidden xs:inline">Elapsed:</span>
+                <span className="font-bold">{formatTime(elapsedSeconds)}</span>
+              </div>
+
+              {/* Remaining Countdown Timer */}
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-mono text-xs ${
+                secondsRemaining < 120 
+                  ? 'bg-red-500/20 border-red-500/40 text-red-300 animate-pulse'
+                  : 'bg-midnight-900 border-stargold-400/30 text-stargold-200'
+              }`}
+              title="Time remaining"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span className="text-[11px] text-lavender-400 hidden xs:inline">Left:</span>
+                <span>{formatTime(secondsRemaining)}</span>
+              </div>
+
+              {/* Pause / Resume Button */}
+              <button
+                onClick={() => setIsTimerPaused(!isTimerPaused)}
+                className={`p-1.5 px-2.5 rounded-xl border text-xs flex items-center gap-1.5 transition-all ${
+                  isTimerPaused
+                    ? 'bg-amber-500/30 text-amber-200 border-amber-400/60 animate-pulse font-bold'
+                    : 'glass-panel-subtle text-lavender-300 hover:text-white border-lavender-400/30'
+                }`}
+                title={isTimerPaused ? "Resume practice quiz" : "Pause practice quiz & timer"}
+              >
+                {isTimerPaused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5" />}
+                <span className="text-[11px]">{isTimerPaused ? 'Resume' : 'Pause'}</span>
+              </button>
+
               <button
                 onClick={() => toggleFlag(currentIndex)}
                 className={`p-1.5 rounded-xl border text-xs flex items-center gap-1 ${
@@ -791,124 +871,137 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
                 <Bookmark className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Flag</span>
               </button>
-
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-mono text-xs ${
-                secondsRemaining < 120 
-                  ? 'bg-red-500/20 border-red-500/40 text-red-300 animate-pulse'
-                  : 'bg-midnight-900 border-stargold-400/30 text-stargold-200'
-              }`}>
-                <Clock className="w-3.5 h-3.5" />
-                <span>{formatTime(secondsRemaining)}</span>
-              </div>
             </div>
           </div>
 
-          {/* Question Index Palette (Click to jump to any question) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-            {activeQuestions.map((_, idx) => {
-              const isAnswered = userAnswers[idx] !== undefined;
-              const isFlagged = flaggedIndices.includes(idx);
-              const isCurrent = currentIndex === idx;
-
-              return (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`w-7 h-7 rounded-lg text-xs font-mono font-bold flex items-center justify-center transition-all ${
-                    isCurrent
-                      ? 'ring-2 ring-stargold-300 bg-lavender-600 text-white'
-                      : isFlagged
-                      ? 'bg-amber-500/30 text-amber-200 border border-amber-400/40'
-                      : isAnswered
-                      ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-400/40'
-                      : 'bg-midnight-900 text-lavender-400 hover:text-white'
-                  }`}
-                >
-                  {idx + 1}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Current Question Body */}
-          {(() => {
-            const currentQ = activeQuestions[currentIndex];
-            if (!currentQ) return null;
-
-            return (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between text-[11px] text-lavender-300 font-mono">
-                  <span className="text-stargold-300 uppercase">{currentQ.subject} • {currentQ.topic}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-midnight-900 border border-lavender-400/20">{currentQ.difficulty}</span>
-                </div>
-
-                <h3 className="font-serif font-bold text-lg md:text-xl text-white leading-relaxed">
-                  {currentQ.question}
-                </h3>
-
-                {/* 4 Answer Options */}
-                <div className="space-y-2.5 pt-2">
-                  {currentQ.options.map((option, optIdx) => {
-                    const isSelected = userAnswers[currentIndex] === optIdx;
-                    return (
-                      <div
-                        key={optIdx}
-                        onClick={() => selectOption(optIdx)}
-                        className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-center justify-between gap-3 ${
-                          isSelected
-                            ? 'bg-gradient-to-r from-lavender-600/40 to-indigo-600/30 border-stargold-300 text-white shadow-md'
-                            : 'glass-panel-subtle border-lavender-400/20 hover:border-lavender-400/40 text-lavender-100'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`w-6 h-6 rounded-full border flex items-center justify-center font-mono text-xs font-bold ${
-                            isSelected ? 'border-stargold-300 text-stargold-200' : 'border-lavender-400/40 text-lavender-300'
-                          }`}>
-                            {String.fromCharCode(65 + optIdx)}
-                          </span>
-                          <span className="text-xs md:text-sm font-sans">{option}</span>
-                        </div>
-                        {isSelected && <Check className="w-4 h-4 text-stargold-300" />}
-                      </div>
-                    );
-                  })}
-                </div>
+          {/* Question Index Palette & Question Body, or Paused Banner */}
+          {isTimerPaused ? (
+            <div className="py-12 px-6 rounded-2xl bg-midnight-950/80 border border-amber-400/30 text-center space-y-4 my-2">
+              <div className="w-14 h-14 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center mx-auto text-amber-300">
+                <Pause className="w-7 h-7" />
               </div>
-            );
-          })()}
-
-          {/* Bottom Navigation & Submit Bar */}
-          <div className="flex items-center justify-between pt-4 border-t border-lavender-400/20">
-            <button
-              disabled={currentIndex === 0}
-              onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
-              className="px-4 py-2 rounded-xl glass-panel-subtle text-xs text-lavender-300 hover:text-white disabled:opacity-30 flex items-center gap-1.5"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Previous</span>
-            </button>
-
-            <span className="text-xs text-lavender-400 font-mono">
-              Answered {Object.keys(userAnswers).length} / {activeQuestions.length}
-            </span>
-
-            {currentIndex + 1 < activeQuestions.length ? (
+              <h3 className="font-serif font-bold text-lg text-white">Quiz Practice Paused</h3>
+              <p className="text-xs text-lavender-300 max-w-sm mx-auto">
+                Timer is currently stopped. Take a moment to reflect, then click Resume whenever you are ready to continue your questions.
+              </p>
               <button
-                onClick={() => setCurrentIndex(prev => Math.min(activeQuestions.length - 1, prev + 1))}
-                className="px-5 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-500 text-white text-xs font-medium flex items-center gap-1.5 shadow-sm"
+                onClick={() => setIsTimerPaused(false)}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 text-midnight-950 font-serif font-bold text-xs hover:brightness-110 flex items-center gap-2 mx-auto shadow-star-glow"
               >
-                <span>Next</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <Play className="w-4 h-4 fill-current" />
+                <span>Resume Practice</span>
               </button>
-            ) : (
-              <button
-                onClick={handleFinalizeQuiz}
-                className="px-6 py-2 rounded-xl bg-gradient-to-r from-stargold-500 to-amber-500 text-midnight-950 font-serif font-bold text-xs shadow-star-glow hover:brightness-110"
-              >
-                Submit Exam & Calculate Score ✨
-              </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <>
+              {/* Question Index Palette (Click to jump to any question) */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                {activeQuestions.map((_, idx) => {
+                  const isAnswered = userAnswers[idx] !== undefined;
+                  const isFlagged = flaggedIndices.includes(idx);
+                  const isCurrent = currentIndex === idx;
+
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`w-7 h-7 rounded-lg text-xs font-mono font-bold flex items-center justify-center transition-all ${
+                        isCurrent
+                          ? 'ring-2 ring-stargold-300 bg-lavender-600 text-white'
+                          : isFlagged
+                          ? 'bg-amber-500/30 text-amber-200 border border-amber-400/40'
+                          : isAnswered
+                          ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-400/40'
+                          : 'bg-midnight-900 text-lavender-400 hover:text-white'
+                      }`}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Current Question Body */}
+              {(() => {
+                const currentQ = activeQuestions[currentIndex];
+                if (!currentQ) return null;
+
+                return (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-[11px] text-lavender-300 font-mono">
+                      <span className="text-stargold-300 uppercase">{currentQ.subject} • {currentQ.topic}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-midnight-900 border border-lavender-400/20">{currentQ.difficulty}</span>
+                    </div>
+
+                    <h3 className="font-serif font-bold text-lg md:text-xl text-white leading-relaxed">
+                      {currentQ.question}
+                    </h3>
+
+                    {/* 4 Answer Options */}
+                    <div className="space-y-2.5 pt-2">
+                      {currentQ.options.map((option, optIdx) => {
+                        const isSelected = userAnswers[currentIndex] === optIdx;
+                        return (
+                          <div
+                            key={optIdx}
+                            onClick={() => selectOption(optIdx)}
+                            className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-center justify-between gap-3 ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-lavender-600/40 to-indigo-600/30 border-stargold-300 text-white shadow-md'
+                                : 'glass-panel-subtle border-lavender-400/20 hover:border-lavender-400/40 text-lavender-100'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className={`w-6 h-6 rounded-full border flex items-center justify-center font-mono text-xs font-bold ${
+                                isSelected ? 'border-stargold-300 text-stargold-200' : 'border-lavender-400/40 text-lavender-300'
+                              }`}>
+                                {String.fromCharCode(65 + optIdx)}
+                              </span>
+                              <span className="text-xs md:text-sm font-sans">{option}</span>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-stargold-300" />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Bottom Navigation & Submit Bar */}
+              <div className="flex items-center justify-between pt-4 border-t border-lavender-400/20">
+                <button
+                  disabled={currentIndex === 0}
+                  onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+                  className="px-4 py-2 rounded-xl glass-panel-subtle text-xs text-lavender-300 hover:text-white disabled:opacity-30 flex items-center gap-1.5"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Previous</span>
+                </button>
+
+                <span className="text-xs text-lavender-400 font-mono">
+                  Answered {Object.keys(userAnswers).length} / {activeQuestions.length}
+                </span>
+
+                {currentIndex + 1 < activeQuestions.length ? (
+                  <button
+                    onClick={() => setCurrentIndex(prev => Math.min(activeQuestions.length - 1, prev + 1))}
+                    className="px-5 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-500 text-white text-xs font-medium flex items-center gap-1.5 shadow-sm"
+                  >
+                    <span>Next</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleFinalizeQuiz}
+                    className="px-6 py-2 rounded-xl bg-gradient-to-r from-stargold-500 to-amber-500 text-midnight-950 font-serif font-bold text-xs shadow-star-glow hover:brightness-110"
+                  >
+                    Submit Exam & Calculate Score ✨
+                  </button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

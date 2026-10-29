@@ -18,6 +18,7 @@ import {
 import { db } from './services/db';
 import { sound } from './services/audio';
 import { authService } from './services/auth';
+import { themeService } from './services/theme';
 import { 
   initialSettings, 
   initialStats,
@@ -44,6 +45,8 @@ import { MagicalBookmarksDrawer } from './components/Bookmarks/MagicalBookmarksD
 import { SecretStudyGarden } from './components/Garden/SecretStudyGarden';
 import { MidnightFocusMode } from './components/Focus/MidnightFocusMode';
 import { MagicalSearchModal } from './components/Search/MagicalSearchModal';
+import { AiStudyAssistantModal } from './components/AI/AiStudyAssistantModal';
+import { Sparkles } from 'lucide-react';
 
 import { HomeView } from './components/Views/HomeView';
 import { FilesView } from './components/Views/FilesView';
@@ -77,6 +80,7 @@ export function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
   const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
+  const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
 
   // App Data State (Defaults initialized to prevent loading screen freeze)
   const [settings, setSettings] = useState<AppSettings>(initialSettings);
@@ -148,6 +152,7 @@ export function App() {
 
   useEffect(() => {
     let mounted = true;
+    themeService.applyTheme();
 
     // Safety watchdog: Guarantee awakening screen unlocks within 1200ms
     const safetyTimer = setTimeout(() => {
@@ -623,6 +628,7 @@ export function App() {
               onOpenFocusMode={() => setIsFocusModeOpen(true)}
               onReopenOpening={() => setShowOpening(true)}
               onOpenProfile={() => setIsProfileModalOpen(true)}
+              onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
               currentUser={currentUser}
               settings={settings}
               onUpdateSettings={handleUpdateSettings}
@@ -808,6 +814,38 @@ export function App() {
         onClose={() => setIsFocusModeOpen(false)}
         onSessionComplete={handleFocusSessionComplete}
         reduceMotion={settings.reduceMotion}
+      />
+
+      {/* Floating Luna AI Study Assistant Button */}
+      {!isAiAssistantOpen && !showOpening && (
+        <button
+          onClick={() => {
+            sound.playSparkle();
+            setIsAiAssistantOpen(true);
+          }}
+          className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-lavender-600 via-indigo-600 to-lavender-700 text-white shadow-star-glow hover:brightness-110 flex items-center gap-2 border border-lavender-300/40 transition-all hover:scale-105 group"
+          title="Open Luna AI Study Assistant (Bilingual Hindi & English)"
+          aria-label="Open AI Study Assistant"
+        >
+          <div className="w-5 h-5 rounded-full bg-stargold-400/20 flex items-center justify-center">
+            <Sparkles className="w-3.5 h-3.5 text-stargold-300 animate-pulse" />
+          </div>
+          <span className="text-xs font-serif font-bold tracking-wide">
+            Ask Luna AI
+          </span>
+          <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.2 rounded-full bg-white/20 font-mono text-stargold-200">
+            Hindi & English
+          </span>
+        </button>
+      )}
+
+      {/* Online AI Study Assistant Modal */}
+      <AiStudyAssistantModal
+        isOpen={isAiAssistantOpen}
+        onClose={() => setIsAiAssistantOpen(false)}
+        activeSubject={undefined}
+        libraryNotesCount={notes.length}
+        libraryFilesCount={files.length}
       />
     </div>
   );

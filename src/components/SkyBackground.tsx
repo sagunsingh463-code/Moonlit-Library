@@ -50,12 +50,21 @@ export const SkyBackground: React.FC<SkyBackgroundProps> = ({ reduceMotion = fal
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Deep space background gradient
+      const isLight = document.documentElement.classList.contains('light-theme');
+
+      // Background gradient (Deep night space in dark mode vs soft pastel daydream sky in light mode)
       const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-      bgGrad.addColorStop(0, '#060814');
-      bgGrad.addColorStop(0.4, '#0B0E1E');
-      bgGrad.addColorStop(0.8, '#10162F');
-      bgGrad.addColorStop(1, '#161D3E');
+      if (isLight) {
+        bgGrad.addColorStop(0, '#EDF2FC');
+        bgGrad.addColorStop(0.4, '#F4F0FA');
+        bgGrad.addColorStop(0.8, '#F8F4FD');
+        bgGrad.addColorStop(1, '#EAE4F7');
+      } else {
+        bgGrad.addColorStop(0, '#060814');
+        bgGrad.addColorStop(0.4, '#0B0E1E');
+        bgGrad.addColorStop(0.8, '#10162F');
+        bgGrad.addColorStop(1, '#161D3E');
+      }
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
