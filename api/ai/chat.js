@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, x-gemini-key, x-openai-key'
   );
 
   if (req.method === 'OPTIONS') {
@@ -19,41 +19,41 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
-  // Verify authentication header
+  // Optional authentication: use userId if valid token is provided, otherwise guest/demo
+  let userId = 'user_demo_seraphina';
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Authentication required. Please log in.' });
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      if (decoded?.userId) userId = decoded.userId;
+    } catch (err) {
+      // Continue gracefully as guest rather than blocking
+    }
   }
 
-  const token = authHeader.split(' ')[1];
-  let userId = null;
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    userId = decoded.userId;
-  } catch (err) {
-    return res.status(401).json({ error: 'Session expired or invalid. Please log in again.' });
-  }
-
-  const { messages, subject } = req.body || {};
+  const { messages, subject, customApiKey } = req.body || {};
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'Messages array is required.' });
   }
 
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openAiKey = process.env.OPENAI_API_KEY;
+  // Resolve API Key: Custom key from user header/body takes precedence over environment variable
+  const userCustomKey = req.headers['x-gemini-key'] || customApiKey;
+  const geminiKey = userCustomKey || process.env.GEMINI_API_KEY;
+  const openAiKey = req.headers['x-openai-key'] || process.env.OPENAI_API_KEY;
 
   if (!geminiKey && !openAiKey) {
     return res.status(503).json({
       configured: false,
       error: 'AI_KEY_NOT_CONFIGURED',
-      message: 'Online AI Study Assistant requires a free Google Gemini API key (or OpenAI API key). Please configure GEMINI_API_KEY in your Vercel Environment Variables. Get a free key at https://aistudio.google.com/app/apikey'
+      message: 'Online AI Study Assistant requires a free Google Gemini API key (or OpenAI API key). Please paste your key in the assistant or configure GEMINI_API_KEY in Vercel Environment Variables. Get a free key at https://aistudio.google.com/app/apikey'
     });
   }
 
   const systemPrompt = `You are Luna, the Moonlit Anime Library AI Study Assistant — an intellectual, warm, and supportive academic mentor.
 Your goals:
 1. Help the student understand academic concepts step-by-step with intuitive explanations, analogies, and practical examples.
-2. Bilingual Capability: Answer questions comfortably and naturally in simple Hindi and English (Hinglish or English), matching whatever language the student communicates in.
+2. Bilingual Capability: Answer questions comfortably and naturally in simple Hindi and English (Hinglish or English), matching whatever language the student communicates in or asking to explain in Hindi/English.
 3. Be encouraging, clear, and structured (use bullet points, bold key terms, and code/math formatting).
 4. Support follow-up questions within the active study dialogue.
 5. If the student asks about specific uploaded files, truthfully acknowledge what is available in the discussion. Do not fabricate or pretend to have read files that have not been provided.`;

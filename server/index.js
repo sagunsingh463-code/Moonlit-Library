@@ -1434,8 +1434,9 @@ app.post('/api/seed', requireAuth, (req, res) => {
 // AI STUDY ASSISTANT ENDPOINTS
 // ============================================
 app.get('/api/ai/status', (req, res) => {
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openAiKey = process.env.OPENAI_API_KEY;
+  const userCustomKey = req.headers['x-gemini-key'] || req.query?.key;
+  const geminiKey = userCustomKey || process.env.GEMINI_API_KEY;
+  const openAiKey = req.headers['x-openai-key'] || process.env.OPENAI_API_KEY;
   const configured = Boolean(geminiKey || openAiKey);
   const provider = geminiKey ? 'gemini' : (openAiKey ? 'openai' : 'none');
   
@@ -1446,26 +1447,27 @@ app.get('/api/ai/status', (req, res) => {
   });
 });
 
-app.post('/api/ai/chat', requireAuth, async (req, res) => {
-  const { messages, subject } = req.body;
+app.post('/api/ai/chat', optionalAuth, async (req, res) => {
+  const { messages, subject, customApiKey } = req.body;
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'Messages array is required.' });
   }
 
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openAiKey = process.env.OPENAI_API_KEY;
+  const userCustomKey = req.headers['x-gemini-key'] || customApiKey;
+  const geminiKey = userCustomKey || process.env.GEMINI_API_KEY;
+  const openAiKey = req.headers['x-openai-key'] || process.env.OPENAI_API_KEY;
 
   if (!geminiKey && !openAiKey) {
     return res.status(503).json({
       configured: false,
       error: 'AI_KEY_NOT_CONFIGURED',
-      message: 'Online AI Study Assistant requires a free Google Gemini API key (or OpenAI API key). Please configure GEMINI_API_KEY in your .env file or Vercel Environment Variables. Get a free key at https://aistudio.google.com/app/apikey'
+      message: 'Online AI Study Assistant requires a free Google Gemini API key (or OpenAI API key). Please paste your key in the assistant or configure GEMINI_API_KEY in your .env file or Vercel Environment Variables. Get a free key at https://aistudio.google.com/app/apikey'
     });
   }
 
   // Retrieve relevant study notes and file metadata belonging to this user
   const db = getDB();
-  const userId = req.userId;
+  const userId = req.userId || DEMO_USER_ID;
   const userNotes = (db.notes || []).filter(n => n.userId === userId || n.userId === DEMO_USER_ID);
   const userFiles = (db.files || []).filter(f => f.userId === userId || f.userId === DEMO_USER_ID);
 

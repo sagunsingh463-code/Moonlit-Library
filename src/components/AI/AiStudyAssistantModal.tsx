@@ -10,8 +10,12 @@ import {
   BookOpen, 
   Copy, 
   Check, 
-  Bot,
-  FileText
+  Key,
+  FileText,
+  ChevronDown,
+  ChevronUp,
+  Settings2,
+  Trash2
 } from 'lucide-react';
 import { sound } from '../../services/audio';
 import { authService, getApiBase } from '../../services/auth';
@@ -34,6 +38,7 @@ interface AiStudyAssistantModalProps {
 }
 
 const STORAGE_KEY = 'moonlit_ai_study_chat_history';
+const API_KEY_STORAGE = 'moonlit_gemini_api_key';
 
 export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
   isOpen,
@@ -64,8 +69,17 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
   const [apiConfigured, setApiConfigured] = useState<boolean | null>(null);
-  const [configErrorMessage, setConfigErrorMessage] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // In-app API Key Management
+  const [customApiKey, setCustomApiKey] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem(API_KEY_STORAGE) || '';
+  });
+  const [keyInputVal, setKeyInputVal] = useState('');
+  const [isKeyDrawerOpen, setIsKeyDrawerOpen] = useState(false);
+  const [isVerifyingKey, setIsVerifyingKey] = useState(false);
+  const [keyFeedback, setKeyFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,33 +113,108 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       inputRef.current?.focus();
     }
-  }, [isOpen, messages, isLoading]);
+  }, [isOpen, messages, isLoading, isKeyDrawerOpen]);
 
-  // Check AI backend configuration status
-  const checkStatus = async () => {
+  // Check AI backend status
+  const checkStatus = async (overrideKey?: string) => {
+    const keyToCheck = overrideKey !== undefined ? overrideKey : customApiKey;
     try {
-      const res = await fetch(`${getApiBase()}/ai/status`);
+      const res = await fetch(`${getApiBase()}/ai/status`, {
+        headers: keyToCheck ? { 'x-gemini-key': keyToCheck } : {}
+      });
       if (res.ok) {
         const data = await res.json();
-        setApiConfigured(Boolean(data.configured));
-        if (!data.configured) {
-          setConfigErrorMessage(
-            'Online AI Study Assistant requires a free Google Gemini API key (or OpenAI API key). Please configure GEMINI_API_KEY in your .env or Vercel dashboard.'
-          );
-        } else {
-          setConfigErrorMessage(null);
-        }
+        setApiConfigured(Boolean(data.configured || keyToCheck));
+      } else {
+        setApiConfigured(Boolean(keyToCheck));
       }
     } catch (err) {
-      // Status endpoint may not be reachable if backend is offline
+      // If backend unreachable, consider configured if user has local key
+      setApiConfigured(Boolean(keyToCheck));
     }
   };
 
   useEffect(() => {
     if (isOpen) {
       checkStatus();
+      if (customApiKey) {
+        setKeyInputVal(customApiKey);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, customApiKey]);
+
+  // Test and save custom Gemini API key
+  const handleSaveApiKey = async () => {
+    const cleanKey = keyInputVal.trim();
+    if (!cleanKey) {
+      setKeyFeedback({ type: 'error', message: 'Please enter a valid Gemini API key.' });
+      return;
+    }
+
+    setIsVerifyingKey(true);
+    setKeyFeedback(null);
+
+    try {
+      // Verify key directly against Google Gemini
+      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
+      const res = await fetch(testUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'Ping' }] }]
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setKeyFeedback({
+          type: 'error',
+          message: data.error?.message || 'Invalid Gemini API key. Please check your key from Google AI Studio.'
+        });
+        setIsVerifyingKey(false);
+        return;
+      }
+
+      // Key is verified!
+      sound.playCelestialChime();
+      localStorage.setItem(API_KEY_STORAGE, cleanKey);
+      setCustomApiKey(cleanKey);
+      setApiConfigured(true);
+      setKeyFeedback({ type: 'success', message: '✨ Gemini API Key verified successfully! Luna is online.' });
+      
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `sys-${Date.now()}`,
+          role: 'assistant',
+          content: '✨ **Google Gemini 1.5 Flash Connected!**\n\nAapka API key verify ho chuka hai. Ab aap mujhse koi bhi study question Hindi ya English mein poochh sakte hain!',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+
+      setTimeout(() => {
+        setIsKeyDrawerOpen(false);
+        setKeyFeedback(null);
+      }, 1500);
+    } catch (err: any) {
+      setKeyFeedback({
+        type: 'error',
+        message: `Network error verifying key: ${err.message || 'Check your internet connection.'}`
+      });
+    } finally {
+      setIsVerifyingKey(false);
+    }
+  };
+
+  const handleRemoveApiKey = () => {
+    sound.playSparkle();
+    localStorage.removeItem(API_KEY_STORAGE);
+    setCustomApiKey('');
+    setKeyInputVal('');
+    setKeyFeedback(null);
+    checkStatus('');
+  };
 
   const handleClearHistory = () => {
     sound.playSparkle();
@@ -186,88 +275,131 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
     setInput('');
     setIsLoading(true);
 
+    const token = authService.getToken();
+    const activeKey = customApiKey || (typeof window !== 'undefined' ? localStorage.getItem(API_KEY_STORAGE) || '' : '');
+
+    const apiPayloadMessages = newMessages
+      .filter(m => !m.isError)
+      .slice(-10)
+      .map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+    let replySuccess = false;
+
+    // Strategy 1: Call Backend / Serverless Endpoint
     try {
-      const token = authService.getToken();
-      // Prepare message history to enable follow-up questions
-      const apiPayloadMessages = newMessages
-        .filter(m => !m.isError)
-        .slice(-10) // Send up to last 10 messages for rich conversational context
-        .map(m => ({
-          role: m.role,
-          content: m.content
-        }));
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (activeKey) headers['x-gemini-key'] = activeKey;
 
       const res = await fetch(`${getApiBase()}/ai/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
+        headers,
         body: JSON.stringify({
           messages: apiPayloadMessages,
-          subject: activeSubject
+          subject: activeSubject,
+          customApiKey: activeKey
         })
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        if (res.status === 503 || data.error === 'AI_KEY_NOT_CONFIGURED' || data.configured === false) {
-          setApiConfigured(false);
-          setConfigErrorMessage(data.message || 'GEMINI_API_KEY is not configured in .env or Vercel Environment Variables.');
-          setMessages(prev => [
-            ...prev,
-            {
-              id: `err-${Date.now()}`,
-              role: 'assistant',
-              content: `🔑 **AI Key Setup Required**\n\nReal Online AI Study Assistant ko chalane ke liye **Google Gemini API Key** configure karni hogi:\n\n1. Visit: [Google AI Studio (Free API Key)](https://aistudio.google.com/app/apikey)\n2. Add to \`.env\` or Vercel Environment Variables:\n\`GEMINI_API_KEY=your_key_here\`\n3. Restart or redeploy the server.`,
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              isError: true
-            }
-          ]);
-        } else {
-          setMessages(prev => [
-            ...prev,
-            {
-              id: `err-${Date.now()}`,
-              role: 'assistant',
-              content: `⚠️ Error (${res.status}): ${data.error || 'Failed to communicate with AI service. Please try again.'}`,
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              isError: true
-            }
-          ]);
-        }
-        return;
-      }
-
-      sound.playCelestialChime();
-      setApiConfigured(true);
-      setConfigErrorMessage(null);
-
-      const assistantReply: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        role: 'assistant',
-        content: data.reply || 'Main aapka sawaal samajh gayi, lekin response generate nahi ho paya. Kripya dubara koshish karein.',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        notesReferenced: data.retrievedNotesCount
-      };
-
-      setMessages(prev => [...prev, assistantReply]);
-    } catch (err: any) {
-      sound.playPageTurn();
-      setMessages(prev => [
-        ...prev,
-        {
-          id: `err-${Date.now()}`,
+      if (res.ok && data.reply) {
+        sound.playCelestialChime();
+        setApiConfigured(true);
+        const assistantReply: ChatMessage = {
+          id: `ai-${Date.now()}`,
           role: 'assistant',
-          content: `⚠️ Network Error: Could not connect to AI backend endpoint (${err.message || 'Offline'}). Kripya internet connection aur server status check karein.`,
+          content: data.reply,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          isError: true
-        }
-      ]);
-    } finally {
-      setIsLoading(false);
+          notesReferenced: data.retrievedNotesCount
+        };
+        setMessages(prev => [...prev, assistantReply]);
+        replySuccess = true;
+      } else if (res.status === 503 || data.error === 'AI_KEY_NOT_CONFIGURED') {
+        setApiConfigured(false);
+      }
+    } catch (backendErr) {
+      // Backend error - will attempt Strategy 2 if activeKey is present
     }
+
+    // Strategy 2: Direct Client Fallback to Google Gemini API if user provided key
+    if (!replySuccess && activeKey) {
+      try {
+        const contents = apiPayloadMessages.map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        }));
+
+        const systemPrompt = `You are Luna, the Moonlit Anime Library AI Study Assistant — an intellectual, warm, and supportive academic mentor.
+Help the student understand academic concepts step-by-step with intuitive explanations, analogies, and practical examples.
+Bilingual Capability: Answer questions comfortably and naturally in simple Hindi and English (Hinglish or English).
+Be encouraging, clear, and structured with markdown formatting.`;
+
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`;
+        const res = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents,
+            generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          sound.playCelestialChime();
+          setApiConfigured(true);
+          const replyText = data.candidates[0].content.parts[0].text;
+          const assistantReply: ChatMessage = {
+            id: `ai-${Date.now()}`,
+            role: 'assistant',
+            content: replyText,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          setMessages(prev => [...prev, assistantReply]);
+          replySuccess = true;
+        }
+      } catch (directErr) {
+        // Direct call failed
+      }
+    }
+
+    // If still not resolved, show clear actionable instructions to connect key
+    if (!replySuccess) {
+      sound.playPageTurn();
+      if (!activeKey) {
+        setIsKeyDrawerOpen(true);
+        setMessages(prev => [
+          ...prev,
+          {
+            id: `key-guide-${Date.now()}`,
+            role: 'assistant',
+            content: '🔑 **Online AI Activation Required**\n\nLuna ko real Google Gemini AI se connect karne ke liye bas ek free Gemini API key chahiye:\n\n1. Upar **"Paste Gemini API Key"** box mein apni key daalein\n2. Free key prapt karein: [Google AI Studio ↗](https://aistudio.google.com/app/apikey) *(Free, koi credit card nahi chahiye)*\n3. "Connect Luna" button pe click karein!',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isError: true
+          }
+        ]);
+      } else {
+        setMessages(prev => [
+          ...prev,
+          {
+            id: `err-${Date.now()}`,
+            role: 'assistant',
+            content: '⚠️ Could not connect to Gemini AI. Kripya apna API key ya internet connection check karein.',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isError: true
+          }
+        ]);
+      }
+    }
+
+    setIsLoading(false);
   };
 
   const handleRetryLast = () => {
@@ -288,12 +420,12 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
 
   return (
     <div 
-      className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 w-[calc(100vw-1.5rem)] sm:w-[450px] max-w-[500px] h-[600px] max-h-[85vh] z-50 rounded-3xl glass-panel-glow border border-lavender-400/40 shadow-2xl flex flex-col overflow-hidden backdrop-blur-2xl animate-book-open"
+      className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 w-[calc(100vw-1.5rem)] sm:w-[460px] max-w-[500px] h-[610px] max-h-[85vh] z-50 rounded-3xl glass-panel-glow border border-lavender-400/40 shadow-2xl flex flex-col overflow-hidden backdrop-blur-2xl animate-book-open"
       role="dialog"
       aria-label="Online AI Study Assistant"
     >
       {/* Header */}
-      <div className="p-3.5 px-4 bg-midnight-950/80 border-b border-lavender-400/20 flex items-center justify-between">
+      <div className="p-3.5 px-4 bg-midnight-950/85 border-b border-lavender-400/20 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="relative">
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-lavender-600 via-indigo-600 to-stargold-400 flex items-center justify-center text-white shadow-star-glow">
@@ -304,11 +436,11 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
               className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-midnight-950 ${
                 !isOnline 
                   ? 'bg-red-500' 
-                  : apiConfigured === false 
-                  ? 'bg-amber-400' 
-                  : 'bg-emerald-400 animate-pulse'
+                  : apiConfigured 
+                  ? 'bg-emerald-400 animate-pulse' 
+                  : 'bg-amber-400'
               }`}
-              title={!isOnline ? 'Offline' : apiConfigured === false ? 'API Key Needed' : 'AI Online & Ready'}
+              title={!isOnline ? 'Offline' : apiConfigured ? 'AI Online & Ready' : 'Gemini Key Needed'}
             />
           </div>
 
@@ -317,8 +449,12 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
               <h3 className="font-serif font-bold text-sm text-white leading-tight">
                 Luna • AI Study Mentor
               </h3>
-              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-lavender-600/40 text-lavender-200 border border-lavender-400/30">
-                Online
+              <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full border ${
+                apiConfigured 
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' 
+                  : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
+              }`}>
+                {apiConfigured ? 'Live AI' : 'Key Needed'}
               </span>
             </div>
             <p className="text-[10px] text-lavender-300/80 leading-tight">
@@ -328,13 +464,30 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          {/* Key Settings Toggle */}
+          <button
+            onClick={() => {
+              sound.playSparkle();
+              setIsKeyDrawerOpen(!isKeyDrawerOpen);
+            }}
+            className={`p-1.5 rounded-xl border text-xs transition-colors ${
+              customApiKey 
+                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40' 
+                : 'bg-amber-500/20 text-amber-300 border-amber-400/40 animate-pulse'
+            }`}
+            title="Configure Gemini API Key"
+          >
+            <Key className="w-3.5 h-3.5" />
+          </button>
+
           <button
             onClick={handleClearHistory}
             className="p-1.5 rounded-xl hover:bg-white/10 text-lavender-300 hover:text-white transition-colors"
             title="Clear Chat History"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
+          
           <button
             onClick={onClose}
             className="p-1.5 rounded-xl hover:bg-white/10 text-lavender-300 hover:text-white transition-colors"
@@ -344,6 +497,63 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Slide-Down Gemini API Key Configuration Drawer */}
+      {isKeyDrawerOpen && (
+        <div className="p-4 bg-midnight-950/95 border-b border-lavender-400/30 space-y-3 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-serif font-bold text-stargold-200 flex items-center gap-1.5">
+              <Key className="w-3.5 h-3.5 text-stargold-300" />
+              <span>Google Gemini API Key Setup</span>
+            </span>
+            <a
+              href="https://aistudio.google.com/app/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-stargold-300 hover:underline flex items-center gap-1"
+            >
+              <span>Get Free Key (Google AI Studio)</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+
+          <p className="text-[11px] text-lavender-300 leading-relaxed">
+            Paste your free API key from Google AI Studio. It is saved securely in your browser session and connects Luna instantly.
+          </p>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="password"
+              value={keyInputVal}
+              onChange={(e) => setKeyInputVal(e.target.value)}
+              placeholder="Paste AIzaSy... API key here"
+              className="flex-1 px-3 py-2 rounded-xl bg-midnight-900 border border-lavender-400/30 text-xs text-white placeholder-lavender-400/50 font-mono focus:outline-none focus:border-stargold-300"
+            />
+            <button
+              onClick={handleSaveApiKey}
+              disabled={isVerifyingKey || !keyInputVal.trim()}
+              className="px-3 py-2 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 text-midnight-950 font-serif font-bold text-xs hover:brightness-110 disabled:opacity-40 shadow-sm"
+            >
+              {isVerifyingKey ? 'Testing...' : 'Connect'}
+            </button>
+            {customApiKey && (
+              <button
+                onClick={handleRemoveApiKey}
+                className="p-2 rounded-xl bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30"
+                title="Remove saved key"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {keyFeedback && (
+            <p className={`text-[10px] ${keyFeedback.type === 'success' ? 'text-emerald-400' : 'text-red-300'}`}>
+              {keyFeedback.message}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Offline Alert Banner */}
       {!isOnline && (
@@ -355,21 +565,21 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
         </div>
       )}
 
-      {/* Unconfigured API Key Banner */}
-      {apiConfigured === false && configErrorMessage && (
-        <div className="p-2.5 px-4 bg-amber-500/20 border-b border-amber-400/40 flex items-center justify-between gap-2 text-amber-200 text-xs">
+      {/* Quick Setup Notice if Key is missing and drawer is closed */}
+      {!apiConfigured && !customApiKey && !isKeyDrawerOpen && (
+        <div 
+          onClick={() => setIsKeyDrawerOpen(true)}
+          className="p-2.5 px-4 bg-amber-500/15 hover:bg-amber-500/25 border-b border-amber-400/30 flex items-center justify-between gap-2 text-amber-200 text-xs cursor-pointer transition-colors"
+        >
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-amber-300" />
+            <Key className="w-3.5 h-3.5 flex-shrink-0 text-amber-300" />
             <p className="text-[11px] leading-tight">
-              <strong>GEMINI_API_KEY</strong> needed in .env or Vercel settings.
+              <strong>Connect Free Gemini Key</strong> to enable instant answers.
             </p>
           </div>
-          <button
-            onClick={checkStatus}
-            className="px-2 py-1 rounded-lg bg-amber-500/30 text-amber-200 border border-amber-400/40 text-[10px] hover:bg-amber-500/40 whitespace-nowrap"
-          >
-            Check Status
-          </button>
+          <span className="text-[10px] font-bold text-stargold-300 underline">
+            Paste Key ↗
+          </span>
         </div>
       )}
 
@@ -402,7 +612,7 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
                 {msg.notesReferenced !== undefined && msg.notesReferenced > 0 && (
                   <span className="px-1.5 py-0.2 rounded-full bg-stargold-400/20 text-stargold-300 text-[9px] border border-stargold-400/30 flex items-center gap-0.5">
                     <FileText className="w-2.5 h-2.5" />
-                    <span>{msg.notesReferenced} notes used</span>
+                    <span>{msg.notesReferenced} notes referenced</span>
                   </span>
                 )}
               </div>
@@ -433,13 +643,24 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
               </div>
 
               {msg.isError && (
-                <button
-                  onClick={handleRetryLast}
-                  className="text-[10px] text-amber-300 hover:underline flex items-center gap-1 px-1 pt-0.5"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  <span>Retry question</span>
-                </button>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <button
+                    onClick={handleRetryLast}
+                    className="text-[10px] text-amber-300 hover:underline flex items-center gap-1 px-1"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Retry question</span>
+                  </button>
+                  {!customApiKey && (
+                    <button
+                      onClick={() => setIsKeyDrawerOpen(true)}
+                      className="text-[10px] text-stargold-300 hover:underline flex items-center gap-1 px-1"
+                    >
+                      <Key className="w-3 h-3" />
+                      <span>Configure API Key</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           );
@@ -453,7 +674,7 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
               <div className="w-2 h-2 rounded-full bg-stargold-400 animate-bounce [animation-delay:-0.3s]" />
               <div className="w-2 h-2 rounded-full bg-lavender-400 animate-bounce [animation-delay:-0.15s]" />
               <div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce" />
-              <span className="text-xs font-mono ml-1 text-lavender-300">Explaining step-by-step...</span>
+              <span className="text-xs font-mono ml-1 text-lavender-300">Explaining step-by-step in Hindi & English...</span>
             </div>
           </div>
         )}
