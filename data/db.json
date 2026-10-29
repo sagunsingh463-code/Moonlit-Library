@@ -459,6 +459,30 @@
       "unlockedAt": "2026-10-26T20:15:00.000Z",
       "unlockCondition": "Submit an assignment with high priority",
       "userId": "user_demo_seraphina"
+    },
+    {
+      "id": "garden-1-user_sagun",
+      "name": "Moonlit Bonsai",
+      "type": "plant",
+      "description": "A miniature ancient juniper tree that glows silver when you finish a daily study goal.",
+      "icon": "bonsai",
+      "rarity": "rare",
+      "unlocked": true,
+      "unlockedAt": "2026-10-24T18:00:00.000Z",
+      "unlockCondition": "Complete your first study session",
+      "userId": "user_sagun"
+    },
+    {
+      "id": "garden-2-user_sagun",
+      "name": "Amethyst Crystal Cluster",
+      "type": "crystal",
+      "description": "A radiant purple geode that resonates with calm focus during midnight study hours.",
+      "icon": "crystal",
+      "rarity": "rare",
+      "unlocked": false,
+      "unlockedAt": "2026-10-26T20:15:00.000Z",
+      "unlockCondition": "Submit an assignment with high priority",
+      "userId": "user_sagun"
     }
   ],
   "stats": {
@@ -581,6 +605,23 @@
           "phase": "waxing-crescent"
         }
       ]
+    },
+    "user_sagun": {
+      "totalStudyMinutes": 120,
+      "tasksCompleted": 8,
+      "quizzesTaken": 4,
+      "quizAverageScore": 92,
+      "starsCollected": 6,
+      "currentStreakDays": 3,
+      "weeklyLogs": [
+        {
+          "date": "2026-10-29",
+          "dayName": "Today",
+          "minutes": 45,
+          "tasksCount": 3,
+          "phase": "waxing-crescent"
+        }
+      ]
     }
   },
   "settings": {
@@ -628,6 +669,15 @@
       "openingSkipped": false,
       "studentName": "Starlight Observer",
       "targetDegree": "Student Scholar"
+    },
+    "user_sagun": {
+      "reduceMotion": false,
+      "soundEnabled": true,
+      "ambientSound": "none",
+      "volume": 0.4,
+      "openingSkipped": false,
+      "studentName": "Sagun Singh",
+      "targetDegree": "Master Scholar"
     }
   },
   "files": [
@@ -731,6 +781,19 @@
       "emailVerified": true,
       "createdAt": "2026-10-29T19:15:13.746Z",
       "updatedAt": "2026-10-29T19:15:13.746Z"
+    },
+    {
+      "id": "user_sagun",
+      "email": "Sagun@463gmail.com",
+      "aliasEmail": "Sagunsingh463@gmail.com",
+      "passwordHash": "$2b$10$ayEa6f1ANc4fKO2IqT2LxujevQ2HNRHX/0RRQ94Bot6ZCCfKjxcni",
+      "name": "Sagun Singh",
+      "avatar": "cat-luna",
+      "phone": "+91 9988776655",
+      "phoneVerified": true,
+      "emailVerified": true,
+      "createdAt": "2026-10-30T00:00:00.000Z",
+      "updatedAt": "2026-10-29T20:32:32.714Z"
     }
   ]
 }

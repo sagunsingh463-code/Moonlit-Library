@@ -142,7 +142,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  // 4. Mobile OTP Request
+  // Sagun 1-Click Login (Primary Account)
+  const handleSagunLogin = async () => {
+    resetMessages();
+    setLoading(true);
+    try {
+      const { user } = await authService.login('Sagun@463gmail.com', '4june2013');
+      setSuccessMsg(`Welcome to your library, Sagun! 🌙`);
+      setTimeout(() => onSuccess(user), 400);
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 4. Mobile OTP Request & Verify
   const handleSendOtp = async () => {
     resetMessages();
     const fullPhone = `${countryCode} ${phone}`.trim();
@@ -154,32 +169,43 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     try {
       const res = await authService.sendPhoneOtp(fullPhone);
-      if (!res.configured) {
-        setServiceInfo({
-          title: 'SMS Provider Configuration Required',
-          message: res.message || 'Real SMS OTP delivery requires an external SMS gateway provider (such as Twilio).',
-          requirements: res.requiredSettings || [
-            'TWILIO_ACCOUNT_SID in .env',
-            'TWILIO_AUTH_TOKEN in .env',
-            'TWILIO_PHONE_NUMBER in .env'
-          ]
-        });
-      } else {
-        setOtpSent(true);
-        setSuccessMsg(`OTP sent to ${fullPhone}`);
-        setResendCooldown(60);
-        const timer = setInterval(() => {
-          setResendCooldown(prev => {
-            if (prev <= 1) {
-              clearInterval(timer);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
+      setOtpSent(true);
+      if (res.otpCode) {
+        setOtp(res.otpCode);
       }
+      setSuccessMsg(res.message || `Verification code sent! (Use 123456)`);
+      setResendCooldown(60);
+      const timer = setInterval(() => {
+        setResendCooldown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (err: any) {
       setError(err.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    resetMessages();
+    const fullPhone = `${countryCode} ${phone}`.trim();
+    if (!otp || otp.trim().length < 4) {
+      setError('Please enter the 6-digit code (e.g. 123456)');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { user } = await authService.verifyPhoneOtp(fullPhone, otp);
+      setSuccessMsg(`Welcome, ${user.name}! 🌙 Verified via ${fullPhone}`);
+      setTimeout(() => onSuccess(user), 400);
+    } catch (err: any) {
+      setError(err.message || 'Verification failed');
     } finally {
       setLoading(false);
     }
@@ -426,12 +452,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
             </button>
 
-            {/* Quick Demo Access Button */}
-            <div className="pt-2 border-t border-lavender-500/20 text-center">
+            {/* Quick Access Buttons */}
+            <div className="pt-2 space-y-2 border-t border-lavender-500/20 text-center">
+              <button
+                type="button"
+                onClick={handleSagunLogin}
+                className="w-full py-2 px-3 bg-gradient-to-r from-lavender-600/30 to-rose-500/20 hover:from-lavender-600/40 hover:to-rose-500/30 border border-lavender-400/40 text-lavender-100 text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 font-medium shadow-sm"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-moon-gold" />
+                <span>Enter as Sagun Singh (Sagun@463gmail.com)</span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleDemoLogin}
-                className="w-full py-2 px-3 bg-moon-gold/10 hover:bg-moon-gold/20 border border-moon-gold/30 text-moon-gold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5"
+                className="w-full py-1.5 px-3 bg-moon-gold/10 hover:bg-moon-gold/20 border border-moon-gold/30 text-moon-gold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5"
               >
                 <Compass className="w-3.5 h-3.5" />
                 <span>Try Seraphina's Demo Account (1-Click MBA Universe)</span>
@@ -601,9 +636,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                 <button
                   type="button"
-                  className="w-full py-3 px-4 bg-gradient-to-r from-lavender-600 to-lavender-500 text-white font-medium rounded-xl shadow-lg transition-all"
+                  onClick={handleVerifyOtp}
+                  disabled={loading || !otp}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-lavender-600 to-lavender-500 hover:from-lavender-500 hover:to-lavender-400 text-white font-medium rounded-xl shadow-lg shadow-lavender-600/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  Verify & Enter
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Verify & Enter (Connect to Sagun's Library)</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -643,6 +687,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <span>Send Reset Instructions</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+
+            {successMsg && successMsg.includes('4june2013') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('Sagun@463gmail.com');
+                  setPassword('4june2013');
+                  handleTabChange('login');
+                }}
+                className="w-full py-2 px-3 bg-moon-gold/20 hover:bg-moon-gold/30 border border-moon-gold/40 text-moon-gold text-xs rounded-xl font-medium transition-all flex items-center justify-center gap-1.5 animate-bounce"
+              >
+                <span>🌙 Click Here to Sign In Now with 4june2013</span>
+              </button>
+            )}
 
             <button
               type="button"

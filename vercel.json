@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!assets/|shagun/|demo_presentation.pptx|.*\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
