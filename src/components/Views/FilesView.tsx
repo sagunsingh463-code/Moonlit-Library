@@ -22,7 +22,8 @@ import {
   Sparkles,
   Play,
   Clock,
-  ChevronRight
+  ChevronRight,
+  Plus
 } from 'lucide-react';
 import { sound } from '../../services/audio';
 import { db } from '../../services/db';
@@ -60,6 +61,34 @@ export const FilesView: React.FC<FilesViewProps> = ({
   const [description, setDescription] = useState('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Drag-and-drop & Subject Folder upload state
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<{
+    status: 'idle' | 'uploading' | 'success' | 'error';
+    current: number;
+    total: number;
+    currentFileName: string;
+    message?: string;
+  }>({
+    status: 'idle',
+    current: 0,
+    total: 0,
+    currentFileName: ''
+  });
+  const folderFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Custom created folders persistence
+  const [customFolders, setCustomFolders] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('moonlit_custom_folders');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showNewFolderModal, setShowNewFolderModal] = useState(false);
+  const [newFolderNameInput, setNewFolderNameInput] = useState('');
+
   // Rename modal state
   const [renameTarget, setRenameTarget] = useState<FileItem | null>(null);
   const [newNameInput, setNewNameInput] = useState('');
@@ -73,8 +102,112 @@ export const FilesView: React.FC<FilesViewProps> = ({
 
   const categories = ['All', 'PDF', 'Notes', 'Slides', 'Assignment', 'Audio', 'Image', 'Other'];
 
-  // Extract all distinct folders
-  const allFolders = ['All', ...Array.from(new Set(files.map(f => f.folder || 'General').filter(Boolean)))];
+  // Extract all distinct folders (combines file folders and custom created subject folders)
+  const allFolders = [
+    'All',
+    ...Array.from(new Set([
+      ...files.map(f => f.folder || 'General'),
+      ...customFolders
+    ].filter(Boolean)))
+  ];
+
+  // Helper to create a new subject folder and immediately switch to it
+  const handleCreateFolder = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newFolderNameInput.trim();
+    if (!trimmed) return;
+    if (!customFolders.includes(trimmed)) {
+      const updated = [...customFolders, trimmed];
+      setCustomFolders(updated);
+      try {
+        localStorage.setItem('moonlit_custom_folders', JSON.stringify(updated));
+      } catch {}
+    }
+    setSelectedFolder(trimmed);
+    setFolderInput(trimmed);
+    setShowNewFolderModal(false);
+    setNewFolderNameInput('');
+    sound.playSparkle();
+  };
+
+  // Direct Drag-and-Drop and File Picker handler for subject folders
+  const handleUploadFilesToFolder = async (fileList: FileList | File[]) => {
+    const filesArray = Array.from(fileList);
+    if (!filesArray.length) return;
+
+    // Filter for PDF files
+    const pdfFiles = filesArray.filter(f => 
+      f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+    );
+
+    if (pdfFiles.length === 0) {
+      setUploadStatus({
+        status: 'error',
+        message: 'Please select PDF file(s). Only PDF documents can be dropped into this subject folder.',
+        current: 0,
+        total: 0,
+        currentFileName: ''
+      });
+      return;
+    }
+
+    const targetFolder = selectedFolder !== 'All' ? selectedFolder : 'General';
+    setUploadStatus({
+      status: 'uploading',
+      current: 0,
+      total: pdfFiles.length,
+      currentFileName: pdfFiles[0].name,
+      message: `Uploading 1 of ${pdfFiles.length}: "${pdfFiles[0].name}"...`
+    });
+
+    let successCount = 0;
+    const errors: string[] = [];
+
+    for (let i = 0; i < pdfFiles.length; i++) {
+      const file = pdfFiles[i];
+      setUploadStatus({
+        status: 'uploading',
+        current: i + 1,
+        total: pdfFiles.length,
+        currentFileName: file.name,
+        message: `Uploading ${i + 1} of ${pdfFiles.length}: "${file.name}"...`
+      });
+
+      try {
+        const tags = [targetFolder, 'PDF'];
+        await onUploadFile(file, 'PDF', tags, `Uploaded to ${targetFolder}`, targetFolder);
+        successCount++;
+      } catch (err: any) {
+        console.error(`Error uploading ${file.name}:`, err);
+        errors.push(file.name);
+      }
+    }
+
+    sound.playSparkle();
+
+    if (errors.length === 0) {
+      setUploadStatus({
+        status: 'success',
+        current: successCount,
+        total: pdfFiles.length,
+        currentFileName: '',
+        message: `✓ Successfully saved ${successCount} PDF${successCount > 1 ? 's' : ''} directly into "${targetFolder}"!`
+      });
+    } else {
+      setUploadStatus({
+        status: errors.length === pdfFiles.length ? 'error' : 'success',
+        current: successCount,
+        total: pdfFiles.length,
+        currentFileName: '',
+        message: `${successCount > 0 ? `✓ Saved ${successCount} PDF(s). ` : ''}⚠️ Failed to upload: ${errors.join(', ')}`
+      });
+    }
+
+    // Auto-dismiss notification after 6 seconds
+    setTimeout(() => {
+      setUploadStatus(prev => prev.status === 'uploading' ? prev : { status: 'idle', current: 0, total: 0, currentFileName: '' });
+    }, 6000);
+  };
 
   // Recently read documents for the Continue Reading shelf
   const continueReadingFiles = files
@@ -208,7 +341,12 @@ export const FilesView: React.FC<FilesViewProps> = ({
 
           {/* Upload Button */}
           <button
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => {
+              if (selectedFolder !== 'All') {
+                setFolderInput(selectedFolder);
+              }
+              fileInputRef.current?.click();
+            }}
             className="min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-lavender-600 to-indigo-600 hover:from-lavender-500 hover:to-indigo-500 text-white font-serif font-bold text-xs shadow-md transition-all active:scale-98"
           >
             <UploadCloud className="w-4 h-4" />
@@ -300,6 +438,17 @@ export const FilesView: React.FC<FilesViewProps> = ({
               {fld}
             </button>
           ))}
+
+          {/* Create New Subject Folder Button */}
+          <button
+            type="button"
+            onClick={() => setShowNewFolderModal(true)}
+            className="px-2.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-white border border-dashed border-lavender-500/30 flex items-center gap-1 transition-all shrink-0"
+            title="Create a new subject folder"
+          >
+            <Plus className="w-3 h-3 text-stargold-300" />
+            <span>New Folder</span>
+          </button>
         </div>
 
         {/* Categories & Search Bar */}
@@ -333,14 +482,188 @@ export const FilesView: React.FC<FilesViewProps> = ({
         </div>
       </div>
 
+      {/* ---------------- 3.5 SUBJECT FOLDER DRAG & DROP ZONE (WHEN FOLDER IS OPEN) ---------------- */}
+      {selectedFolder !== 'All' && (
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDraggingOver(true);
+          }}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDraggingOver(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDraggingOver(false);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDraggingOver(false);
+            if (e.dataTransfer?.files) {
+              handleUploadFilesToFolder(e.dataTransfer.files);
+            }
+          }}
+          className={`p-4 sm:p-5 rounded-3xl border-2 border-dashed transition-all duration-300 flex flex-col sm:flex-row items-center justify-between gap-4 ${
+            isDraggingOver
+              ? 'bg-lavender-600/20 border-stargold-300 shadow-[0_0_25px_rgba(254,224,71,0.25)] scale-[1.01]'
+              : 'bg-navy-900/60 border-lavender-500/30 hover:border-lavender-400/50'
+          }`}
+        >
+          <div className="flex items-center gap-3 text-left w-full sm:w-auto">
+            <div className={`p-3 rounded-2xl border transition-colors shrink-0 ${
+              isDraggingOver
+                ? 'bg-stargold-400/20 border-stargold-300 text-stargold-200 animate-bounce'
+                : 'bg-navy-950/80 border-lavender-500/20 text-lavender-300'
+            }`}>
+              <UploadCloud className="w-6 h-6 text-moon-gold" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-serif font-bold text-sm sm:text-base text-cream-100 truncate">
+                  📁 {selectedFolder}
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-lavender-600/30 text-lavender-200 border border-lavender-500/30">
+                  {filteredFiles.length} file{filteredFiles.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              <p className="text-xs text-lavender-300/80 mt-0.5">
+                {isDraggingOver
+                  ? `Release to drop PDF files directly into "${selectedFolder}"`
+                  : `Drag and drop PDF files here, or use Choose PDF to save inside "${selectedFolder}"`}
+              </p>
+            </div>
+          </div>
+
+          {/* Native Phone / Desktop File Picker */}
+          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+            <input
+              ref={folderFileInputRef}
+              type="file"
+              accept=".pdf,application/pdf"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) {
+                  handleUploadFilesToFolder(e.target.files);
+                  e.target.value = '';
+                }
+              }}
+            />
+            <button
+              type="button"
+              disabled={uploadStatus.status === 'uploading'}
+              onClick={() => folderFileInputRef.current?.click()}
+              className="min-h-[44px] w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-lavender-600 to-indigo-600 hover:from-lavender-500 hover:to-indigo-500 text-white font-serif font-bold text-xs shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 disabled:opacity-50"
+              title={`Choose PDF files from your phone or device to save into "${selectedFolder}"`}
+            >
+              <FileText className="w-4 h-4 text-stargold-300" />
+              <span>Choose PDF</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Progress & Success/Error Banner */}
+      {uploadStatus.status !== 'idle' && (
+        <div className={`p-3.5 rounded-2xl border transition-all flex flex-col gap-2 ${
+          uploadStatus.status === 'uploading'
+            ? 'bg-navy-900/90 border-lavender-400/40 text-cream-100 shadow-lg'
+            : uploadStatus.status === 'success'
+            ? 'bg-emerald-950/70 border-emerald-500/40 text-emerald-200 shadow-md'
+            : 'bg-rose-950/70 border-rose-500/40 text-rose-200 shadow-md'
+        }`}>
+          <div className="flex items-center justify-between text-xs font-medium">
+            <div className="flex items-center gap-2">
+              {uploadStatus.status === 'uploading' && (
+                <UploadCloud className="w-4 h-4 text-stargold-300 animate-bounce" />
+              )}
+              {uploadStatus.status === 'success' && (
+                <Check className="w-4 h-4 text-emerald-400" />
+              )}
+              {uploadStatus.status === 'error' && (
+                <X className="w-4 h-4 text-rose-400" />
+              )}
+              <span>{uploadStatus.message}</span>
+            </div>
+
+            {uploadStatus.status === 'uploading' && uploadStatus.total > 0 && (
+              <span className="font-mono text-[11px] text-stargold-300">
+                {Math.round((uploadStatus.current / uploadStatus.total) * 100)}%
+              </span>
+            )}
+
+            {uploadStatus.status !== 'uploading' && (
+              <button
+                type="button"
+                onClick={() => setUploadStatus({ status: 'idle', current: 0, total: 0, currentFileName: '' })}
+                className="text-xs opacity-70 hover:opacity-100 p-1"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {uploadStatus.status === 'uploading' && uploadStatus.total > 0 && (
+            <div className="w-full h-1.5 rounded-full bg-navy-950 overflow-hidden border border-lavender-500/20">
+              <div
+                className="h-full bg-gradient-to-r from-lavender-500 to-stargold-300 transition-all duration-200"
+                style={{ width: `${Math.round((uploadStatus.current / uploadStatus.total) * 100)}%` }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ---------------- 4. FILE LIST GRID WITH ALL 5 ACTIONS ---------------- */}
       {filteredFiles.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl bg-navy-900/40 border border-lavender-500/20">
-          <UploadCloud className="w-12 h-12 text-lavender-400/40 mx-auto mb-3 animate-bounce" />
-          <h3 className="font-serif text-base text-white">No files found in this shelf</h3>
-          <p className="text-xs text-lavender-300/70 mt-1 max-w-sm mx-auto">
-            Upload PDFs, lecture slides, DOCX cases, spreadsheets, or images to begin studying in Moonlit Reader.
+        <div 
+          onDragOver={(e) => {
+            if (selectedFolder !== 'All') {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingOver(true);
+            }
+          }}
+          onDrop={(e) => {
+            if (selectedFolder !== 'All') {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingOver(false);
+              if (e.dataTransfer?.files) {
+                handleUploadFilesToFolder(e.dataTransfer.files);
+              }
+            }
+          }}
+          className={`p-10 text-center rounded-3xl border-2 border-dashed transition-all ${
+            isDraggingOver && selectedFolder !== 'All'
+              ? 'bg-lavender-600/20 border-stargold-300 shadow-[0_0_25px_rgba(254,224,71,0.25)]'
+              : 'bg-navy-900/40 border-lavender-500/20'
+          }`}
+        >
+          <UploadCloud className="w-10 h-10 text-lavender-400/40 mx-auto mb-3" />
+          <h3 className="font-serif text-base text-white">
+            {selectedFolder !== 'All' ? `"${selectedFolder}" is ready for PDFs` : 'No files found in this shelf'}
+          </h3>
+          <p className="text-xs text-lavender-300/70 mt-1 max-w-sm mx-auto mb-4">
+            {selectedFolder !== 'All' 
+              ? `Drag and drop your PDF study materials into "${selectedFolder}", or click the button below.`
+              : 'Upload PDFs, lecture slides, DOCX cases, spreadsheets, or images to begin studying in Moonlit Reader.'}
           </p>
+          {selectedFolder !== 'All' && (
+            <button
+              type="button"
+              onClick={() => folderFileInputRef.current?.click()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-lavender-600 to-indigo-600 hover:from-lavender-500 hover:to-indigo-500 text-white font-medium text-xs shadow-md"
+            >
+              <FileText className="w-3.5 h-3.5 text-stargold-300" />
+              <span>Choose PDF for {selectedFolder}</span>
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -677,6 +1000,58 @@ export const FilesView: React.FC<FilesViewProps> = ({
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------- MODAL 0: CREATE NEW SUBJECT FOLDER ---------------- */}
+      {showNewFolderModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-md">
+          <div className="w-full max-w-sm p-6 rounded-3xl bg-navy-900 border border-lavender-500/30 shadow-2xl text-cream-50 animate-scaleUp">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Folder className="w-5 h-5 text-moon-gold" />
+                <h3 className="font-serif font-bold text-base text-white">New Subject Folder</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowNewFolderModal(false)}
+                className="text-lavender-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreateFolder} className="space-y-4">
+              <div>
+                <label className="block text-xs text-lavender-300 mb-1">Folder / Subject Name</label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={newFolderNameInput}
+                  onChange={(e) => setNewFolderNameInput(e.target.value)}
+                  placeholder="e.g. Product Management"
+                  className="w-full px-3 py-2 rounded-xl bg-navy-950 border border-lavender-500/30 text-xs text-white focus:outline-none focus:border-moon-gold"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowNewFolderModal(false)}
+                  className="flex-1 py-2 rounded-xl bg-white/10 text-xs text-cream-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 rounded-xl bg-gradient-to-r from-lavender-600 to-indigo-600 hover:from-lavender-500 hover:to-indigo-500 text-xs text-white font-medium shadow-md"
+                >
+                  Create & Open
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
