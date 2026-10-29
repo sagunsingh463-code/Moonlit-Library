@@ -22,3 +22,12 @@ yarn-error.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Android build artifacts
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+android/*.iml
+android/local.properties
+

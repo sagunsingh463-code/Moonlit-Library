@@ -1,0 +1,17 @@
+{
+  "short_name": "Moonlit Library",
+  "name": "Moonlit Library — Your Little Universe of Learning",
+  "icons": [
+    {
+      "src": "/shagun/shagun_reading.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0a0d1a",
+  "theme_color": "#0f172a",
+  "display": "standalone",
+  "orientation": "portrait"
+}
