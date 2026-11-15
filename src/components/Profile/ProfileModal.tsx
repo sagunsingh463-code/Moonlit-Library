@@ -169,6 +169,17 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       }}
       className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-6 bg-[#1E1528]/85 backdrop-blur-md overflow-y-auto"
     >
+      {/* Floating Exit Button - always visible regardless of scroll position */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="fixed top-4 right-4 z-[70] flex items-center gap-2 px-4 py-2 rounded-full bg-[#30243D]/95 hover:bg-[#C7B6E8] text-[#FFF7ED] hover:text-[#241733] border-2 border-[#C7B6E8] shadow-2xl backdrop-blur-md font-serif font-bold text-xs sm:text-sm transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+        title="Exit settings and return to library (Esc)"
+      >
+        <span className="text-sm font-bold">✕</span>
+        <span>Exit to Library</span>
+      </button>
+
       <div className="relative w-full max-w-lg my-6 sm:my-8 bg-gradient-to-b from-[#241A30] via-[#241A30] to-[#1E1528] rounded-3xl border border-[#C7B6E8]/30 shadow-2xl p-6 sm:p-8 backdrop-blur-xl text-cream-50 animate-fadeIn">
         
         {/* Prominent Header Close */}

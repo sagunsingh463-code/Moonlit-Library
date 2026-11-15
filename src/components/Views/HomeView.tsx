@@ -184,41 +184,56 @@ export const HomeView: React.FC<HomeViewProps> = ({
     <div className="p-3.5 sm:p-6 space-y-6 max-w-7xl mx-auto overflow-x-hidden">
       
       {/* ======================================================== */}
-      {/* 1. WIDE DREAMY PINTEREST LIBRARY COVER BANNER            */}
+      {/* 1. ENCHANTED GRAND ENTRANCE TO MOONLIT LIBRARY           */}
       {/* ======================================================== */}
-      <div className="relative rounded-3xl overflow-hidden border border-[#C7B6E8]/35 shadow-2xl bg-[#20162B]">
-        {/* Dreamy Library Banner Image (Compact & Balanced Height) */}
-        <div className="h-32 sm:h-36 md:h-40 w-full relative overflow-hidden">
+      <div className="relative rounded-3xl overflow-hidden border border-[#C7B6E8]/40 shadow-2xl bg-[#20162B] group">
+        {/* Fairy Light Garland along Entrance Arches */}
+        <div className="absolute top-2.5 left-0 right-0 flex items-center justify-around pointer-events-none z-20 text-[11px] opacity-80 select-none">
+          <span className="text-[#F3D8E5] animate-pulse">✨</span>
+          <span className="text-amber-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🏮</span>
+          <span className="text-[#C7B6E8] hidden sm:inline">✦</span>
+          <span className="text-amber-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🏮</span>
+          <span className="text-[#F3D8E5] animate-pulse">✨</span>
+          <span className="text-amber-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🏮</span>
+          <span className="text-[#C7B6E8] hidden sm:inline">✦</span>
+          <span className="text-amber-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🏮</span>
+          <span className="text-[#F3D8E5] animate-pulse">✨</span>
+        </div>
+
+        {/* Grand Arched Library Panorama Image */}
+        <div className="h-32 sm:h-36 md:h-44 w-full relative overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1507842229450-79779f62a6b2?auto=format&fit=crop&w=1600&q=85"
-            alt="Moonlit Library Vintage Panorama"
-            className="w-full h-full object-cover object-[center_35%] filter brightness-[0.78] contrast-[1.05]"
+            alt="The Grand Moonlit Library"
+            className="w-full h-full object-cover object-[center_35%] filter brightness-[0.78] contrast-[1.08] group-hover:scale-[1.02] transition-transform duration-1000"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#20162B] via-[#20162B]/55 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#20162B]/85 via-transparent to-[#20162B]/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#20162B] via-[#20162B]/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#20162B]/90 via-transparent to-[#20162B]/75" />
 
-          {/* Dreamy Ambient Moonlight & Lilac Glow */}
-          <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-[#C7B6E8]/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute top-1/3 right-1/4 w-60 h-60 bg-[#F3D8E5]/12 rounded-full blur-3xl pointer-events-none" />
+          {/* Dreamy Ambient Moonlight & Stained Glass Glow */}
+          <div className="absolute top-1/4 left-1/3 w-80 h-80 bg-[#C7B6E8]/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-[#F3D8E5]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-20 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
         </div>
 
         {/* Banner Content & Balanced Vertical Alignment */}
         <div className="p-5 sm:p-6 relative -mt-8 sm:-mt-10 z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="text-xs sm:text-sm font-mono text-[#F3D8E5] tracking-widest flex items-center gap-2">
-              <span>library ˚୨୧⋆｡˚ ⋆ 🌸</span>
-              <span>•</span>
-              <span className="text-[#E8DDF8] font-sans font-medium">🌙 Sagun Singh’s Dreamy Study Sanctuary ✨</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#30243D]/90 border border-[#C7B6E8]/35 text-[10px] uppercase font-semibold text-[#F3D8E5]">
+                ✦ Step Inside Your Enchanted Sanctuary ✦
+              </span>
+              <span className="text-[#E8DDF8] font-sans font-medium hidden sm:inline">🌸 Sagun Singh’s Moonlit World ✨</span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-[#FFF7ED] tracking-wide text-glow leading-tight">
-              Welcome to Moonlit Library
+              The Moonlit Library
             </h1>
             <p className="text-xs sm:text-sm text-[#E8DDF8] font-sans max-w-xl leading-relaxed mt-0.5 font-normal">
-              The candles are lit, the tea is warm, and a tranquil twilight sanctuary invites deep focus. What shall we master tonight?
+              Where quiet midnight thoughts turn into wisdom, your companion waits with open books, and learning is a starlit adventure.
             </p>
           </div>
 
-          {/* Quick Sanctuary Action Pills */}
+          {/* Enchanted Talisman Action Pills */}
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <button
               onClick={onOpenFocusMode}
@@ -263,13 +278,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {/* ------------------------------------------------------ */}
-        {/* COLUMN 1: Quote, Stickers, Retro Player & Checklist     */}
+        {/* COLUMN 1: The Whispering Archives                      */}
         {/* ------------------------------------------------------ */}
         <div className="space-y-6">
           {/* Literary / MBA Wisdom Quote Card */}
           <div className="p-5 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#30243D]/75 space-y-3 relative group shadow-md">
             <div className="flex items-center justify-between text-[11px] font-mono text-[#E8DDF8] font-medium">
-              <span>Wisdom Shelf ˚୨୧⋆｡˚ 🌸</span>
+              <span className="flex items-center gap-1.5">
+                <span>📜</span>
+                <span>The Whispering Archives • Wisdom Shelf ˚୨୧⋆｡˚</span>
+              </span>
               <button 
                 onClick={handleNextQuote}
                 className="hover:underline text-[10px] text-[#F3D8E5] hover:text-[#FFF7ED]"
@@ -278,7 +296,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </button>
             </div>
             <p className="text-xs sm:text-sm font-serif italic text-[#FFF7ED] leading-relaxed">
-              {quotesList[quoteIndex].quote}
+              "{quotesList[quoteIndex].quote}"
             </p>
             <span className="text-[11px] font-mono text-[#F3D8E5] block text-right font-medium">
               — {quotesList[quoteIndex].author}
@@ -299,7 +317,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex items-center justify-between text-xs font-serif font-bold text-[#FFF7ED]">
               <div className="flex items-center gap-2">
                 <span className="text-base">📻</span>
-                <span>Dreamy Study Sanctuary Player ✨</span>
+                <span>Melodies of the Sanctuary • Ambient Player ✨</span>
               </div>
               <span className="text-[10px] font-mono text-[#F3D8E5] px-2.5 py-0.5 rounded-full bg-[#1E1528] border border-[#C7B6E8]/35 font-medium">
                 {isPlayingMusic ? 'Now Playing' : 'Paused'}
@@ -455,14 +473,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {/* ------------------------------------------------------ */}
-        {/* COLUMN 2: Shagun's Reading Nook & Retro Flip Clock      */}
+        {/* COLUMN 2: The Librarian's Desk & Chrono Tower          */}
         {/* ------------------------------------------------------ */}
         <div className="space-y-6">
           {/* Shagun Permanent Mascot Reading Card */}
           <div className="p-6 rounded-3xl glass-panel-glow border border-[#C99B9B]/40 bg-[#241A30]/85 space-y-4 shadow-xl text-center relative overflow-hidden">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#30243D] border border-[#C7B6E8]/30 text-xs font-serif text-[#F3D8E5]">
+            {/* Ambient warm lantern glow behind Shagun's nook */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#C7B6E8]/10 rounded-full blur-2xl pointer-events-none" />
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#30243D] border border-[#C7B6E8]/35 text-xs font-serif text-[#F3D8E5]">
               <span>☕</span>
-              <span>Sanctuary Mascot & Companion</span>
+              <span>The Librarian's Desk • Shagun 🌙 🌸</span>
             </div>
 
             {/* Permanent Mascot Shagun */}
@@ -474,8 +496,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Retro Flip Clock Widget (From Reference!) */}
           <div className="p-5 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#241A30]/80 space-y-3 text-center">
             <span className="text-[11px] font-mono text-[#E8DDF8] font-medium flex items-center justify-center gap-1.5">
-              <span>🌙</span>
-              <span>-- check the time ˚୨୧⋆｡˚ --</span>
+              <span>⏳</span>
+              <span>Tower of Astral Hours • Chrono Clock ˚୨୧⋆｡˚</span>
               <span>🌸</span>
             </span>
 
@@ -515,7 +537,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="flex items-center gap-2">
                 <Calendar size={15} className="text-[#C7B6E8]" />
                 <h3 className="font-serif font-bold text-xs text-[#FFF7ED]">
-                  Today's Classes ({todayName}) 🌸
+                  Today's Academy Lectures & Masterclasses ({todayName}) 🌸
                 </h3>
               </div>
               <button
@@ -549,14 +571,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {/* ------------------------------------------------------ */}
-        {/* COLUMN 3: Streak, Pet & 9-Readings Subject Gallery     */}
+        {/* COLUMN 3: The Scholar's Hearth & Familiars              */}
         {/* ------------------------------------------------------ */}
         <div className="space-y-6">
-          {/* Study Streak Counter Box (From Reference!) */}
+          {/* Study Streak Counter Box (The Eternal Flame) */}
           <div className="p-5 rounded-3xl glass-panel border border-[#C99B9B]/35 bg-[#241A30]/85 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-serif font-bold text-[#FFF7ED]">
-                study streak ˚୨୧⋆｡˚ 🌸
+              <span className="text-xs font-serif font-bold text-[#FFF7ED] flex items-center gap-1.5">
+                <span>🔥</span>
+                <span>The Eternal Flame • Scholar Streak ˚୨୧⋆｡˚</span>
               </span>
               {/* Cute Ramen & Dango Stickers from Reference! */}
               <div className="flex items-center gap-1.5 text-base">
@@ -600,16 +623,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </div>
 
       {/* ======================================================== */}
-      {/* 3. 9—SUBJECTS / READINGS GALLERY (From Reference!)       */}
+      {/* 3. THE GRAND STACKS — TERM 2 TOMES & CURRICULA           */}
       {/* ======================================================== */}
       <div className="p-6 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#241A30]/80 space-y-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#C7B6E8]/15">
           <div>
             <div className="text-[11px] font-mono text-[#F3D8E5] tracking-wider font-medium flex items-center gap-1.5">
-              <span>9—readings / subjects ˚୨୧⋆｡˚ 🌸</span>
+              <span>📚 The Grand Stacks — Term 2 Tomes & Curricula ˚୨୧⋆｡˚ 🌸</span>
             </div>
             <h2 className="text-xl font-serif font-bold text-[#FFF7ED] mt-0.5">
-              Term 2 Academic Subjects & Curricula Gallery ✨
+              Vault of Academic Tomes, Case Studies & Frameworks ✨
             </h2>
           </div>
           <button
@@ -717,7 +740,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </div>
 
       {/* ======================================================== */}
-      {/* 5. YOUTUBE MASTERCLASSES SHELF (Curated Lectures)        */}
+      {/* 5. THE ASTRAL PROJECTION HALL — CURATED MASTERCLASSES    */}
       {/* ======================================================== */}
       {youtubeResources.length > 0 && (
         <div className="glass-panel p-6 rounded-3xl border border-[#C7B6E8]/25 bg-[#241A30]/80 space-y-4 shadow-md">
@@ -725,14 +748,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex items-center gap-2">
               <Video size={18} className="text-[#C7B6E8]" />
               <h3 className="font-serif font-bold text-base text-[#FFF7ED]">
-                Curated YouTube Masterclasses 🌸
+                The Astral Projection Hall — Curated Masterclasses 🌸
               </h3>
             </div>
             <button
               onClick={() => onNavigate('youtube')}
               className="text-xs text-[#F3D8E5] hover:text-[#FFF7ED] hover:underline font-medium"
             >
-              Open YouTube Centre →
+              Open Projection Hall →
             </button>
           </div>
 

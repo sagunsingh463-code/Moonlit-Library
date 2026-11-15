@@ -116,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   Moonlit Library
                 </h2>
                 <p className="text-[10px] text-[#C7B6E8] font-sans tracking-wider uppercase opacity-90 truncate">
-                  Dreamy Study Sanctuary
+                  Enchanted Study Sanctuary 🌸
                 </p>
               </div>
             )}

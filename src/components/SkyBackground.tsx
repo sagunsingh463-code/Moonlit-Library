@@ -49,6 +49,18 @@ export const SkyBackground: React.FC<SkyBackgroundProps> = ({ reduceMotion = fal
       { x: width * 0.85, y: height * 0.45, radius: 200, speed: 0.12, opacity: 0.03 }
     ];
 
+    // Delicate floating fairy sparkles (starlit library dust)
+    const sparkleCount = 28;
+    const sparkles = Array.from({ length: sparkleCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 1.8 + 0.8,
+      speedY: Math.random() * 0.22 + 0.08,
+      angle: Math.random() * Math.PI * 2,
+      angularSpeed: Math.random() * 0.02 + 0.01,
+      color: Math.random() > 0.5 ? '#F3D8E5' : '#E2C785' // Blush pink or warm golden candlelight
+    }));
+
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
@@ -169,6 +181,27 @@ export const SkyBackground: React.FC<SkyBackgroundProps> = ({ reduceMotion = fal
             shootingStar = null;
           }
         }
+
+        // Drifting fairy dust sparkles (warm golden & blush pink glowing particles)
+        sparkles.forEach(sp => {
+          sp.y -= sp.speedY;
+          sp.angle += sp.angularSpeed;
+          sp.x += Math.sin(sp.angle) * 0.35;
+          if (sp.y < -10) {
+            sp.y = height + 10;
+            sp.x = Math.random() * width;
+          }
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+          ctx.fillStyle = sp.color;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = sp.color;
+          ctx.globalAlpha = 0.5 + Math.sin(sp.angle) * 0.35;
+          ctx.fill();
+          ctx.restore();
+        });
       }
 
       animationFrameId = requestAnimationFrame(render);

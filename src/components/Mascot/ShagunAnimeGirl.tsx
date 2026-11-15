@@ -194,8 +194,8 @@ export const ShagunAnimeGirl: React.FC<ShagunAnimeGirlProps> = ({
           <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex items-center gap-1.5">
               <span className="font-serif font-bold text-[#F3D8E5] text-[11px]">Shagun</span>
-              <span className="text-[9px] px-2 py-0.2 rounded-full bg-[#C7B6E8]/20 text-[#C7B6E8] border border-[#C7B6E8]/30">
-                Host 🌙
+              <span className="text-[9px] px-2 py-0.2 rounded-full bg-[#C7B6E8]/20 text-[#E8DDF8] border border-[#C7B6E8]/35 font-medium">
+                Librarian & Companion 🌙 🌸
               </span>
             </div>
             <Sparkles size={12} className={`text-[#F3D8E5] ${isSparkling ? 'animate-spin' : ''}`} />
