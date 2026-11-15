@@ -117,6 +117,7 @@ export interface QuestionItem {
   explanation: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   isBookmarked: boolean;
+  isApproved?: boolean;
   lastPracticed?: string;
   timesPracticed?: number;
   timesCorrect?: number;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   SubjectItem, 
   QuestionItem, 
@@ -36,7 +36,15 @@ import {
   Filter,
   Trash2,
   Edit3,
-  Trophy
+  Trophy,
+  SlidersHorizontal,
+  Settings,
+  HelpCircle,
+  Lightbulb,
+  AlertTriangle,
+  ChevronRight,
+  Check,
+  X
 } from 'lucide-react';
 import { sound } from '../../services/sound';
 import confetti from 'canvas-confetti';
@@ -51,6 +59,17 @@ interface MoonlightArcadeViewProps {
   userStars: number;
 }
 
+// Canonical Term 2 Ongoing Subjects
+const term2DefaultSubjects: Partial<SubjectItem>[] = [
+  { id: 't2-1', name: 'Microeconomics', termNumber: 2, code: 'ECON201' },
+  { id: 't2-2', name: 'Introduction to UI/UX', termNumber: 2, code: 'UX202' },
+  { id: 't2-3', name: 'Leadership Accelerator', termNumber: 2, code: 'LEAD203' },
+  { id: 't2-4', name: 'Market Research Methods', termNumber: 2, code: 'MRM204' },
+  { id: 't2-5', name: 'Product Management', termNumber: 2, code: 'PM205' },
+  { id: 't2-6', name: 'CV Interview Workshop', termNumber: 2, code: 'CAR206' },
+  { id: 't2-7', name: 'Entrepreneurial Mindset', termNumber: 2, code: 'ENT207' }
+];
+
 export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
   subjects,
   allQuestions,
@@ -61,7 +80,38 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
   userStars
 }) => {
   // Navigation between Arcade sub-zones
-  const [activeTab, setActiveTab] = useState<'wheel' | 'memory' | 'flashcard' | 'speed' | 'concept' | 'true-false' | 'bank' | 'leaderboard'>('wheel');
+  const [activeTab, setActiveTab] = useState<'wheel' | 'memory' | 'flashcard' | 'true-false' | 'bank' | 'leaderboard'>('wheel');
+
+  // ============================================
+  // TERM 2 SELECTION & WHEEL SETTINGS
+  // Default strictly to Term 2 (Currently Ongoing)
+  // ============================================
+  const [selectedWheelTerm, setSelectedWheelTerm] = useState<number>(() => {
+    if (typeof window === 'undefined') return 2;
+    const saved = localStorage.getItem('moonlit_arcade_wheel_term');
+    return saved ? parseInt(saved, 10) : 2;
+  });
+
+  const [isTermSettingsOpen, setIsTermSettingsOpen] = useState(false);
+
+  // Active subjects for the wheel: Strictly filter by selectedWheelTerm
+  const activeWheelSubjects = useMemo(() => {
+    const termFiltered = subjects.filter(s => s.termNumber === selectedWheelTerm);
+    if (termFiltered.length > 0) return termFiltered;
+    if (selectedWheelTerm === 2) {
+      return term2DefaultSubjects as SubjectItem[];
+    }
+    return subjects.filter(s => s.termNumber === selectedWheelTerm).length > 0 
+      ? subjects.filter(s => s.termNumber === selectedWheelTerm)
+      : (term2DefaultSubjects as SubjectItem[]);
+  }, [subjects, selectedWheelTerm]);
+
+  const handleSelectWheelTerm = (termNum: number) => {
+    sound.playCardClick();
+    setSelectedWheelTerm(termNum);
+    localStorage.setItem('moonlit_arcade_wheel_term', String(termNum));
+    setIsTermSettingsOpen(false);
+  };
 
   // ============================================
   // SPIN THE WHEEL & 50-QUESTION CHALLENGE STATE
@@ -69,7 +119,6 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedSubjectName, setSelectedSubjectName] = useState<string>('');
-  const [isMixedQuiz, setIsMixedQuiz] = useState(false);
   
   // 50-Question Challenge Active Session
   const [isChallengeActive, setIsChallengeActive] = useState(false);
@@ -78,32 +127,22 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [hasSubmittedAnswer, setHasSubmittedAnswer] = useState(false);
   const [userAnswers, setUserAnswers] = useState<{ [qIndex: number]: { selected: number; isCorrect: boolean } }>({});
-  const [challengeTimerSeconds, setChallengeTimerSeconds] = useState(3000); // 50 mins default
+  const [challengeTimerSeconds, setChallengeTimerSeconds] = useState(3000); // 50 mins countdown
   const [challengeTimeTaken, setChallengeTimeTaken] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isChallengeComplete, setIsChallengeComplete] = useState(false);
-  const [isReviewingIncorrect, setIsReviewingIncorrect] = useState(false);
+  
+  // Audit filter in Scorecard: 'missed' | 'all'
+  const [auditFilter, setAuditFilter] = useState<'missed' | 'all'>('missed');
 
   // Scores History
   const [scoreHistory, setScoreHistory] = useState<GameScoreRecord[]>([]);
 
-  // Wheel colors
+  // Wheel vibrant colors
   const wheelColors = [
-    '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', 
-    '#06b6d4', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7'
+    '#f43f5e', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', 
+    '#ec4899', '#3b82f6', '#6366f1', '#14b8a6', '#a855f7'
   ];
-
-  // Active subjects for the wheel (default to Term 2 ongoing + core)
-  const activeWheelSubjects = subjects.length > 0 
-    ? subjects 
-    : [
-        { id: '1', name: 'Product Management' },
-        { id: '2', name: 'Microeconomics' },
-        { id: '3', name: 'Introduction to UI/UX' },
-        { id: '4', name: 'Leadership Accelerator' },
-        { id: '5', name: 'Finance' },
-        { id: '6', name: 'Marketing Analysis' }
-      ];
 
   const currentRotation = useRef(0);
 
@@ -119,7 +158,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     const centerX = width / 2;
     const centerY = height / 2;
     const radius = Math.min(centerX, centerY) - 16;
-    const numSegments = activeWheelSubjects.length;
+    const numSegments = activeWheelSubjects.length || 1;
     const arc = (2 * Math.PI) / numSegments;
 
     ctx.clearRect(0, 0, width, height);
@@ -133,7 +172,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
       ctx.closePath();
       ctx.fillStyle = wheelColors[i % wheelColors.length];
       ctx.fill();
-      ctx.strokeStyle = '#1e1b4b';
+      ctx.strokeStyle = '#0f172a';
       ctx.lineWidth = 3;
       ctx.stroke();
 
@@ -144,10 +183,10 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
       ctx.textAlign = 'right';
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 12px "Cinzel", serif, sans-serif';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-      ctx.shadowBlur = 4;
-      const text = activeWheelSubjects[i].name;
-      ctx.fillText(text.length > 18 ? text.slice(0, 16) + '..' : text, radius - 20, 5);
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      ctx.shadowBlur = 5;
+      const text = activeWheelSubjects[i]?.name || `Subject ${i + 1}`;
+      ctx.fillText(text.length > 18 ? text.slice(0, 16) + '..' : text, radius - 22, 5);
       ctx.restore();
     }
 
@@ -155,12 +194,12 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius + 2, 0, 2 * Math.PI);
     ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 5;
     ctx.stroke();
 
     // Center Hub
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 28, 0, 2 * Math.PI);
+    ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
     ctx.fillStyle = '#0f172a';
     ctx.fill();
     ctx.strokeStyle = '#fbbf24';
@@ -168,7 +207,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     ctx.stroke();
 
     ctx.fillStyle = '#fbbf24';
-    ctx.font = 'bold 16px sans-serif';
+    ctx.font = 'bold 18px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('🌙', centerX, centerY);
@@ -178,16 +217,16 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     drawWheel(currentRotation.current);
   }, [activeWheelSubjects]);
 
-  // Spin Wheel Action
+  // Spin Wheel Action (Random Selection)
   const handleSpinWheel = () => {
-    if (isSpinning) return;
+    if (isSpinning || activeWheelSubjects.length === 0) return;
     sound.playCelestialChime();
     setIsSpinning(true);
     setSelectedSubjectName('');
 
-    const spinRotations = 5 + Math.random() * 4; // 5 to 9 full turns
+    const spinRotations = 6 + Math.random() * 4; // 6 to 10 full turns
     const totalAngle = spinRotations * 2 * Math.PI;
-    const durationMs = 4000;
+    const durationMs = 4200;
     const startTime = performance.now();
     const startAngle = currentRotation.current;
 
@@ -207,15 +246,14 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
         const numSegments = activeWheelSubjects.length;
         const arc = (2 * Math.PI) / numSegments;
         const normalized = (currentRotation.current % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-        // pointer is at top (1.5 * PI)
         const pointerAngle = (1.5 * Math.PI - normalized + 2 * Math.PI) % (2 * Math.PI);
         const selectedIndex = Math.floor(pointerAngle / arc) % numSegments;
-        const picked = activeWheelSubjects[selectedIndex]?.name || 'Product Management';
+        const picked = activeWheelSubjects[selectedIndex]?.name || 'Microeconomics';
         setSelectedSubjectName(picked);
         sound.playCelestialChime();
         confetti({
-          particleCount: 70,
-          spread: 70,
+          particleCount: 80,
+          spread: 80,
           origin: { y: 0.6 }
         });
       }
@@ -224,7 +262,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     requestAnimationFrame(animateSpin);
   };
 
-  // Launch 50-Question Challenge
+  // Launch 50-Question Scenario Challenge
   const handleStart50QuestionChallenge = (subjectName: string) => {
     sound.playCelestialChime();
     const questions50 = generateSubjectChallengeQuestions(subjectName, 50);
@@ -238,7 +276,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     setIsTimerRunning(true);
     setIsChallengeActive(true);
     setIsChallengeComplete(false);
-    setIsReviewingIncorrect(false);
+    setAuditFilter('missed');
   };
 
   // Timer loop
@@ -305,12 +343,12 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     const totalQuestions = challengeQuestions.length;
     const correctCount = Object.values(userAnswers).filter(a => a.isCorrect).length;
     const accuracy = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
-    const xpEarned = correctCount * 10 + (accuracy >= 80 ? 200 : 50);
+    const xpEarned = correctCount * 10 + (accuracy >= 80 ? 250 : 50);
 
     const scoreRecord: GameScoreRecord = {
       id: `score-${Date.now()}`,
       gameType: 'wheel',
-      subjectName: selectedSubjectName || 'Mixed MBA',
+      subjectName: selectedSubjectName || 'Term 2 MBA Challenge',
       score: correctCount,
       maxScore: totalQuestions,
       accuracy,
@@ -323,7 +361,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     setScoreHistory(prev => [scoreRecord, ...prev]);
 
     confetti({
-      particleCount: 100,
+      particleCount: 120,
       spread: 90,
       origin: { y: 0.6 }
     });
@@ -337,6 +375,93 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
   };
 
   // ============================================
+  // WEAK TOPICS & PERSONALIZED RECOMMENDATIONS ENGINE
+  // ============================================
+  const challengeAnalytics = useMemo(() => {
+    if (!isChallengeComplete || challengeQuestions.length === 0) {
+      return { weakTopics: [], recommendations: [], correctCount: 0, accuracy: 0 };
+    }
+
+    const topicStats: Record<string, { subject: string; topic: string; total: number; incorrect: number; questions: QuestionItem[] }> = {};
+    let correctCount = 0;
+
+    challengeQuestions.forEach((q, idx) => {
+      const ans = userAnswers[idx];
+      const isCorrect = Boolean(ans?.isCorrect);
+      if (isCorrect) correctCount++;
+
+      if (!topicStats[q.topic]) {
+        topicStats[q.topic] = {
+          subject: q.subject,
+          topic: q.topic,
+          total: 0,
+          incorrect: 0,
+          questions: []
+        };
+      }
+      topicStats[q.topic].total += 1;
+      if (!isCorrect) {
+        topicStats[q.topic].incorrect += 1;
+        topicStats[q.topic].questions.push(q);
+      }
+    });
+
+    const weakTopics = Object.values(topicStats)
+      .filter(t => t.incorrect > 0)
+      .sort((a, b) => b.incorrect - a.incorrect);
+
+    const totalQuestions = challengeQuestions.length;
+    const accuracy = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+    // Generate personalized MBA recommendations
+    const recommendations: { title: string; detail: string; action: string }[] = [];
+
+    weakTopics.slice(0, 4).forEach(w => {
+      let advice = `Review foundational frameworks for "${w.topic}" in your ${w.subject} curriculum.`;
+      let action = `Focus on case study scenarios in ${w.subject}`;
+
+      if (w.topic.toLowerCase().includes('elasticity') || w.topic.toLowerCase().includes('revenue')) {
+        advice = 'Revisit Price Elasticity of Demand (|Ed| > 1 elastic vs |Ed| < 1 inelastic) and how price adjustments shift total revenue curves.';
+        action = 'Practice Microeconomics Lecture 3 pricing formulas';
+      } else if (w.topic.toLowerCase().includes('rice') || w.topic.toLowerCase().includes('prioritization')) {
+        advice = 'Review the RICE scoring formula ((Reach × Impact × Confidence) / Effort) and how to discount speculative projects.';
+        action = 'Review Term 2 Product Management Lecture 2';
+      } else if (w.topic.toLowerCase().includes('retention') || w.topic.toLowerCase().includes('nrr') || w.topic.toLowerCase().includes('churn')) {
+        advice = 'Focus on cohort retention curve flattening (PMF indicator) and SaaS Net Revenue Retention (NRR) decomposition.';
+        action = 'Analyze SaaS unit economics in Product Management';
+      } else if (w.topic.toLowerCase().includes('fitts') || w.topic.toLowerCase().includes('hick') || w.topic.toLowerCase().includes('wcag')) {
+        advice = 'Revise human-computer interaction heuristics: Fitts\'s Law thumb zones, Hick\'s decision latency, and WCAG AA 4.5:1 text contrast ratios.';
+        action = 'Re-check UI/UX Lecture 4 accessibility rules';
+      } else if (w.topic.toLowerCase().includes('psychological safety') || w.topic.toLowerCase().includes('hersey') || w.topic.toLowerCase().includes('situational')) {
+        advice = 'Deep dive into Amy Edmondson\'s Google Project Aristotle psychological safety and Hersey-Blanchard Situational Leadership matrices.';
+        action = 'Review Leadership Accelerator Case Studies';
+      } else if (w.topic.toLowerCase().includes('star') || w.topic.toLowerCase().includes('x-y-z') || w.topic.toLowerCase().includes('interview')) {
+        advice = 'Practice structuring behavioral answers using STAR (Situation, Task, Action, Result) and Google\'s X-Y-Z quantifiable resume formula.';
+        action = 'Practice in CV Interview Workshop notes';
+      } else if (w.topic.toLowerCase().includes('effectuation') || w.topic.toLowerCase().includes('affordable loss') || w.topic.toLowerCase().includes('mom test')) {
+        advice = 'Study Saras Sarasvathy\'s Effectuation principles (Bird-in-Hand, Affordable Loss, Lemonade) and Rob Fitzpatrick\'s Mom Test interview rules.';
+        action = 'Review Entrepreneurial Mindset frameworks';
+      }
+
+      recommendations.push({
+        title: `${w.topic} (${w.incorrect} Missed)`,
+        detail: advice,
+        action
+      });
+    });
+
+    if (recommendations.length === 0) {
+      recommendations.push({
+        title: 'Outstanding Mastery!',
+        detail: 'You demonstrated comprehensive conceptual mastery across all tested business scenarios. Proceed to advanced case studies or explore another Term 2 subject.',
+        action: 'Maintain streak and challenge other active subjects'
+      });
+    }
+
+    return { weakTopics, recommendations, correctCount, accuracy };
+  }, [isChallengeComplete, challengeQuestions, userAnswers]);
+
+  // ============================================
   // MEMORY MATCH GAME MODE STATE
   // ============================================
   const [memoryCards, setMemoryCards] = useState<any[]>([]);
@@ -346,13 +471,12 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
 
   const initMemoryGame = () => {
     sound.playCardClick();
-    const pairs = initialMemoryGamePairs.slice(0, 6); // 6 pairs = 12 cards
+    const pairs = initialMemoryGamePairs.slice(0, 6);
     const cards: any[] = [];
     pairs.forEach(p => {
       cards.push({ id: p.id, type: 'concept', text: p.concept, matchId: p.id });
       cards.push({ id: `${p.id}-def`, type: 'definition', text: p.definition, matchId: p.id });
     });
-    // Shuffle cards
     setMemoryCards(cards.sort(() => Math.random() - 0.5));
     setFlippedIndices([]);
     setMatchedIds([]);
@@ -429,26 +553,30 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
   };
 
   // ============================================
-  // QUESTION BANK EDITOR STATE
+  // EDITABLE QUESTION BANK STATE & APPROVAL FLOW
   // ============================================
   const [bankSearch, setBankSearch] = useState('');
   const [bankSubjectFilter, setBankSubjectFilter] = useState('all');
   const [bankDifficultyFilter, setBankDifficultyFilter] = useState('all');
+  const [bankApprovalFilter, setBankApprovalFilter] = useState<'all' | 'approved' | 'pending'>('all');
   const [isAddQModalOpen, setIsAddQModalOpen] = useState(false);
   const [editingQ, setEditingQ] = useState<QuestionItem | null>(null);
 
   // Form states for adding/editing question
-  const [qSubject, setQSubject] = useState(subjects[0]?.name || 'Product Management');
+  const [qSubject, setQSubject] = useState('Microeconomics');
   const [qTopic, setQTopic] = useState('');
   const [qText, setQText] = useState('');
   const [qOptions, setQOptions] = useState(['', '', '', '']);
   const [qCorrectIndex, setQCorrectIndex] = useState(0);
   const [qExplanation, setQExplanation] = useState('');
   const [qDifficulty, setQDifficulty] = useState<'Easy' | 'Medium' | 'Hard'>('Medium');
+  const [qIsApproved, setQIsApproved] = useState(true);
 
   const filteredBankQuestions = allQuestions.filter(q => {
     if (bankSubjectFilter !== 'all' && q.subject.toLowerCase() !== bankSubjectFilter.toLowerCase()) return false;
     if (bankDifficultyFilter !== 'all' && q.difficulty.toLowerCase() !== bankDifficultyFilter.toLowerCase()) return false;
+    if (bankApprovalFilter === 'approved' && q.isApproved === false) return false;
+    if (bankApprovalFilter === 'pending' && q.isApproved !== false) return false;
     if (bankSearch.trim()) {
       const match = q.question.toLowerCase().includes(bankSearch.toLowerCase()) ||
                     q.topic.toLowerCase().includes(bankSearch.toLowerCase()) ||
@@ -461,13 +589,14 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
   const handleOpenAddQuestion = () => {
     sound.playCardClick();
     setEditingQ(null);
-    setQSubject(subjects[0]?.name || 'Product Management');
+    setQSubject(activeWheelSubjects[0]?.name || 'Microeconomics');
     setQTopic('');
     setQText('');
     setQOptions(['', '', '', '']);
     setQCorrectIndex(0);
     setQExplanation('');
     setQDifficulty('Medium');
+    setQIsApproved(true);
     setIsAddQModalOpen(true);
   };
 
@@ -481,13 +610,23 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     setQCorrectIndex(q.correctOptionIndex);
     setQExplanation(q.explanation);
     setQDifficulty(q.difficulty);
+    setQIsApproved(q.isApproved !== false);
     setIsAddQModalOpen(true);
+  };
+
+  const handleToggleApproveQuestion = async (q: QuestionItem) => {
+    sound.playSparkle();
+    const updated: QuestionItem = {
+      ...q,
+      isApproved: q.isApproved === false ? true : false
+    };
+    await onSaveQuestion(updated);
   };
 
   const handleSaveQuestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!qText.trim() || qOptions.some(o => !o.trim())) {
-      alert('Please fill out the question and all 4 options.');
+      alert('Please fill out the question scenario and all 4 options.');
       return;
     }
 
@@ -495,12 +634,13 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
     const qData: QuestionItem = {
       id: editingQ ? editingQ.id : `q-${Date.now()}`,
       subject: qSubject,
-      topic: qTopic.trim() || 'General MBA Concepts',
+      topic: qTopic.trim() || 'General MBA Case Application',
       question: qText.trim(),
       options: qOptions.map(o => o.trim()),
       correctOptionIndex: qCorrectIndex,
-      explanation: qExplanation.trim() || 'Verified answer rationale.',
+      explanation: qExplanation.trim() || 'Verified answer rationale based on MBA frameworks.',
       difficulty: qDifficulty,
+      isApproved: qIsApproved,
       isBookmarked: editingQ?.isBookmarked ?? false,
       timesPracticed: editingQ?.timesPracticed ?? 0,
       timesCorrect: editingQ?.timesCorrect ?? 0
@@ -534,7 +674,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
               Moonlight Arcade
             </h1>
             <p className="text-xs sm:text-sm text-lavender-300/80 mt-1 max-w-2xl font-sans">
-              Master your MBA curriculum through animated spin challenges, memory matches, rapid flashcards, and 50-question mastery trials.
+              Master practical MBA decision-making through the 50-Question Spin Wheel, weak-topic diagnostics, and conceptual trials.
             </p>
           </div>
 
@@ -569,7 +709,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
           {[
             { id: 'wheel', label: '🎡 Spin the Subject Wheel (50 Qs)' },
             { id: 'memory', label: '🃏 Memory Match' },
-            { id: 'flashcard', label: '⚡ Flashcard Challenge' },
+            { id: 'flashcard', label: '⚡ Flashcards' },
             { id: 'true-false', label: '✓/✗ True or False' },
             { id: 'bank', label: `📚 Question Bank (${allQuestions.length})` },
             { id: 'leaderboard', label: '🏆 High Scores' }
@@ -600,67 +740,128 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
           {!isChallengeActive ? (
             /* Wheel Spinning Stage */
             <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-lavender-400/20 bg-midnight-950/60 flex flex-col items-center text-center space-y-6">
+              {/* Active Wheel Term Configuration Pill */}
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stargold-400/10 border border-stargold-400/30 text-stargold-300 text-xs font-serif">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  Active Wheel: <strong>Term {selectedWheelTerm} {selectedWheelTerm === 2 ? '(Currently Ongoing)' : selectedWheelTerm === 1 ? '(Completed)' : '(Upcoming)'}</strong>
+                  <span className="text-lavender-400 text-[11px]">({activeWheelSubjects.length} Subjects)</span>
+                </div>
+
+                <button
+                  onClick={() => setIsTermSettingsOpen(!isTermSettingsOpen)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-midnight-900 border border-lavender-400/30 text-lavender-300 hover:text-white text-xs hover:border-stargold-400 transition-all"
+                  title="Configure wheel term settings"
+                >
+                  <Settings size={13} />
+                  <span>Switch Term Settings</span>
+                </button>
+              </div>
+
+              {/* Term Settings Drawer / Dropdown */}
+              {isTermSettingsOpen && (
+                <div className="p-4 rounded-2xl bg-midnight-900/95 border border-stargold-400/40 max-w-md w-full text-left space-y-3 animate-fadeIn shadow-2xl">
+                  <div className="flex items-center justify-between text-xs font-bold text-white border-b border-lavender-400/20 pb-2">
+                    <span className="flex items-center gap-1.5">
+                      <SlidersHorizontal size={14} className="text-stargold-300" />
+                      Wheel Subject Term Settings
+                    </span>
+                    <button 
+                      onClick={() => setIsTermSettingsOpen(false)}
+                      className="text-lavender-400 hover:text-white"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-lavender-300">
+                    Per preference, Term 2 is active by default. Term 1 and future terms do not appear on the active Term 2 wheel unless switched here.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    {[
+                      { num: 1, label: 'Term 1 (Completed)', count: '9 Subjects' },
+                      { num: 2, label: 'Term 2 (Ongoing) ★', count: '7 Subjects' },
+                      { num: 3, label: 'Term 3 (Upcoming)', count: 'Electives' },
+                      { num: 4, label: 'Term 4 (Upcoming)', count: 'Electives' }
+                    ].map(t => (
+                      <button
+                        key={t.num}
+                        onClick={() => handleSelectWheelTerm(t.num)}
+                        className={`p-2.5 rounded-xl border text-left text-xs transition-all ${
+                          selectedWheelTerm === t.num
+                            ? 'border-stargold-400 bg-stargold-400/20 text-white font-bold'
+                            : 'border-lavender-400/20 bg-midnight-950/60 text-lavender-300 hover:border-lavender-400/50'
+                        }`}
+                      >
+                        <div className="font-serif">{t.label}</div>
+                        <div className="text-[10px] text-lavender-400">{t.count}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="max-w-md space-y-2">
                 <h3 className="text-2xl font-serif font-bold text-white">
                   Spin the Wheel of Destiny
                 </h3>
                 <p className="text-xs text-lavender-300">
-                  Press SPIN to randomly select an active MBA subject and launch a full 50-question conceptual trial!
+                  Press SPIN to randomly select an active subject from <strong>Term {selectedWheelTerm}</strong> and launch a 50-question conceptual scenario challenge!
                 </p>
               </div>
 
               {/* Animated Canvas Wheel Container */}
               <div className="relative flex items-center justify-center py-4">
-                {/* Fixed Top Glowing Pointer */}
+                {/* Fixed Top Golden Pointer */}
                 <div className="absolute top-0 z-20 transform -translate-y-1">
-                  <div className="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-stargold-400 filter drop-shadow-[0_0_8px_#fbbf24]" />
+                  <div className="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-stargold-400 filter drop-shadow-[0_0_10px_#fbbf24]" />
                 </div>
 
                 <canvas
                   ref={canvasRef}
-                  width={340}
-                  height={340}
-                  className="rounded-full shadow-2xl transition-transform duration-100"
+                  width={350}
+                  height={350}
+                  className="rounded-full shadow-2xl transition-transform duration-100 border-2 border-stargold-400/40"
                 />
               </div>
 
               {/* Spin & Launch Controls */}
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-3 w-full max-w-md">
                 <button
-                  disabled={isSpinning}
+                  disabled={isSpinning || activeWheelSubjects.length === 0}
                   onClick={handleSpinWheel}
-                  className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-stargold-400 via-amber-400 to-amber-500 text-midnight-950 font-bold text-base hover:scale-105 active:scale-95 disabled:opacity-50 transition-all shadow-xl shadow-stargold-400/25 flex items-center gap-2.5"
+                  className="w-full sm:w-auto px-10 py-3.5 rounded-2xl bg-gradient-to-r from-stargold-400 via-amber-400 to-amber-500 text-midnight-950 font-bold text-base hover:scale-105 active:scale-95 disabled:opacity-50 transition-all shadow-xl shadow-stargold-400/25 flex items-center justify-center gap-2.5"
                 >
                   <RotateCw size={20} className={isSpinning ? 'animate-spin' : ''} />
-                  {isSpinning ? 'Selecting Subject...' : 'SPIN THE WHEEL'}
+                  {isSpinning ? 'Spinning Subject Wheel...' : 'SPIN THE WHEEL'}
                 </button>
 
                 {/* Selected Subject Result Banner */}
                 {selectedSubjectName && (
-                  <div className="p-4 rounded-2xl bg-lavender-500/20 border border-stargold-400/60 animate-bounce mt-2 space-y-2">
-                    <div className="text-xs font-mono text-stargold-300 uppercase">
+                  <div className="w-full p-5 rounded-2xl bg-gradient-to-r from-lavender-500/20 via-purple-500/20 to-lavender-500/20 border border-stargold-400/70 animate-bounce mt-2 space-y-3">
+                    <div className="text-xs font-mono text-stargold-300 uppercase tracking-widest">
                       Wheel Landed On:
                     </div>
-                    <div className="text-xl font-serif font-bold text-white">
+                    <div className="text-2xl font-serif font-bold text-white tracking-wide">
                       {selectedSubjectName}
                     </div>
                     <button
                       onClick={() => handleStart50QuestionChallenge(selectedSubjectName)}
-                      className="px-6 py-2.5 rounded-xl bg-stargold-400 text-midnight-950 font-bold text-xs hover:scale-105 transition-all shadow-md"
+                      className="w-full py-3 rounded-xl bg-stargold-400 text-midnight-950 font-bold text-sm hover:scale-105 transition-all shadow-lg flex items-center justify-center gap-2"
                     >
-                      Start 50-Question {selectedSubjectName} Challenge →
+                      <span>Start 50-Question Scenario Challenge</span>
+                      <ArrowRight size={16} />
                     </button>
                   </div>
                 )}
 
-                {/* Or Choose Mixed Quiz */}
-                <div className="pt-4 border-t border-lavender-400/15 w-full flex items-center justify-center gap-3">
-                  <span className="text-xs text-lavender-400">Prefer all subjects combined?</span>
+                {/* Mixed Term Challenge Option */}
+                <div className="pt-4 border-t border-lavender-400/15 w-full flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <span className="text-xs text-lavender-300">Want all Term {selectedWheelTerm} subjects combined?</span>
                   <button
-                    onClick={() => handleStart50QuestionChallenge('Mixed MBA Curriculum')}
-                    className="px-4 py-2 rounded-xl bg-midnight-900 border border-lavender-400/30 text-xs text-lavender-200 hover:text-white hover:border-stargold-400"
+                    onClick={() => handleStart50QuestionChallenge(`Term ${selectedWheelTerm} Comprehensive MBA Exam`)}
+                    className="px-4 py-2 rounded-xl bg-midnight-900 border border-lavender-400/30 text-xs text-stargold-300 hover:text-white hover:border-stargold-400 transition-all whitespace-nowrap"
                   >
-                    Take Mixed 50-Question Exam
+                    Take Mixed 50-Question Exam →
                   </button>
                 </div>
               </div>
@@ -670,37 +871,44 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
             <div className="space-y-6">
               {!isChallengeComplete ? (
                 <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-lavender-400/25 bg-midnight-950/70 space-y-6">
-                  {/* Runner Header: Progress & Timer */}
+                  {/* Runner Header: Progress & Countdown Timer */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-lavender-400/15">
                     <div>
-                      <div className="text-xs font-mono text-stargold-300 font-bold">
-                        {selectedSubjectName || 'MBA Challenge'} • 50 QUESTIONS TRIAL
+                      <div className="text-xs font-mono text-stargold-300 font-bold uppercase tracking-wider flex items-center gap-2">
+                        <span>{selectedSubjectName || 'Term 2 MBA Challenge'}</span>
+                        <span>•</span>
+                        <span>50 SCENARIO-BASED QUESTIONS</span>
                       </div>
-                      <h3 className="text-xl font-serif font-bold text-white">
+                      <h3 className="text-xl font-serif font-bold text-white mt-0.5">
                         Question {currentQIndex + 1} of {challengeQuestions.length}
                       </h3>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      {/* Live Timer */}
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-midnight-900 border border-lavender-400/20 text-xs font-mono text-stargold-300 font-bold">
+                      {/* Live Countdown Timer */}
+                      <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-mono font-bold ${
+                        challengeTimerSeconds < 300 
+                          ? 'bg-rose-500/20 border-rose-500 text-rose-300 animate-pulse' 
+                          : 'bg-midnight-900 border-lavender-400/20 text-stargold-300'
+                      }`}>
                         <Timer size={16} />
-                        {formatTimer(challengeTimerSeconds)}
+                        <span>{formatTimer(challengeTimerSeconds)}</span>
+                        <span className="text-[10px] text-lavender-400 font-normal">remaining</span>
                       </div>
                       <button
                         onClick={() => {
-                          if (confirm('Exit current challenge? Your progress will be saved.')) {
+                          if (confirm('Submit current challenge early? Your score and analysis will be calculated based on answered questions.')) {
                             handleCompleteChallenge();
                           }
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs"
+                        className="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs hover:bg-rose-500/30"
                       >
                         End & Submit
                       </button>
                     </div>
                   </div>
 
-                  {/* Progress bar */}
+                  {/* Visual Progress Bar */}
                   <div className="w-full h-2 rounded-full bg-midnight-900 overflow-hidden">
                     <div 
                       className="h-full bg-gradient-to-r from-stargold-400 to-amber-500 transition-all duration-300"
@@ -708,19 +916,19 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                     />
                   </div>
 
-                  {/* Question Box */}
+                  {/* Question Scenario Box */}
                   {challengeQuestions[currentQIndex] && (
                     <div className="space-y-5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="px-2.5 py-0.5 rounded-md bg-lavender-500/15 text-lavender-300">
+                        <span className="px-3 py-1 rounded-lg bg-lavender-500/20 text-lavender-200 border border-lavender-400/30 font-medium">
                           {challengeQuestions[currentQIndex].topic}
                         </span>
-                        <span className="text-[11px] font-mono text-stargold-300 uppercase">
-                          {challengeQuestions[currentQIndex].difficulty} Difficulty
+                        <span className="text-[11px] font-mono text-stargold-300 uppercase tracking-wider">
+                          {challengeQuestions[currentQIndex].difficulty} Case Difficulty
                         </span>
                       </div>
 
-                      <h4 className="text-lg sm:text-xl font-serif text-white font-medium leading-relaxed">
+                      <h4 className="text-base sm:text-lg font-serif text-white font-medium leading-relaxed bg-midnight-900/40 p-4 rounded-2xl border border-lavender-400/10">
                         {challengeQuestions[currentQIndex].question}
                       </h4>
 
@@ -738,7 +946,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                               btnStyle = 'border-rose-500/80 bg-rose-500/20 text-rose-200 line-through';
                             }
                           } else if (isPicked) {
-                            btnStyle = 'border-stargold-400 bg-lavender-500/20 text-white font-semibold';
+                            btnStyle = 'border-stargold-400 bg-lavender-500/20 text-white font-semibold shadow-md';
                           }
 
                           return (
@@ -746,35 +954,35 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                               key={optIdx}
                               disabled={hasSubmittedAnswer}
                               onClick={() => handleAnswerOptionSelect(optIdx)}
-                              className={`w-full p-4 rounded-2xl border text-left text-sm transition-all flex items-start gap-3 ${btnStyle}`}
+                              className={`w-full p-4 rounded-2xl border text-left text-xs sm:text-sm transition-all flex items-start gap-3 ${btnStyle}`}
                             >
                               <span className="w-6 h-6 rounded-lg bg-midnight-950 text-stargold-300 text-xs font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">
                                 {['A', 'B', 'C', 'D'][optIdx]}
                               </span>
-                              <span className="flex-1 leading-snug">{opt}</span>
-                              {hasSubmittedAnswer && isCorrect && <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />}
-                              {hasSubmittedAnswer && isPicked && !isCorrect && <XCircle size={18} className="text-rose-400 shrink-0" />}
+                              <span className="flex-1 leading-relaxed">{opt}</span>
+                              {hasSubmittedAnswer && isCorrect && <CheckCircle2 size={18} className="text-emerald-400 shrink-0 mt-0.5" />}
+                              {hasSubmittedAnswer && isPicked && !isCorrect && <XCircle size={18} className="text-rose-400 shrink-0 mt-0.5" />}
                             </button>
                           );
                         })}
                       </div>
 
-                      {/* Immediate Feedback Explanation */}
+                      {/* Immediate Feedback with Conceptual Explanation */}
                       {hasSubmittedAnswer && (
-                        <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20 space-y-2 animate-fadeIn">
+                        <div className="p-4 rounded-2xl bg-midnight-900/90 border border-lavender-400/25 space-y-2 animate-fadeIn">
                           <div className="flex items-center gap-2 text-xs font-bold font-serif">
                             {userAnswers[currentQIndex]?.isCorrect ? (
                               <span className="text-emerald-400 flex items-center gap-1.5">
-                                <CheckCircle2 size={16} /> Correct Answer! (+10 XP)
+                                <CheckCircle2 size={16} /> Correct Decision! (+10 XP)
                               </span>
                             ) : (
                               <span className="text-rose-400 flex items-center gap-1.5">
-                                <XCircle size={16} /> Incorrect Answer
+                                <XCircle size={16} /> Incorrect Decision
                               </span>
                             )}
                           </div>
                           <p className="text-xs text-lavender-200/90 leading-relaxed">
-                            <strong className="text-stargold-300">Explanation:</strong> {challengeQuestions[currentQIndex].explanation}
+                            <strong className="text-stargold-300">MBA Rationale & Case Explanation:</strong> {challengeQuestions[currentQIndex].explanation}
                           </p>
                         </div>
                       )}
@@ -791,14 +999,14 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                             onClick={handleConfirmAnswer}
                             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 text-midnight-950 font-bold text-xs hover:scale-105 disabled:opacity-50 transition-all shadow-md"
                           >
-                            Submit Answer
+                            Confirm Answer
                           </button>
                         ) : (
                           <button
                             onClick={handleNextQuestion}
                             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 text-midnight-950 font-bold text-xs hover:scale-105 transition-all shadow-md flex items-center gap-1.5"
                           >
-                            {currentQIndex < challengeQuestions.length - 1 ? 'Next Question →' : 'View Final Scoreboard 🏆'}
+                            {currentQIndex < challengeQuestions.length - 1 ? 'Next Scenario Question →' : 'View Final Scoreboard & Analysis 🏆'}
                           </button>
                         )}
                       </div>
@@ -806,57 +1014,153 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                   )}
                 </div>
               ) : (
-                /* Challenge Complete Scorecard */
-                <div className="glass-panel p-8 sm:p-12 rounded-3xl border border-stargold-400/40 bg-midnight-950/80 text-center space-y-6 animate-fadeIn">
-                  <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-stargold-400 to-amber-500 text-midnight-950 flex items-center justify-center shadow-xl shadow-stargold-400/25">
-                    <Trophy size={40} />
-                  </div>
-
-                  <div className="space-y-1">
-                    <h3 className="text-3xl font-serif font-bold text-white">
-                      50-Question Challenge Completed!
+                /* ========================================================= */
+                /* CHALLENGE COMPLETE: METRICS, WEAK TOPICS & RECOMMENDATIONS */
+                /* ========================================================= */
+                <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-stargold-400/40 bg-midnight-950/80 space-y-8 animate-fadeIn">
+                  <div className="text-center space-y-2">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-stargold-400 to-amber-500 text-midnight-950 flex items-center justify-center shadow-xl shadow-stargold-400/25">
+                      <Trophy size={40} />
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white">
+                      50-Question Scenario Challenge Completed!
                     </h3>
                     <p className="text-xs text-lavender-300">
-                      Subject: {selectedSubjectName || 'Mixed MBA'}
+                      Subject: {selectedSubjectName || 'Term 2 MBA Challenge'}
                     </p>
                   </div>
 
                   {/* Summary Metric Boxes */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto pt-2">
-                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
+                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20 text-center">
                       <div className="text-[10px] text-lavender-400 uppercase font-mono">Score</div>
                       <div className="text-2xl font-serif font-bold text-stargold-300">
-                        {Object.values(userAnswers).filter(a => a.isCorrect).length} / 50
+                        {challengeAnalytics.correctCount} / 50
                       </div>
                     </div>
-                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20">
+                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20 text-center">
                       <div className="text-[10px] text-lavender-400 uppercase font-mono">Accuracy</div>
-                      <div className="text-2xl font-serif font-bold text-emerald-300">
-                        {Math.round((Object.values(userAnswers).filter(a => a.isCorrect).length / 50) * 100)}%
+                      <div className={`text-2xl font-serif font-bold ${
+                        challengeAnalytics.accuracy >= 75 ? 'text-emerald-300' : 'text-amber-300'
+                      }`}>
+                        {challengeAnalytics.accuracy}%
                       </div>
                     </div>
-                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20">
+                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20 text-center">
                       <div className="text-[10px] text-lavender-400 uppercase font-mono">Time Taken</div>
                       <div className="text-2xl font-serif font-bold text-white font-mono">
                         {formatTimer(challengeTimeTaken)}
                       </div>
                     </div>
-                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20">
+                    <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20 text-center">
                       <div className="text-[10px] text-lavender-400 uppercase font-mono">XP Earned</div>
                       <div className="text-2xl font-serif font-bold text-purple-300">
-                        +{Object.values(userAnswers).filter(a => a.isCorrect).length * 10 + 100} XP
+                        +{challengeAnalytics.correctCount * 10 + 100} XP
                       </div>
                     </div>
                   </div>
 
-                  {/* Review incorrect or start new challenge */}
-                  <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
-                    <button
-                      onClick={() => setIsReviewingIncorrect(!isReviewingIncorrect)}
-                      className="px-5 py-2.5 rounded-xl bg-midnight-900 border border-lavender-400/30 text-lavender-200 hover:text-white text-xs font-serif"
-                    >
-                      {isReviewingIncorrect ? 'Hide Review' : 'Review Incorrect Answers (Audit)'}
-                    </button>
+                  {/* ========================================================= */}
+                  {/* WEAK TOPICS IDENTIFICATION & ERROR ANALYSIS */}
+                  {/* ========================================================= */}
+                  <div className="glass-panel p-6 rounded-2xl bg-midnight-900/70 border border-rose-500/30 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-serif font-bold text-rose-300 flex items-center gap-2">
+                        <AlertTriangle size={16} className="text-rose-400" />
+                        Weak Topics & Competency Analysis ({challengeAnalytics.weakTopics.length} Areas Needing Review)
+                      </h4>
+                      <span className="text-[11px] text-lavender-400">
+                        {50 - challengeAnalytics.correctCount} Incorrect Out of 50
+                      </span>
+                    </div>
+
+                    {challengeAnalytics.weakTopics.length === 0 ? (
+                      <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 text-xs">
+                        🎉 Flawless performance! You achieved 100% accuracy with zero weak topics identified.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {challengeAnalytics.weakTopics.map((wt, i) => (
+                          <div 
+                            key={i}
+                            className="p-3.5 rounded-xl bg-midnight-950/80 border border-rose-500/20 space-y-1.5"
+                          >
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-bold text-white font-serif">{wt.topic}</span>
+                              <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-mono font-bold">
+                                {wt.incorrect} / {wt.total} Missed
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-lavender-400">
+                              Subject: <strong>{wt.subject}</strong>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-midnight-900 overflow-hidden mt-1">
+                              <div 
+                                className="h-full bg-rose-500" 
+                                style={{ width: `${Math.round((wt.incorrect / wt.total) * 100)}%` }} 
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ========================================================= */}
+                  {/* PERSONALIZED MBA IMPROVEMENT RECOMMENDATIONS */}
+                  {/* ========================================================= */}
+                  <div className="glass-panel p-6 rounded-2xl bg-midnight-900/70 border border-stargold-400/30 space-y-4">
+                    <h4 className="text-sm font-serif font-bold text-stargold-300 flex items-center gap-2">
+                      <Lightbulb size={16} className="text-amber-400" />
+                      Personalized Improvement Recommendations
+                    </h4>
+
+                    <div className="space-y-3">
+                      {challengeAnalytics.recommendations.map((rec, i) => (
+                        <div 
+                          key={i} 
+                          className="p-4 rounded-xl bg-midnight-950/70 border border-lavender-400/15 space-y-1.5 text-xs"
+                        >
+                          <div className="font-serif font-bold text-white text-sm">
+                            {rec.title}
+                          </div>
+                          <p className="text-lavender-300 leading-relaxed">
+                            {rec.detail}
+                          </p>
+                          <div className="inline-flex items-center gap-1.5 text-[11px] text-stargold-300 font-mono pt-1">
+                            <span>Recommended Action:</span>
+                            <span className="text-white font-medium">{rec.action}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Return / Audit Controls */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-lavender-400/20">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setAuditFilter('missed')}
+                        className={`px-4 py-2 rounded-xl text-xs font-serif transition-all ${
+                          auditFilter === 'missed'
+                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold'
+                            : 'bg-midnight-900 text-lavender-400 hover:text-white border border-lavender-400/20'
+                        }`}
+                      >
+                        Show Missed Questions ({50 - challengeAnalytics.correctCount})
+                      </button>
+                      <button
+                        onClick={() => setAuditFilter('all')}
+                        className={`px-4 py-2 rounded-xl text-xs font-serif transition-all ${
+                          auditFilter === 'all'
+                            ? 'bg-stargold-400/20 text-stargold-300 border border-stargold-400/40 font-bold'
+                            : 'bg-midnight-900 text-lavender-400 hover:text-white border border-lavender-400/20'
+                        }`}
+                      >
+                        Show All 50 Questions
+                      </button>
+                    </div>
+
                     <button
                       onClick={() => {
                         setIsChallengeActive(false);
@@ -868,28 +1172,66 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                     </button>
                   </div>
 
-                  {/* Review Incorrect Section */}
-                  {isReviewingIncorrect && (
-                    <div className="pt-6 border-t border-lavender-400/20 text-left space-y-4 max-w-3xl mx-auto">
-                      <h4 className="text-sm font-serif font-bold text-stargold-300">
-                        Reviewing Missed Questions:
-                      </h4>
-                      {challengeQuestions.map((q, idx) => {
-                        if (userAnswers[idx]?.isCorrect) return null;
-                        return (
-                          <div key={idx} className="p-4 rounded-2xl bg-midnight-900/80 border border-rose-500/30 space-y-2 text-xs">
-                            <div className="text-rose-300 font-bold">Q{idx + 1}: {q.question}</div>
-                            <div className="text-lavender-300">
-                              <strong className="text-emerald-300">Correct:</strong> {q.options[q.correctOptionIndex]}
-                            </div>
-                            <div className="text-[11px] text-lavender-400">
-                              <strong className="text-stargold-300">Rationale:</strong> {q.explanation}
-                            </div>
+                  {/* Audit Review Section */}
+                  <div className="pt-2 text-left space-y-4 max-w-4xl mx-auto">
+                    <h5 className="text-xs font-mono uppercase tracking-wider text-stargold-300">
+                      {auditFilter === 'missed' ? 'Auditing Missed Scenarios:' : 'Auditing All 50 Scenarios:'}
+                    </h5>
+
+                    {challengeQuestions.map((q, idx) => {
+                      const userAns = userAnswers[idx];
+                      if (auditFilter === 'missed' && userAns?.isCorrect) return null;
+
+                      return (
+                        <div 
+                          key={idx} 
+                          className={`p-5 rounded-2xl bg-midnight-900/90 border space-y-3 text-xs ${
+                            userAns?.isCorrect ? 'border-emerald-500/30' : 'border-rose-500/40'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-stargold-300 font-bold">
+                              Q{idx + 1} • {q.topic}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              userAns?.isCorrect ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                            }`}>
+                              {userAns?.isCorrect ? 'Correct Decision ✓' : 'Incorrect Decision ✗'}
+                            </span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+
+                          <div className="text-white font-serif text-sm leading-relaxed">
+                            {q.question}
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            {q.options.map((opt, optIdx) => {
+                              const isUserChoice = userAns?.selected === optIdx;
+                              const isCorrectOpt = optIdx === q.correctOptionIndex;
+
+                              let optBg = 'bg-midnight-950/60 border-lavender-400/10 text-lavender-300';
+                              if (isCorrectOpt) {
+                                optBg = 'bg-emerald-500/20 border-emerald-500/60 text-emerald-200 font-bold';
+                              } else if (isUserChoice && !isCorrectOpt) {
+                                optBg = 'bg-rose-500/20 border-rose-500/60 text-rose-200 line-through';
+                              }
+
+                              return (
+                                <div key={optIdx} className={`p-2.5 rounded-xl border text-xs flex items-start gap-2 ${optBg}`}>
+                                  <span className="font-mono font-bold shrink-0">{['A', 'B', 'C', 'D'][optIdx]}:</span>
+                                  <span>{opt}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-midnight-950/90 border border-lavender-400/15 text-[11px] text-lavender-300 leading-relaxed">
+                            <strong className="text-stargold-300">Explanation:</strong> {q.explanation}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -965,7 +1307,6 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
             </h3>
           </div>
 
-          {/* Flashcard container with flip animation */}
           <div
             onClick={() => {
               sound.playCardClick();
@@ -981,7 +1322,6 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
             </div>
           </div>
 
-          {/* Controls */}
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => {
@@ -1071,14 +1411,14 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
       )}
 
       {/* ========================================================= */}
-      {/* 5. EDITABLE QUESTION BANK */}
+      {/* 5. EDITABLE QUESTION BANK & APPROVAL WORKFLOW */}
       {/* ========================================================= */}
       {activeTab === 'bank' && (
         <div className="space-y-6 animate-fadeIn">
-          {/* Header controls: Search, Filter, Add, Export */}
+          {/* Header controls: Search, Filter, Approval Filter, Add, Export */}
           <div className="glass-panel p-6 rounded-3xl border border-lavender-400/20 bg-midnight-950/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex flex-1 items-center gap-3">
-              <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-1 flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px] max-w-sm">
                 <Search size={16} className="absolute left-3 top-2.5 text-lavender-400" />
                 <input
                   type="text"
@@ -1096,7 +1436,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
               >
                 <option value="all">All Subjects</option>
                 {subjects.map(s => (
-                  <option key={s.id} value={s.name}>{s.name}</option>
+                  <option key={s.id} value={s.name}>{s.name} (Term {s.termNumber})</option>
                 ))}
               </select>
 
@@ -1110,6 +1450,16 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
               </select>
+
+              <select
+                value={bankApprovalFilter}
+                onChange={(e) => setBankApprovalFilter(e.target.value as any)}
+                className="px-3 py-2 rounded-xl bg-midnight-900 border border-lavender-400/30 text-lavender-200 text-xs"
+              >
+                <option value="all">All Statuses</option>
+                <option value="approved">Approved Only ✅</option>
+                <option value="pending">Pending Approval ⏳</option>
+              </select>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1121,14 +1471,14 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
               </button>
               <button
                 onClick={handleOpenAddQuestion}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 text-midnight-950 font-bold text-xs flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 text-midnight-950 font-bold text-xs flex items-center gap-1.5 shadow-md"
               >
                 <Plus size={16} /> Add Question
               </button>
             </div>
           </div>
 
-          {/* Question List */}
+          {/* Question List with Approval Badges */}
           <div className="space-y-4">
             {filteredBankQuestions.map((q, idx) => (
               <div
@@ -1137,7 +1487,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-xs">
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
                       <span className="font-mono text-stargold-300 font-bold">Q{idx + 1}</span>
                       <span className="px-2 py-0.5 rounded bg-lavender-500/10 text-lavender-300 text-[10px]">
                         {q.subject} • {q.topic}
@@ -1145,24 +1495,46 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                       <span className="px-1.5 py-0.5 rounded bg-midnight-900 text-[10px] text-lavender-400">
                         {q.difficulty}
                       </span>
+                      <button
+                        onClick={() => handleToggleApproveQuestion(q)}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all ${
+                          q.isApproved !== false
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30'
+                            : 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                        }`}
+                        title="Click to toggle approved status"
+                      >
+                        {q.isApproved !== false ? 'Approved ✓' : 'Pending Approval ⏳'}
+                      </button>
                     </div>
                     <h4 className="text-sm font-medium text-white">{q.question}</h4>
                   </div>
 
                   <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                     <button
+                      onClick={() => handleToggleApproveQuestion(q)}
+                      className={`p-1.5 rounded-lg text-xs ${
+                        q.isApproved !== false ? 'text-emerald-400 hover:bg-emerald-500/20' : 'text-amber-400 hover:bg-amber-500/20'
+                      }`}
+                      title={q.isApproved !== false ? 'Mark as Pending' : 'Approve Question'}
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
                       onClick={() => handleOpenEditQuestion(q)}
                       className="p-1.5 rounded-lg text-lavender-300 hover:text-white hover:bg-lavender-500/20"
+                      title="Edit Question"
                     >
                       <Edit3 size={14} />
                     </button>
                     <button
                       onClick={async () => {
-                        if (confirm('Delete this question?')) {
+                        if (confirm('Delete this question from question bank?')) {
                           await onDeleteQuestion(q.id);
                         }
                       }}
                       className="p-1.5 rounded-lg text-lavender-300 hover:text-rose-400 hover:bg-rose-500/20"
+                      title="Delete Question"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -1195,10 +1567,15 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
           {isAddQModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-midnight-950/80 backdrop-blur-md animate-fadeIn">
               <div className="glass-panel p-6 sm:p-8 rounded-3xl max-w-lg w-full border border-lavender-400/30 bg-midnight-900/95 space-y-4 max-h-[90vh] overflow-y-auto">
-                <h3 className="text-lg font-serif font-bold text-white flex items-center gap-2">
-                  <Sparkles size={18} className="text-stargold-300" />
-                  {editingQ ? 'Edit Question' : 'Add New Question to Bank'}
-                </h3>
+                <div className="flex items-center justify-between pb-2 border-b border-lavender-400/20">
+                  <h3 className="text-lg font-serif font-bold text-white flex items-center gap-2">
+                    <Sparkles size={18} className="text-stargold-300" />
+                    {editingQ ? 'Edit Scenario Question' : 'Add New Question to Bank'}
+                  </h3>
+                  <button onClick={() => setIsAddQModalOpen(false)} className="text-lavender-400 hover:text-white">
+                    <X size={16} />
+                  </button>
+                </div>
 
                 <form onSubmit={handleSaveQuestionSubmit} className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
@@ -1210,7 +1587,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                         className="w-full px-3 py-2 rounded-xl bg-midnight-950 border border-lavender-400/30 text-white text-xs"
                       >
                         {subjects.map(s => (
-                          <option key={s.id} value={s.name}>{s.name}</option>
+                          <option key={s.id} value={s.name}>{s.name} (Term {s.termNumber})</option>
                         ))}
                       </select>
                     </div>
@@ -1229,10 +1606,10 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs text-lavender-200 mb-1">Topic / Framework</label>
+                    <label className="block text-xs text-lavender-200 mb-1">Topic / Conceptual Framework</label>
                     <input
                       type="text"
-                      placeholder="e.g. RICE Prioritization"
+                      placeholder="e.g. Price Elasticity of Demand, RICE Scoring"
                       value={qTopic}
                       onChange={(e) => setQTopic(e.target.value)}
                       className="w-full px-3 py-2 rounded-xl bg-midnight-950 border border-lavender-400/30 text-white text-xs"
@@ -1240,11 +1617,11 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs text-lavender-200 mb-1">Question Prompt *</label>
+                    <label className="block text-xs text-lavender-200 mb-1">Scenario / Question Prompt *</label>
                     <textarea
-                      rows={2}
+                      rows={3}
                       required
-                      placeholder="State the MBA conceptual or case question..."
+                      placeholder="State the real-life business situation, MBA case, or trade-off dilemma..."
                       value={qText}
                       onChange={(e) => setQText(e.target.value)}
                       className="w-full px-3 py-2 rounded-xl bg-midnight-950 border border-lavender-400/30 text-white text-xs"
@@ -1253,7 +1630,7 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
 
                   <div className="space-y-2">
                     <label className="block text-xs text-lavender-200">
-                      Options & Correct Answer (Select the radio for correct option):
+                      Options & Correct Answer (Select the radio button for the correct option):
                     </label>
                     {qOptions.map((opt, i) => (
                       <div key={i} className="flex items-center gap-2">
@@ -1281,14 +1658,27 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs text-lavender-200 mb-1">Explanation & Rationale</label>
+                    <label className="block text-xs text-lavender-200 mb-1">Explanation & MBA Rationale</label>
                     <textarea
                       rows={2}
-                      placeholder="Why is this the correct answer? Cite MBA frameworks or mechanics..."
+                      placeholder="Explain why this decision is optimal and why alternatives are flawed..."
                       value={qExplanation}
                       onChange={(e) => setQExplanation(e.target.value)}
                       className="w-full px-3 py-2 rounded-xl bg-midnight-950 border border-lavender-400/30 text-white text-xs"
                     />
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      id="qIsApprovedCheck"
+                      checked={qIsApproved}
+                      onChange={(e) => setQIsApproved(e.target.checked)}
+                      className="accent-stargold-400 rounded"
+                    />
+                    <label htmlFor="qIsApprovedCheck" className="text-xs text-lavender-200 cursor-pointer">
+                      Mark as Approved for active arcade play
+                    </label>
                   </div>
 
                   <div className="flex justify-end gap-2 pt-3 border-t border-lavender-400/20">
