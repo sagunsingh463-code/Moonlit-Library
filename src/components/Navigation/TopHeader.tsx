@@ -12,7 +12,8 @@ import {
   User,
   Sparkles,
   Sun,
-  Moon
+  Moon,
+  Plus
 } from 'lucide-react';
 import { AppSettings, MoonPhaseType, UserProfile } from '../../types';
 import { sound } from '../../services/audio';
@@ -25,6 +26,7 @@ interface TopHeaderProps {
   onOpenProfile: () => void;
   onReopenOpening: () => void;
   onOpenAiAssistant?: () => void;
+  onOpenQuickAdd?: () => void;
   currentUser: UserProfile | null;
   settings: AppSettings;
   onUpdateSettings: (updater: (prev: AppSettings) => AppSettings) => void;
@@ -38,6 +40,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onReopenOpening,
   onOpenProfile,
   onOpenAiAssistant,
+  onOpenQuickAdd,
   currentUser,
   settings,
   onUpdateSettings,
@@ -136,6 +139,18 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <span className="text-sm">{phaseInfo.symbol}</span>
           <span className="font-serif font-medium">{phaseInfo.name}</span>
         </div>
+
+        {/* Quick Add Button */}
+        {onOpenQuickAdd && (
+          <button
+            onClick={onOpenQuickAdd}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 hover:from-stargold-300 hover:to-amber-400 text-midnight-950 text-xs font-bold transition-all shadow-md hover:scale-105"
+            title="Quick Add Note, Task, Class, or Video"
+          >
+            <Plus className="w-4 h-4 shrink-0 stroke-[2.5]" />
+            <span className="hidden sm:inline">Quick Add</span>
+          </button>
+        )}
 
         {/* Bookmarks Quick Drawer Button */}
         <button

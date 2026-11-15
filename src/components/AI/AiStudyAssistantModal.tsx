@@ -156,66 +156,88 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
 
     try {
       // 1. Query available models for this specific API key via ListModels
-      const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${cleanKey}`);
-      if (!listRes.ok) {
-        const errData = await listRes.json();
-        setKeyFeedback({
-          type: 'error',
-          message: errData.error?.message || 'Invalid Gemini API key. Please check your key from Google AI Studio.'
-        });
-        setIsVerifyingKey(false);
-        return;
+      let contentModels: any[] = [];
+      try {
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${cleanKey}`);
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          contentModels = (listData.models || []).filter((m: any) => 
+            Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent')
+          );
+        }
+      } catch {
+        // Fallback gracefully to default model list
       }
 
-      const listData = await listRes.json();
-      const contentModels = (listData.models || []).filter((m: any) => 
-        Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent')
-      );
+      // Compile ranked candidates prioritizing 2.0-flash, 1.5-flash-latest, etc.
+      const rankedNames: string[] = [
+        'models/gemini-2.0-flash',
+        'models/gemini-1.5-flash-latest',
+        'models/gemini-2.5-flash',
+        'models/gemini-1.5-flash-002',
+        'models/gemini-pro',
+        'models/gemini-1.5-pro'
+      ];
 
-      if (contentModels.length === 0) {
-        setKeyFeedback({
-          type: 'error',
-          message: 'No models supporting content generation found for this key. Please create a key in Google AI Studio.'
-        });
-        setIsVerifyingKey(false);
-        return;
-      }
-
-      // Select best model (prefer flash, then gemini-2.0, then any gemini)
-      const preferred = contentModels.find((m: any) => m.name?.includes('flash') && !m.name?.includes('8b') && !m.name?.includes('thinking'))
-        || contentModels.find((m: any) => m.name?.includes('flash'))
-        || contentModels.find((m: any) => m.name?.includes('gemini'))
-        || contentModels[0];
-
-      const modelPath: string = preferred.name.startsWith('models/') ? preferred.name : `models/${preferred.name}`;
-      const cleanModelName = modelPath.replace(/^models\//, '');
-      const displayName = preferred.displayName || cleanModelName;
-
-      // 2. Perform test ping with discovered model
-      const testUrl = `https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent?key=${cleanKey}`;
-      const res = await fetch(testUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: 'Ping' }] }]
-        })
+      // Insert any active flash/gemini models found from listModels that aren't already included
+      contentModels.forEach((m: any) => {
+        const name = m.name?.startsWith('models/') ? m.name : `models/${m.name}`;
+        if (!name.includes('8b') && !name.includes('thinking') && !rankedNames.includes(name)) {
+          if (name.includes('flash') || name.includes('2.0') || name.includes('gemini')) {
+            rankedNames.push(name);
+          }
+        }
       });
 
-      const data = await res.json();
+      // 2. Perform test ping across candidate models and API versions until verified
+      let verifiedModel = '';
+      let verifiedEndpoint = 'v1beta';
+      let lastErrorMessage = '';
 
-      if (!res.ok) {
+      for (const target of rankedNames) {
+        for (const apiVer of ['v1beta', 'v1']) {
+          try {
+            const testUrl = `https://generativelanguage.googleapis.com/${apiVer}/${target}:generateContent?key=${cleanKey}`;
+            const res = await fetch(testUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ role: 'user', parts: [{ text: 'Ping' }] }]
+              })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              verifiedModel = target;
+              verifiedEndpoint = apiVer;
+              break;
+            } else if (data.error?.message) {
+              lastErrorMessage = data.error.message;
+            }
+          } catch (pingErr: any) {
+            lastErrorMessage = pingErr?.message || 'Network error';
+          }
+        }
+        if (verifiedModel) break;
+      }
+
+      if (!verifiedModel) {
         setKeyFeedback({
           type: 'error',
-          message: data.error?.message || `Ping to ${cleanModelName} failed.`
+          message: lastErrorMessage || 'Unable to connect to Google Gemini. Please check your API key from Google AI Studio.'
         });
         setIsVerifyingKey(false);
         return;
       }
+
+      const cleanModelName = verifiedModel.replace(/^models\//, '');
+      const displayName = cleanModelName;
 
       // Key & Model are verified!
       sound.playCelestialChime();
       localStorage.setItem(API_KEY_STORAGE, cleanKey);
       localStorage.setItem('moonlit_gemini_model', cleanModelName);
+      localStorage.setItem('moonlit_gemini_apiversion', verifiedEndpoint);
       setCustomApiKey(cleanKey);
       setApiConfigured(true);
       setKeyFeedback({ type: 'success', message: `✨ Connected to ${displayName}! Luna is online.` });
@@ -225,7 +247,7 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
         {
           id: `sys-${Date.now()}`,
           role: 'assistant',
-          content: `✨ **Google Gemini (${displayName}) Connected!**\n\nAapka API key verify ho chuka hai. Ab aap mujhse koi bhi study question Hindi ya English mein poochh sakte hain!`,
+          content: `✨ **Google Gemini (${displayName}) Connected!**\n\nAapka API key verify ho chuka hai (${verifiedEndpoint}). Ab aap mujhse koi bhi study question Hindi ya English mein poochh sakte hain!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
@@ -377,46 +399,53 @@ Help the student understand academic concepts step-by-step with intuitive explan
 Bilingual Capability: Answer questions comfortably and naturally in simple Hindi and English (Hinglish or English).
 Be encouraging, clear, and structured with markdown formatting.`;
 
-        const savedModel = (typeof window !== 'undefined' ? localStorage.getItem('moonlit_gemini_model') : null) || 'gemini-1.5-flash-latest';
+        const savedModel = (typeof window !== 'undefined' ? localStorage.getItem('moonlit_gemini_model') : null) || 'gemini-2.0-flash';
+        const savedApiVer = (typeof window !== 'undefined' ? localStorage.getItem('moonlit_gemini_apiversion') : null) || 'v1beta';
         const primaryTarget = savedModel.startsWith('models/') ? savedModel : `models/${savedModel}`;
         const candidateModels = [
           primaryTarget,
-          'models/gemini-1.5-flash-latest',
           'models/gemini-2.0-flash',
+          'models/gemini-1.5-flash-latest',
+          'models/gemini-2.5-flash',
           'models/gemini-1.5-flash-002',
           'models/gemini-pro'
         ];
+        const uniqueDirectCandidates = Array.from(new Set(candidateModels));
+        const apiVersions = savedApiVer === 'v1' ? ['v1', 'v1beta'] : ['v1beta', 'v1'];
 
-        for (const target of candidateModels) {
-          try {
-            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/${target}:generateContent?key=${activeKey}`;
-            const res = await fetch(geminiUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                contents,
-                generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
-              })
-            });
+        for (const target of uniqueDirectCandidates) {
+          if (replySuccess) break;
+          for (const apiVer of apiVersions) {
+            try {
+              const geminiUrl = `https://generativelanguage.googleapis.com/${apiVer}/${target}:generateContent?key=${activeKey}`;
+              const res = await fetch(geminiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  systemInstruction: { parts: [{ text: systemPrompt }] },
+                  contents,
+                  generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
+                })
+              });
 
-            const data = await res.json();
-            if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-              sound.playCelestialChime();
-              setApiConfigured(true);
-              const replyText = data.candidates[0].content.parts[0].text;
-              const assistantReply: ChatMessage = {
-                id: `ai-${Date.now()}`,
-                role: 'assistant',
-                content: replyText,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              };
-              setMessages(prev => [...prev, assistantReply]);
-              replySuccess = true;
-              break;
+              const data = await res.json();
+              if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                sound.playCelestialChime();
+                setApiConfigured(true);
+                const replyText = data.candidates[0].content.parts[0].text;
+                const assistantReply: ChatMessage = {
+                  id: `ai-${Date.now()}`,
+                  role: 'assistant',
+                  content: replyText,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+                setMessages(prev => [...prev, assistantReply]);
+                replySuccess = true;
+                break;
+              }
+            } catch (e) {
+              // try next candidate
             }
-          } catch (e) {
-            // try next candidate
           }
         }
       } catch (directErr) {

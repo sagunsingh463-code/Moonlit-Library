@@ -485,6 +485,7 @@ app.post('/api/auth/forgot-password', (req, res) => {
     return res.status(400).json({ error: 'Email address is required' });
   }
 
+  const db = getDB();
   const cleanEmail = email.toLowerCase().trim();
   if (cleanEmail.includes('sagun') && cleanEmail.includes('463')) {
     return res.json({
@@ -495,6 +496,7 @@ app.post('/api/auth/forgot-password', (req, res) => {
     });
   }
 
+  const user = (db.users || []).find(u => u.email && u.email.toLowerCase() === cleanEmail);
   if (!user) {
     return res.status(404).json({ error: 'No account registered with this email address' });
   }
@@ -577,15 +579,36 @@ app.post('/api/auth/verify-phone-otp', (req, res) => {
   }
 
   const db = getDB();
-  let user = db.users.find(u => u.id === 'user_sagun');
-  if (!user) {
-    user = db.users.find(u => u.email && u.email.toLowerCase().includes('sagun'));
+  const cleanPhone = phone ? phone.trim() : '';
+
+  // Look for existing user with this phone number
+  let user = db.users.find(u => u.phone === cleanPhone);
+
+  // If not found by phone, check if it's Sagun's known login or if no phone was assigned to Sagun
+  if (!user && (cleanPhone.includes('9999') || cleanPhone.includes('463'))) {
+    user = db.users.find(u => u.id === 'user_sagun' || (u.email && u.email.toLowerCase().includes('sagun')));
+    if (user && cleanPhone) {
+      user.phone = cleanPhone;
+      user.phoneVerified = true;
+      user.updatedAt = new Date().toISOString();
+      saveDB(db);
+    }
   }
 
-  if (user && phone) {
-    user.phone = phone.trim();
-    user.phoneVerified = true;
-    user.updatedAt = new Date().toISOString();
+  // If still not found, create a distinct account for this phone number
+  if (!user) {
+    user = {
+      id: `user_phone_${Date.now()}`,
+      name: `Scholar (${cleanPhone.slice(-4) || 'New'})`,
+      email: `${cleanPhone.replace(/[^0-9]/g, '') || Date.now()}@moonlit.library`,
+      phone: cleanPhone,
+      phoneVerified: true,
+      role: 'student',
+      avatar: 'starlight',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    db.users.push(user);
     saveDB(db);
   }
 
@@ -596,7 +619,7 @@ app.post('/api/auth/verify-phone-otp', (req, res) => {
   );
 
   res.json({
-    message: 'Phone verified! Welcome, Sagun Singh 🌙',
+    message: `Phone verified! Welcome, ${user.name} 🌙`,
     token,
     user: sanitizeUser(user)
   });
@@ -1431,6 +1454,171 @@ app.post('/api/seed', requireAuth, (req, res) => {
 });
 
 // ============================================
+// ACADEMIC TERMS & SUBJECTS REST ENDPOINTS
+// ============================================
+app.get('/api/terms', optionalAuth, (req, res) => {
+  const db = getDB();
+  res.json(db.terms || []);
+});
+
+app.put('/api/terms/:id', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (!db.terms) db.terms = [];
+  const idx = db.terms.findIndex(t => t.id === req.params.id);
+  if (idx !== -1) {
+    db.terms[idx] = { ...db.terms[idx], ...req.body };
+  } else {
+    db.terms.push(req.body);
+  }
+  saveDB(db);
+  res.json({ success: true });
+});
+
+app.get('/api/subjects', optionalAuth, (req, res) => {
+  const db = getDB();
+  res.json(db.subjects || []);
+});
+
+app.post('/api/subjects', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (!db.subjects) db.subjects = [];
+  const idx = db.subjects.findIndex(s => s.id === req.body.id);
+  if (idx !== -1) {
+    db.subjects[idx] = { ...db.subjects[idx], ...req.body, updatedAt: new Date().toISOString() };
+  } else {
+    db.subjects.push({ ...req.body, createdAt: req.body.createdAt || new Date().toISOString() });
+  }
+  saveDB(db);
+  res.json({ success: true });
+});
+
+app.delete('/api/subjects/:id', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (db.subjects) {
+    db.subjects = db.subjects.filter(s => s.id !== req.params.id);
+    saveDB(db);
+  }
+  res.json({ success: true });
+});
+
+// CALENDAR & TIMETABLE
+app.get('/api/calendar', optionalAuth, (req, res) => {
+  const db = getDB();
+  res.json(db.calendar || []);
+});
+
+app.post('/api/calendar', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (!db.calendar) db.calendar = [];
+  const idx = db.calendar.findIndex(c => c.id === req.body.id);
+  if (idx !== -1) {
+    db.calendar[idx] = { ...db.calendar[idx], ...req.body };
+  } else {
+    db.calendar.push(req.body);
+  }
+  saveDB(db);
+  res.json({ success: true });
+});
+
+app.delete('/api/calendar/:id', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (db.calendar) {
+    db.calendar = db.calendar.filter(c => c.id !== req.params.id);
+    saveDB(db);
+  }
+  res.json({ success: true });
+});
+
+// YOUTUBE LEARNING RESOURCES
+app.get('/api/youtube', optionalAuth, (req, res) => {
+  const db = getDB();
+  res.json(db.youtube || []);
+});
+
+app.post('/api/youtube', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (!db.youtube) db.youtube = [];
+  const idx = db.youtube.findIndex(y => y.id === req.body.id);
+  if (idx !== -1) {
+    db.youtube[idx] = { ...db.youtube[idx], ...req.body };
+  } else {
+    db.youtube.push(req.body);
+  }
+  saveDB(db);
+  res.json({ success: true });
+});
+
+app.delete('/api/youtube/:id', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (db.youtube) {
+    db.youtube = db.youtube.filter(y => y.id !== req.params.id);
+    saveDB(db);
+  }
+  res.json({ success: true });
+});
+
+// LEARNING DIARY
+app.get('/api/diary', optionalAuth, (req, res) => {
+  const db = getDB();
+  res.json(db.diary || []);
+});
+
+app.post('/api/diary', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (!db.diary) db.diary = [];
+  const idx = db.diary.findIndex(d => d.id === req.body.id);
+  if (idx !== -1) {
+    db.diary[idx] = { ...db.diary[idx], ...req.body, updatedAt: new Date().toISOString() };
+  } else {
+    db.diary.push(req.body);
+  }
+  saveDB(db);
+  res.json({ success: true });
+});
+
+app.delete('/api/diary/:id', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (db.diary) {
+    db.diary = db.diary.filter(d => d.id !== req.params.id);
+    saveDB(db);
+  }
+  res.json({ success: true });
+});
+
+// ARCADE SCORES
+app.get('/api/arcade/scores', optionalAuth, (req, res) => {
+  const db = getDB();
+  res.json(db.scores || []);
+});
+
+app.post('/api/arcade/scores', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (!db.scores) db.scores = [];
+  db.scores.push(req.body);
+  saveDB(db);
+  res.json({ success: true });
+});
+
+// ACHIEVEMENTS
+app.get('/api/achievements', optionalAuth, (req, res) => {
+  const db = getDB();
+  res.json(db.achievements || []);
+});
+
+app.post('/api/achievements', optionalAuth, (req, res) => {
+  const db = getDB();
+  if (!db.achievements) db.achievements = [];
+  const idx = db.achievements.findIndex(a => a.id === req.body.id);
+  if (idx !== -1) {
+    db.achievements[idx] = { ...db.achievements[idx], ...req.body };
+  } else {
+    db.achievements.push(req.body);
+  }
+  saveDB(db);
+  res.json({ success: true });
+});
+
+// ============================================
 // AI STUDY ASSISTANT ENDPOINTS
 // ============================================
 app.get('/api/ai/status', (req, res) => {
@@ -1510,12 +1698,14 @@ ${docContextSnippet}`;
         parts: [{ text: m.content }]
       }));
 
-      // 1. Query available models for this specific API key via ListModels
+      // 1. Compile prioritized model candidates
       let modelCandidates = [
-        'models/gemini-1.5-flash-latest',
         'models/gemini-2.0-flash',
+        'models/gemini-1.5-flash-latest',
+        'models/gemini-2.5-flash',
         'models/gemini-1.5-flash-002',
-        'models/gemini-pro'
+        'models/gemini-pro',
+        'models/gemini-1.5-pro'
       ];
 
       try {
@@ -1525,16 +1715,14 @@ ${docContextSnippet}`;
           const contentModels = (listData.models || []).filter(m => 
             Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent')
           );
-          if (contentModels.length > 0) {
-            const preferred = contentModels.find(m => m.name?.includes('flash') && !m.name?.includes('8b') && !m.name?.includes('thinking'))
-              || contentModels.find(m => m.name?.includes('flash'))
-              || contentModels.find(m => m.name?.includes('gemini'))
-              || contentModels[0];
-            if (preferred?.name) {
-              const fullPath = preferred.name.startsWith('models/') ? preferred.name : `models/${preferred.name}`;
-              modelCandidates = [fullPath, ...modelCandidates.filter(c => c !== fullPath)];
+          contentModels.forEach(m => {
+            const name = m.name?.startsWith('models/') ? m.name : `models/${m.name}`;
+            if (!name.includes('8b') && !name.includes('thinking') && !modelCandidates.includes(name)) {
+              if (name.includes('flash') || name.includes('2.0') || name.includes('gemini')) {
+                modelCandidates.push(name);
+              }
             }
-          }
+          });
         }
       } catch (e) {
         // Fallback to predefined candidate list
@@ -1542,30 +1730,33 @@ ${docContextSnippet}`;
 
       let lastErrorData = null;
       for (const target of modelCandidates) {
-        try {
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/${target}:generateContent?key=${geminiKey}`;
-          const apiRes = await fetch(geminiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              systemInstruction: { parts: [{ text: systemPrompt }] },
-              contents,
-              generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
-            })
-          });
-
-          const data = await apiRes.json();
-          if (apiRes.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-            return res.json({
-              reply: data.candidates[0].content.parts[0].text,
-              provider: 'gemini',
-              model: target,
-              retrievedNotesCount: relevantNotes.length
+        for (const apiVer of ['v1beta', 'v1']) {
+          try {
+            const geminiUrl = `https://generativelanguage.googleapis.com/${apiVer}/${target}:generateContent?key=${geminiKey}`;
+            const apiRes = await fetch(geminiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents,
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
+              })
             });
+
+            const data = await apiRes.json();
+            if (apiRes.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              return res.json({
+                reply: data.candidates[0].content.parts[0].text,
+                provider: 'gemini',
+                model: target,
+                apiVersion: apiVer,
+                retrievedNotesCount: relevantNotes.length
+              });
+            }
+            lastErrorData = data;
+          } catch (e) {
+            // try next candidate
           }
-          lastErrorData = data;
-        } catch (e) {
-          // try next candidate
         }
       }
 

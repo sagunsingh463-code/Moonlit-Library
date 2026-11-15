@@ -13,7 +13,15 @@ import {
   GardenItem, 
   UserStudyStats, 
   AppSettings,
-  UserProfile
+  UserProfile,
+  AcademicTerm,
+  SubjectItem,
+  CalendarEvent,
+  YouTubeResource,
+  LearningDiaryEntry,
+  AchievementItem,
+  GameScoreRecord,
+  ExamCountdownItem
 } from './types';
 import { db } from './services/db';
 import { sound } from './services/audio';
@@ -29,7 +37,14 @@ import {
   initialCustomQuizzes,
   initialConstellations,
   initialPlannerTasks,
-  initialGardenItems
+  initialGardenItems,
+  initialTerms,
+  initialSubjects,
+  initialCalendarEvents,
+  initialYouTubeResources,
+  initialAchievements,
+  initialDiaryEntries,
+  initialExamCountdowns
 } from './services/seedData';
 
 import { OpeningExperience } from './components/OpeningExperience';
@@ -46,6 +61,7 @@ import { SecretStudyGarden } from './components/Garden/SecretStudyGarden';
 import { MidnightFocusMode } from './components/Focus/MidnightFocusMode';
 import { MagicalSearchModal } from './components/Search/MagicalSearchModal';
 import { AiStudyAssistantModal } from './components/AI/AiStudyAssistantModal';
+import { QuickAddModal } from './components/Navigation/QuickAddModal';
 import { Sparkles } from 'lucide-react';
 
 import { HomeView } from './components/Views/HomeView';
@@ -57,6 +73,13 @@ import { QuizRoomView } from './components/Views/QuizRoomView';
 import { QuestionBankView } from './components/Views/QuestionBankView';
 import { StudyPlannerView } from './components/Views/StudyPlannerView';
 import { ProgressView } from './components/Views/ProgressView';
+import { AcademicTermsView } from './components/Views/AcademicTermsView';
+import { SubjectDashboardView } from './components/Views/SubjectDashboardView';
+import { CalendarTimetableView } from './components/Views/CalendarTimetableView';
+import { MoonlightArcadeView } from './components/Views/MoonlightArcadeView';
+import { YouTubeCentreView } from './components/Views/YouTubeCentreView';
+import { LearningDiaryView } from './components/Views/LearningDiaryView';
+import { AchievementsView } from './components/Views/AchievementsView';
 
 export function App() {
   const [showOpening, setShowOpening] = useState(() => {
@@ -81,6 +104,7 @@ export function App() {
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
   const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
   // App Data State (Defaults initialized to prevent loading screen freeze)
   const [settings, setSettings] = useState<AppSettings>(initialSettings);
@@ -97,6 +121,15 @@ export function App() {
   const [stats, setStats] = useState<UserStudyStats>(initialStats);
   const [isAwakening, setIsAwakening] = useState<boolean>(true);
 
+  // Six-Term Academic, Calendar, YouTube, Diary & Achievements State
+  const [terms, setTerms] = useState<AcademicTerm[]>(initialTerms);
+  const [subjects, setSubjects] = useState<SubjectItem[]>(initialSubjects);
+  const [selectedSubject, setSelectedSubject] = useState<SubjectItem | null>(null);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(initialCalendarEvents);
+  const [youtubeResources, setYouTubeResources] = useState<YouTubeResource[]>(initialYouTubeResources);
+  const [diaryEntries, setDiaryEntries] = useState<LearningDiaryEntry[]>(initialDiaryEntries);
+  const [achievements, setAchievements] = useState<AchievementItem[]>(initialAchievements);
+
   // Load all initial persistent data for the current authenticated user
   const loadData = async () => {
     try {
@@ -112,7 +145,13 @@ export function App() {
         loadedConstellations,
         loadedPlanner,
         loadedGarden,
-        loadedStats
+        loadedStats,
+        loadedTerms,
+        loadedSubjects,
+        loadedCalendar,
+        loadedYouTube,
+        loadedDiary,
+        loadedAchievements
       ] = await Promise.all([
         db.getSettings().catch(() => initialSettings),
         db.getAllFiles().catch(() => []),
@@ -125,7 +164,13 @@ export function App() {
         db.getConstellationStars().catch(() => initialConstellations),
         db.getPlannerTasks().catch(() => initialPlannerTasks),
         db.getGardenItems().catch(() => initialGardenItems),
-        db.getStats().catch(() => initialStats)
+        db.getStats().catch(() => initialStats),
+        db.getTerms().catch(() => initialTerms),
+        db.getSubjects().catch(() => initialSubjects),
+        db.getCalendarEvents().catch(() => initialCalendarEvents),
+        db.getYouTubeResources().catch(() => initialYouTubeResources),
+        db.getDiaryEntries().catch(() => initialDiaryEntries),
+        db.getAchievements().catch(() => initialAchievements)
       ]);
 
       if (loadedSettings) setSettings(loadedSettings);
@@ -140,6 +185,12 @@ export function App() {
       if (loadedPlanner) setPlannerTasks(loadedPlanner);
       if (loadedGarden) setGardenItems(loadedGarden);
       if (loadedStats) setStats(loadedStats);
+      if (loadedTerms) setTerms(loadedTerms);
+      if (loadedSubjects) setSubjects(loadedSubjects);
+      if (loadedCalendar) setCalendarEvents(loadedCalendar);
+      if (loadedYouTube) setYouTubeResources(loadedYouTube);
+      if (loadedDiary) setDiaryEntries(loadedDiary);
+      if (loadedAchievements) setAchievements(loadedAchievements);
 
       sound.setMuted(!loadedSettings?.soundEnabled);
       sound.setVolume(loadedSettings?.volume || 0.35);
@@ -535,6 +586,120 @@ export function App() {
     setStats(updatedStats);
   };
 
+  // Terms & Subjects handlers
+  const handleSaveTerm = async (term: AcademicTerm) => {
+    await db.saveTerm(term);
+    setTerms(prev => prev.map(t => t.id === term.id ? term : t));
+  };
+
+  const handleSaveSubject = async (subj: SubjectItem) => {
+    await db.saveSubject(subj);
+    setSubjects(prev => {
+      const idx = prev.findIndex(s => s.id === subj.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = subj;
+        return copy;
+      }
+      return [...prev, subj];
+    });
+    if (selectedSubject?.id === subj.id) setSelectedSubject(subj);
+  };
+
+  const handleDeleteSubject = async (id: string) => {
+    await db.deleteSubject(id);
+    setSubjects(prev => prev.filter(s => s.id !== id));
+    if (selectedSubject?.id === id) {
+      setSelectedSubject(null);
+      setCurrentView('terms');
+    }
+  };
+
+  const handleSelectSubject = (subj: SubjectItem) => {
+    setSelectedSubject(subj);
+    setCurrentView('subject');
+  };
+
+  // Calendar Event handlers
+  const handleSaveCalendarEvent = async (event: CalendarEvent) => {
+    await db.saveCalendarEvent(event);
+    setCalendarEvents(prev => {
+      const idx = prev.findIndex(e => e.id === event.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = event;
+        return copy;
+      }
+      return [...prev, event];
+    });
+  };
+
+  const handleDeleteCalendarEvent = async (id: string) => {
+    await db.deleteCalendarEvent(id);
+    setCalendarEvents(prev => prev.filter(e => e.id !== id));
+  };
+
+  // YouTube Resource handlers
+  const handleSaveYouTubeResource = async (res: YouTubeResource) => {
+    await db.saveYouTubeResource(res);
+    setYouTubeResources(prev => {
+      const idx = prev.findIndex(y => y.id === res.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = res;
+        return copy;
+      }
+      return [...prev, res];
+    });
+  };
+
+  const handleDeleteYouTubeResource = async (id: string) => {
+    await db.deleteYouTubeResource(id);
+    setYouTubeResources(prev => prev.filter(y => y.id !== id));
+  };
+
+  // Learning Diary handlers
+  const handleSaveDiaryEntry = async (entry: LearningDiaryEntry) => {
+    await db.saveDiaryEntry(entry);
+    setDiaryEntries(prev => {
+      const idx = prev.findIndex(d => d.id === entry.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = entry;
+        return copy;
+      }
+      return [entry, ...prev];
+    });
+  };
+
+  const handleDeleteDiaryEntry = async (id: string) => {
+    await db.deleteDiaryEntry(id);
+    setDiaryEntries(prev => prev.filter(d => d.id !== id));
+  };
+
+  // Arcade Score handler
+  const handleSaveGameScore = async (score: GameScoreRecord) => {
+    await db.saveGameScore(score);
+    if (score.accuracy >= 80) {
+      await handleAddStar(
+        `High Score in ${score.subjectName} (${score.accuracy}%)`,
+        'quiz',
+        `Earned +${score.xpEarned} XP in Moonlight Arcade`
+      );
+    }
+  };
+
+  // Direct subject file upload helper
+  const handleUploadSubjectFile = async (file: File, subjectName: string) => {
+    let cat: FileItem['category'] = 'PDF';
+    if (file.name.endsWith('.pdf')) cat = 'PDF';
+    else if (file.name.endsWith('.ppt') || file.name.endsWith('.pptx')) cat = 'Slides';
+    else if (file.name.endsWith('.doc') || file.name.endsWith('.docx') || file.name.endsWith('.txt')) cat = 'Notes';
+    else if (file.type.startsWith('image/')) cat = 'Image';
+    const uploaded = await db.saveRealFile(file, cat, [subjectName, 'Subject Material'], `Course material for ${subjectName}`, subjectName);
+    setFiles(prev => [uploaded, ...prev]);
+  };
+
   // Universal Navigation helper
   const handleNavigate = (view: ViewMode, itemId?: string) => {
     if (view === 'files' && itemId) {
@@ -629,6 +794,7 @@ export function App() {
               onReopenOpening={() => setShowOpening(true)}
               onOpenProfile={() => setIsProfileModalOpen(true)}
               onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
+              onOpenQuickAdd={() => setIsQuickAddOpen(true)}
               currentUser={currentUser}
               settings={settings}
               onUpdateSettings={handleUpdateSettings}
@@ -645,9 +811,92 @@ export function App() {
                   questions={questions}
                   assignments={assignments}
                   plannerTasks={plannerTasks}
+                  calendarEvents={calendarEvents}
+                  youtubeResources={youtubeResources}
+                  subjects={subjects}
                   onNavigate={handleNavigate}
                   onOpenFocusMode={() => setIsFocusModeOpen(true)}
                   onToggleTask={handleTogglePlannerTask}
+                />
+              )}
+
+              {currentView === 'terms' && (
+                <AcademicTermsView
+                  terms={terms}
+                  subjects={subjects}
+                  onSelectSubject={handleSelectSubject}
+                  onSaveTerm={handleSaveTerm}
+                  onSaveSubject={handleSaveSubject}
+                  onDeleteSubject={handleDeleteSubject}
+                />
+              )}
+
+              {currentView === 'subject' && selectedSubject && (
+                <SubjectDashboardView
+                  subject={selectedSubject}
+                  notes={notes}
+                  files={files}
+                  assignments={assignments}
+                  lectures={lectures}
+                  questions={questions}
+                  calendarEvents={calendarEvents}
+                  youtubeResources={youtubeResources}
+                  onBack={() => setCurrentView('terms')}
+                  onNavigateToView={(v) => setCurrentView(v)}
+                  onUploadFile={handleUploadSubjectFile}
+                  onOpenFileViewer={handleOpenFile}
+                  onSaveYouTube={handleSaveYouTubeResource}
+                  onDeleteYouTube={handleDeleteYouTubeResource}
+                  onSaveSubject={handleSaveSubject}
+                />
+              )}
+
+              {currentView === 'calendar' && (
+                <CalendarTimetableView
+                  events={calendarEvents}
+                  subjects={subjects}
+                  onSaveEvent={handleSaveCalendarEvent}
+                  onDeleteEvent={handleDeleteCalendarEvent}
+                  onSelectSubject={handleSelectSubject}
+                />
+              )}
+
+              {currentView === 'arcade' && (
+                <MoonlightArcadeView
+                  subjects={subjects}
+                  allQuestions={questions}
+                  onSaveScore={handleSaveGameScore}
+                  onSaveQuestion={handleSaveQuestion}
+                  onDeleteQuestion={handleDeleteQuestion}
+                  userStreak={stats.currentStreakDays}
+                  userStars={stats.starsCollected}
+                />
+              )}
+
+              {currentView === 'youtube' && (
+                <YouTubeCentreView
+                  resources={youtubeResources}
+                  subjects={subjects}
+                  onSaveResource={handleSaveYouTubeResource}
+                  onDeleteResource={handleDeleteYouTubeResource}
+                />
+              )}
+
+              {currentView === 'diary' && (
+                <LearningDiaryView
+                  entries={diaryEntries}
+                  subjects={subjects}
+                  onSaveEntry={handleSaveDiaryEntry}
+                  onDeleteEntry={handleDeleteDiaryEntry}
+                  userStreak={stats.currentStreakDays}
+                />
+              )}
+
+              {currentView === 'achievements' && (
+                <AchievementsView
+                  achievements={achievements}
+                  userStars={stats.starsCollected}
+                  userStreak={stats.currentStreakDays}
                 />
               )}
 
@@ -846,6 +1095,17 @@ export function App() {
         activeSubject={undefined}
         libraryNotesCount={notes.length}
         libraryFilesCount={files.length}
+      />
+
+      {/* Quick Add Modal */}
+      <QuickAddModal
+        isOpen={isQuickAddOpen}
+        onClose={() => setIsQuickAddOpen(false)}
+        subjects={subjects}
+        onSaveNote={handleSaveNote}
+        onSaveTask={handleSavePlannerTask}
+        onSaveCalendarEvent={handleSaveCalendarEvent}
+        onSaveYouTube={handleSaveYouTubeResource}
       />
     </div>
   );

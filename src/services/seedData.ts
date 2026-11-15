@@ -9,7 +9,15 @@ import {
   GardenItem, 
   UserStudyStats, 
   AppSettings,
-  QuizDefinition
+  QuizDefinition,
+  AcademicTerm,
+  SubjectItem,
+  CalendarEvent,
+  YouTubeResource,
+  YouTubeTimestampNote,
+  AchievementItem,
+  LearningDiaryEntry,
+  ExamCountdownItem
 } from '../types';
 
 export const initialSettings: AppSettings = {
@@ -536,4 +544,734 @@ export const initialCustomQuizzes: QuizDefinition[] = [
     isCustom: true
   }
 ];
+
+// ============================================
+// ACADEMIC TERMS & SUBJECTS SEED DATA
+// ============================================
+
+export const initialTerms: AcademicTerm[] = [
+  {
+    id: 'term-1',
+    termNumber: 1,
+    title: 'Term 1 — Foundations',
+    status: 'completed',
+    startDate: '2026-06-01',
+    endDate: '2026-09-30',
+    description: 'Foundational analytical and strategic management disciplines completed with distinction.',
+    creditsTotal: 27
+  },
+  {
+    id: 'term-2',
+    termNumber: 2,
+    title: 'Term 2 — Core Strategy & Operations',
+    status: 'in-progress',
+    startDate: '2026-10-01',
+    endDate: '2027-01-31',
+    description: 'Active term focusing on product architecture, economics, design systems, and leadership.',
+    creditsTotal: 21
+  },
+  {
+    id: 'term-3',
+    termNumber: 3,
+    title: 'Term 3 — Advanced Specialization',
+    status: 'upcoming',
+    startDate: '2027-02-01',
+    endDate: '2027-05-31',
+    description: 'Elective immersion in quantitative technology, advanced modeling, and scaling ventures.',
+    creditsTotal: 0
+  },
+  {
+    id: 'term-4',
+    termNumber: 4,
+    title: 'Term 4 — Global Leadership',
+    status: 'upcoming',
+    startDate: '2027-06-01',
+    endDate: '2027-09-30',
+    description: 'Cross-border enterprise operations, macroeconomics, and organizational governance.',
+    creditsTotal: 0
+  },
+  {
+    id: 'term-5',
+    termNumber: 5,
+    title: 'Term 5 — Innovation & Venture Lab',
+    status: 'upcoming',
+    startDate: '2027-10-01',
+    endDate: '2028-01-31',
+    description: 'Venture capital financing, corporate strategy, and incubations.',
+    creditsTotal: 0
+  },
+  {
+    id: 'term-6',
+    termNumber: 6,
+    title: 'Term 6 — Capstone & Practicum',
+    status: 'upcoming',
+    startDate: '2028-02-01',
+    endDate: '2028-05-31',
+    description: 'Comprehensive industry consulting project and final thesis defense.',
+    creditsTotal: 0
+  }
+];
+
+export const initialSubjects: SubjectItem[] = [
+  // --- TERM 1: 9 COMPLETED SUBJECTS ---
+  {
+    id: 'subj-dt101',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Design Thinking',
+    code: 'DT101',
+    description: 'Human-centered design methodology, empathy mapping, ideation, and rapid paper/digital prototyping.',
+    credits: 3,
+    professor: 'Dr. Evelyn Vance',
+    color: 'from-pink-500 to-rose-600',
+    icon: 'palette',
+    syllabus: ['Empathize & User Interviews', 'Define & POV Statements', 'Ideate & Brainstorming', 'Prototyping Fidelity', 'User Testing Loops'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-vc102',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Vibe Coding',
+    code: 'VC102',
+    description: 'Intuitive AI-assisted software rapid prototyping, rapid web architectures, and conversational iteration.',
+    credits: 3,
+    professor: 'Prof. Lucas Chen',
+    color: 'from-indigo-500 to-purple-600',
+    icon: 'code',
+    syllabus: ['Conversational Development', 'LLM Code Assistants', 'Rapid Prototyping', 'Component Modularity', 'Visual Verification'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-pe103',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Prompt Engineering',
+    code: 'PE103',
+    description: 'Advanced LLM context steering, few-shot prompting, chain-of-thought, RAG, and AI agent architectures.',
+    credits: 3,
+    professor: 'Dr. Maya Lin',
+    color: 'from-violet-500 to-fuchsia-600',
+    icon: 'sparkles',
+    syllabus: ['Zero-Shot & Few-Shot', 'Chain-of-Thought (CoT)', 'System Prompting', 'Embeddings & RAG', 'Agentic Workflows'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-acc104',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Accounting Primer',
+    code: 'ACC104',
+    description: 'Double-entry bookkeeping, balance sheet mechanics, income statements, and cash flow statement reconciliation.',
+    credits: 3,
+    professor: 'Prof. Arthur Pendelton',
+    color: 'from-emerald-500 to-teal-600',
+    icon: 'calculator',
+    syllabus: ['The Accounting Equation', 'Accruals vs Cash Flow', 'Balance Sheet Analysis', 'Income Statement Metrics', 'Working Capital'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-mkt105',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Marketing Analysis',
+    code: 'MKT105',
+    description: 'Customer Lifetime Value (CLV), Customer Acquisition Cost (CAC), funnel optimization, and segmentation.',
+    credits: 3,
+    professor: 'Dr. Rebecca Sterling',
+    color: 'from-amber-500 to-orange-600',
+    icon: 'trending-up',
+    syllabus: ['CLV Modeling', 'CAC Payback & Cohorts', 'Market Sizing (TAM/SAM/SOM)', 'Positioning Frameworks', 'Conversion Attribution'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-ob106',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Organizational Behavior',
+    code: 'OB106',
+    description: 'Group dynamics, motivation frameworks, organizational culture, conflict resolution, and behavioral ethics.',
+    credits: 3,
+    professor: 'Prof. David Thorne',
+    color: 'from-blue-500 to-cyan-600',
+    icon: 'users',
+    syllabus: ['Herzberg & Maslow', 'High-Performing Teams', 'Culture & Change Management', 'Conflict Mediation', 'Power & Influence'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-mc107',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Managerial Communication',
+    code: 'MC107',
+    description: 'Executive storytelling, Minto Pyramid Principle, strategic memos, board presentations, and persuasive negotiation.',
+    credits: 3,
+    professor: 'Dr. Clara Thorne',
+    color: 'from-cyan-500 to-blue-600',
+    icon: 'message-square',
+    syllabus: ['Minto Pyramid Principle', 'Executive Memos', 'Crisis Communication', 'Persuasion & Rhetoric', 'Boardroom Delivery'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-stat108',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Statistics',
+    code: 'STAT108',
+    description: 'Probability distributions, hypothesis testing (Z/t-tests), ANOVA, regression modeling, and statistical inference.',
+    credits: 3,
+    professor: 'Prof. Gregory Holt',
+    color: 'from-purple-500 to-indigo-600',
+    icon: 'bar-chart',
+    syllabus: ['Central Limit Theorem', 'Hypothesis Testing & p-values', 'Type I & II Errors', 'Linear Regression', 'A/B Experiment Power'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-fin109',
+    termId: 'term-1',
+    termNumber: 1,
+    name: 'Finance',
+    code: 'FIN109',
+    description: 'Time value of money, Discounted Cash Flow (DCF), WACC, capital structure, and portfolio theory.',
+    credits: 3,
+    professor: 'Dr. Alistair Ross',
+    color: 'from-yellow-500 to-amber-600',
+    icon: 'dollar-sign',
+    syllabus: ['Time Value & NPV/IRR', 'DCF Valuation Mechanics', 'WACC & Cost of Capital', 'Modigliani-Miller Theorems', 'Risk & Beta (CAPM)'],
+    completionPercentage: 100,
+    createdAt: '2026-06-01T08:00:00.000Z'
+  },
+
+  // --- TERM 2: 7 ONGOING SUBJECTS ---
+  {
+    id: 'subj-econ201',
+    termId: 'term-2',
+    termNumber: 2,
+    name: 'Microeconomics',
+    code: 'ECON201',
+    description: 'Market structures, price elasticity, game theory & Nash equilibrium, price discrimination, and externalities.',
+    credits: 3,
+    professor: 'Dr. Alistair Ross',
+    color: 'from-emerald-500 to-teal-600',
+    icon: 'pie-chart',
+    syllabus: ['Supply & Demand Elasticity', 'Consumer Surplus & Deadweight Loss', 'Game Theory & Nash Equilibrium', 'Monopoly & Oligopoly', 'Asymmetric Information'],
+    completionPercentage: 68,
+    createdAt: '2026-10-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-ux202',
+    termId: 'term-2',
+    termNumber: 2,
+    name: 'Introduction to UI/UX',
+    code: 'UX202',
+    description: 'Interaction design laws (Fitts, Hick), Jakob Nielsen heuristics, typography, accessibility (WCAG), and Figma systems.',
+    credits: 3,
+    professor: 'Prof. Samantha Blake',
+    color: 'from-fuchsia-500 to-pink-600',
+    icon: 'layout',
+    syllabus: ['Interaction Laws (Fitts, Hick)', 'Nielsen Usability Heuristics', 'Design Systems & Tokens', 'Accessibility (WCAG 2.1)', 'Figma Micro-Interactions'],
+    completionPercentage: 74,
+    createdAt: '2026-10-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-lead203',
+    termId: 'term-2',
+    termNumber: 2,
+    name: 'Leadership Accelerator',
+    code: 'LEAD203',
+    description: 'Situational leadership, psychological safety, emotional intelligence, authentic leadership, and team coaching.',
+    credits: 3,
+    professor: 'Dr. Marcus Vance',
+    color: 'from-amber-500 to-yellow-600',
+    icon: 'award',
+    syllabus: ['Situational Leadership (S1-S4)', 'Psychological Safety & Voice', 'Emotional Intelligence (EQ)', 'High-Performance Culture', 'Coaching & Mentorship'],
+    completionPercentage: 60,
+    createdAt: '2026-10-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-mrm204',
+    termId: 'term-2',
+    termNumber: 2,
+    name: 'Market Research Methods',
+    code: 'MRM204',
+    description: 'Qualitative customer discovery, conjoint analysis, survey design, NPS statistical analysis, and competitor benchmarks.',
+    credits: 3,
+    professor: 'Prof. Helen Zimmerman',
+    color: 'from-blue-500 to-indigo-600',
+    icon: 'search',
+    syllabus: ['Customer In-Depth Interviews', 'Choice-Based Conjoint (CBC)', 'Survey Instrument Design', 'Net Promoter Score (NPS)', 'Brand Equity Benchmarking'],
+    completionPercentage: 55,
+    createdAt: '2026-10-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-pm205',
+    termId: 'term-2',
+    termNumber: 2,
+    name: 'Product Management',
+    code: 'PM205',
+    description: 'Product lifecycle, roadmapping, RICE prioritization, MVP formulation, user cohort retention, and feature experiments.',
+    credits: 3,
+    professor: 'Prof. Nathan Reed',
+    color: 'from-purple-500 to-pink-600',
+    icon: 'box',
+    syllabus: ['Product Discovery & Opportunity Trees', 'RICE & Kano Prioritization', 'MVP Types (Wizard of Oz, Concierge)', 'Cohort Retention & NRR', 'A/B Experimentation'],
+    completionPercentage: 82,
+    createdAt: '2026-10-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-car206',
+    termId: 'term-2',
+    termNumber: 2,
+    name: 'CV Interview Workshop',
+    code: 'CAR206',
+    description: 'Executive resume crafting, Google XYZ impact bullet formatting, STAR behavioral cases, and compensation negotiation.',
+    credits: 3,
+    professor: 'Dr. Patricia Hayes',
+    color: 'from-rose-500 to-orange-600',
+    icon: 'file-text',
+    syllabus: ['Google XYZ Resume Formula', 'STAR Method Mastery', 'Product & Strategy Case Studies', 'LinkedIn & Personal Brand', 'Offer Negotiation Dynamics'],
+    completionPercentage: 88,
+    createdAt: '2026-10-01T08:00:00.000Z'
+  },
+  {
+    id: 'subj-ent207',
+    termId: 'term-2',
+    termNumber: 2,
+    name: 'Entrepreneurial Mindset',
+    code: 'ENT207',
+    description: 'Effectuation theory, affordable loss, lean startup cycles, business model canvas, and venture pitching.',
+    credits: 3,
+    professor: 'Prof. Victor Thorne',
+    color: 'from-cyan-500 to-teal-600',
+    icon: 'zap',
+    syllabus: ['Effectuation vs Causation', 'Affordable Loss Principle', 'Lean Canvas Validation', 'Unit Economics & Burn Rate', 'Investor Pitch Deck Crafting'],
+    completionPercentage: 50,
+    createdAt: '2026-10-01T08:00:00.000Z'
+  }
+];
+
+// ============================================
+// ACADEMIC CALENDAR & TIMETABLE EVENTS
+// ============================================
+
+export const initialCalendarEvents: CalendarEvent[] = [
+  // Recurring Weekly Timetable
+  {
+    id: 'evt-1',
+    subjectId: 'subj-pm205',
+    subjectName: 'Product Management',
+    title: 'Product Discovery & RICE Prioritization Lecture',
+    type: 'class',
+    dayOfWeek: 'Monday',
+    startTime: '09:30',
+    endTime: '11:00',
+    room: 'Lab A3',
+    professor: 'Prof. Nathan Reed',
+    isRecurring: true,
+    notes: 'Bring current sprint backlog and user interview notes'
+  },
+  {
+    id: 'evt-2',
+    subjectId: 'subj-econ201',
+    subjectName: 'Microeconomics',
+    title: 'Game Theory & Oligopoly Markets',
+    type: 'lecture',
+    dayOfWeek: 'Monday',
+    startTime: '14:00',
+    endTime: '15:30',
+    room: 'Auditorium 2',
+    professor: 'Dr. Alistair Ross',
+    isRecurring: true,
+    notes: 'Chapter 11 Problem set discussion'
+  },
+  {
+    id: 'evt-3',
+    subjectId: 'subj-ux202',
+    subjectName: 'Introduction to UI/UX',
+    title: 'Interaction Laws & Design Systems Lab',
+    type: 'class',
+    dayOfWeek: 'Tuesday',
+    startTime: '10:00',
+    endTime: '11:30',
+    room: 'Design Studio 4',
+    professor: 'Prof. Samantha Blake',
+    isRecurring: true,
+    notes: 'Figma interactive component prototype review'
+  },
+  {
+    id: 'evt-4',
+    subjectId: 'subj-mrm204',
+    subjectName: 'Market Research Methods',
+    title: 'Conjoint Analysis & Survey Instrument Design',
+    type: 'lecture',
+    dayOfWeek: 'Tuesday',
+    startTime: '15:00',
+    endTime: '16:30',
+    room: 'Hall B',
+    professor: 'Prof. Helen Zimmerman',
+    isRecurring: true,
+    notes: 'Qualtrics survey setup demo'
+  },
+  {
+    id: 'evt-5',
+    subjectId: 'subj-pm205',
+    subjectName: 'Product Management',
+    title: 'Cohort Retention & NRR Analytics Workshop',
+    type: 'class',
+    dayOfWeek: 'Wednesday',
+    startTime: '09:30',
+    endTime: '11:00',
+    room: 'Lab A3',
+    professor: 'Prof. Nathan Reed',
+    isRecurring: true,
+    notes: 'Mixpanel / Amplitude case study walkthrough'
+  },
+  {
+    id: 'evt-6',
+    subjectId: 'subj-lead203',
+    subjectName: 'Leadership Accelerator',
+    title: 'Psychological Safety & High-Performing Teams',
+    type: 'class',
+    dayOfWeek: 'Wednesday',
+    startTime: '13:30',
+    endTime: '15:00',
+    room: 'Executive Suite 1',
+    professor: 'Dr. Marcus Vance',
+    isRecurring: true,
+    notes: 'Peer coaching simulation in pairs'
+  },
+  {
+    id: 'evt-7',
+    subjectId: 'subj-ux202',
+    subjectName: 'Introduction to UI/UX',
+    title: 'Accessibility & WCAG 2.1 Heuristic Audit',
+    type: 'class',
+    dayOfWeek: 'Thursday',
+    startTime: '10:00',
+    endTime: '11:30',
+    room: 'Design Studio 4',
+    professor: 'Prof. Samantha Blake',
+    isRecurring: true,
+    notes: 'Screen reader and contrast analysis'
+  },
+  {
+    id: 'evt-8',
+    subjectId: 'subj-econ201',
+    subjectName: 'Microeconomics',
+    title: 'Price Discrimination & Asymmetric Information',
+    type: 'lecture',
+    dayOfWeek: 'Thursday',
+    startTime: '14:00',
+    endTime: '15:30',
+    room: 'Auditorium 2',
+    professor: 'Dr. Alistair Ross',
+    isRecurring: true,
+    notes: 'Exam review questions'
+  },
+  {
+    id: 'evt-9',
+    subjectId: 'subj-ent207',
+    subjectName: 'Entrepreneurial Mindset',
+    title: 'Effectuation & Lean Startup Business Model Lab',
+    type: 'class',
+    dayOfWeek: 'Friday',
+    startTime: '10:30',
+    endTime: '12:00',
+    room: 'Innovation Hub',
+    professor: 'Prof. Victor Thorne',
+    isRecurring: true,
+    notes: 'Present 60-second venture elevator pitch'
+  },
+  {
+    id: 'evt-10',
+    subjectId: 'subj-car206',
+    subjectName: 'CV Interview Workshop',
+    title: 'Executive Case & STAR Behavioral Mock Interviews',
+    type: 'class',
+    dayOfWeek: 'Friday',
+    startTime: '14:00',
+    endTime: '16:00',
+    room: 'Career Center',
+    professor: 'Dr. Patricia Hayes',
+    isRecurring: true,
+    notes: 'Recorded mock interview rounds with live feedback'
+  },
+
+  // Specific Date Deadlines and Exams
+  {
+    id: 'evt-exam-1',
+    subjectId: 'subj-pm205',
+    subjectName: 'Product Management',
+    title: 'Product Management Mid-Term Case Exam',
+    type: 'exam',
+    date: '2026-11-20',
+    startTime: '10:00',
+    endTime: '12:30',
+    room: 'Main Examination Hall A',
+    professor: 'Prof. Nathan Reed',
+    isRecurring: false,
+    notes: 'Covers RICE, MVP formulations, and Cohort Retention'
+  },
+  {
+    id: 'evt-exam-2',
+    subjectId: 'subj-econ201',
+    subjectName: 'Microeconomics',
+    title: 'Microeconomics Mid-Term Examination',
+    type: 'exam',
+    date: '2026-11-25',
+    startTime: '14:00',
+    endTime: '16:00',
+    room: 'Auditorium 1',
+    professor: 'Dr. Alistair Ross',
+    isRecurring: false,
+    notes: 'Comprehensive exam on game theory and price elasticity'
+  },
+  {
+    id: 'evt-assign-1',
+    subjectId: 'subj-ux202',
+    subjectName: 'Introduction to UI/UX',
+    title: 'Interactive Design System & Prototype Submission',
+    type: 'assignment',
+    date: '2026-11-18',
+    startTime: '23:59',
+    endTime: '23:59',
+    room: 'Online Portal',
+    professor: 'Prof. Samantha Blake',
+    isRecurring: false,
+    notes: 'Submit Figma public view link and PDF documentation'
+  }
+];
+
+// ============================================
+// YOUTUBE LEARNING CENTRE SEED DATA
+// ============================================
+
+export const initialYouTubeResources: YouTubeResource[] = [
+  {
+    id: 'yt-1',
+    subjectId: 'subj-pm205',
+    subjectName: 'Product Management',
+    title: 'How to Build Products Users Love (Harvard/Stanford Case)',
+    description: 'Comprehensive masterclass on user interview signals, RICE prioritization, and finding genuine product-market fit.',
+    youtubeUrl: 'https://www.youtube.com/watch?v=1287h3ZlIe8',
+    videoId: '1287h3ZlIe8',
+    playlistName: 'Core Product Architecture',
+    durationMinutes: 48,
+    isWatched: true,
+    watchedAt: '2026-10-28T22:00:00.000Z',
+    notes: [
+      {
+        id: 'note-yt-1',
+        timestampSeconds: 312,
+        timestampDisplay: '05:12',
+        note: 'Crucial quote: "Talk to users about their specific past behavior, never ask them to speculate on what they would pay in future."',
+        createdAt: '2026-10-28T21:10:00.000Z'
+      },
+      {
+        id: 'note-yt-2',
+        timestampSeconds: 1145,
+        timestampDisplay: '19:05',
+        note: 'Cohort retention analysis: If month 3 retention flattens above 20%, you have a viable high-LTV product core.',
+        createdAt: '2026-10-28T21:25:00.000Z'
+      }
+    ],
+    createdAt: '2026-10-25T14:00:00.000Z'
+  },
+  {
+    id: 'yt-2',
+    subjectId: 'subj-econ201',
+    subjectName: 'Microeconomics',
+    title: 'Game Theory: Nash Equilibrium & Dominant Strategies',
+    description: 'Mathematical intuition behind strategic interaction, payoff matrices, and mixed strategy equilibria.',
+    youtubeUrl: 'https://www.youtube.com/watch?v=MHS-htjGgSY',
+    videoId: 'MHS-htjGgSY',
+    playlistName: 'Microeconomic Foundations',
+    durationMinutes: 34,
+    isWatched: false,
+    notes: [
+      {
+        id: 'note-yt-3',
+        timestampSeconds: 420,
+        timestampDisplay: '07:00',
+        note: 'Best response formulation: underline dominant outcomes per player to quickly identify pure strategy Nash equilibria.',
+        createdAt: '2026-10-29T10:00:00.000Z'
+      }
+    ],
+    createdAt: '2026-10-26T11:00:00.000Z'
+  },
+  {
+    id: 'yt-3',
+    subjectId: 'subj-ux202',
+    subjectName: 'Introduction to UI/UX',
+    title: 'Nielsen Usability Heuristics & Modern UI Systems',
+    description: 'Detailed analysis of Jakob Nielsens 10 heuristics applied to modern web and mobile apps.',
+    youtubeUrl: 'https://www.youtube.com/watch?v=cPtN4LgV2K0',
+    videoId: 'cPtN4LgV2K0',
+    playlistName: 'UX/UI Foundations',
+    durationMinutes: 42,
+    isWatched: false,
+    notes: [],
+    createdAt: '2026-10-27T09:30:00.000Z'
+  },
+  {
+    id: 'yt-4',
+    subjectId: 'subj-fin109',
+    subjectName: 'Finance',
+    title: 'Valuation Masterclass: DCF, WACC & Gordon Growth',
+    description: 'Building an enterprise DCF model from scratch with sensitivity tables on terminal value.',
+    youtubeUrl: 'https://www.youtube.com/watch?v=fd_epV4JC44',
+    videoId: 'fd_epV4JC44',
+    playlistName: 'Valuation & Corporate Finance',
+    durationMinutes: 55,
+    isWatched: true,
+    watchedAt: '2026-10-27T23:30:00.000Z',
+    notes: [
+      {
+        id: 'note-yt-4',
+        timestampSeconds: 840,
+        timestampDisplay: '14:00',
+        note: 'Hamada equation un-levering and re-levering beta when target debt ratio differs from peers.',
+        createdAt: '2026-10-27T23:45:00.000Z'
+      }
+    ],
+    createdAt: '2026-10-24T18:00:00.000Z'
+  }
+];
+
+// ============================================
+// ACHIEVEMENTS SEED DATA
+// ============================================
+
+export const initialAchievements: AchievementItem[] = [
+  {
+    id: 'ach-1',
+    title: 'Wheel of Wisdom',
+    description: 'Spin the Subject Wheel in Moonlight Arcade and complete your first challenge.',
+    icon: 'sparkles',
+    category: 'arcade',
+    unlocked: true,
+    unlockedAt: '2026-10-28T20:00:00.000Z',
+    progress: 1,
+    maxProgress: 1,
+    xpReward: 150
+  },
+  {
+    id: 'ach-2',
+    title: '50-Question Titan',
+    description: 'Complete a full 50-Question Challenge in Moonlight Arcade with > 80% accuracy.',
+    icon: 'award',
+    category: 'arcade',
+    unlocked: false,
+    progress: 32,
+    maxProgress: 50,
+    xpReward: 500
+  },
+  {
+    id: 'ach-3',
+    title: 'Midnight Scholar',
+    description: 'Spend 60 minutes in Midnight Focus Room during celestial night hours.',
+    icon: 'moon',
+    category: 'study',
+    unlocked: true,
+    unlockedAt: '2026-10-29T23:30:00.000Z',
+    progress: 60,
+    maxProgress: 60,
+    xpReward: 200
+  },
+  {
+    id: 'ach-4',
+    title: 'Master of Terms',
+    description: 'Review and complete all subjects in Academic Term 1.',
+    icon: 'graduation-cap',
+    category: 'quizzes',
+    unlocked: true,
+    unlockedAt: '2026-10-25T18:00:00.000Z',
+    progress: 9,
+    maxProgress: 9,
+    xpReward: 400
+  },
+  {
+    id: 'ach-5',
+    title: 'Video Sage',
+    description: 'Watch 5 YouTube lectures and record timestamped study notes.',
+    icon: 'video',
+    category: 'reading',
+    unlocked: false,
+    progress: 2,
+    maxProgress: 5,
+    xpReward: 250
+  },
+  {
+    id: 'ach-6',
+    title: 'Seven-Day Luminary',
+    description: 'Maintain a 7-day continuous study streak.',
+    icon: 'flame',
+    category: 'consistency',
+    unlocked: false,
+    progress: 6,
+    maxProgress: 7,
+    xpReward: 350
+  }
+];
+
+// ============================================
+// LEARNING DIARY SEED DATA
+// ============================================
+
+export const initialDiaryEntries: LearningDiaryEntry[] = [
+  {
+    id: 'diary-1',
+    date: '2026-10-29',
+    mood: 'focused',
+    title: 'Deep dive into RICE scoring & Cohort Retention',
+    content: 'Analyzed how high-growth SaaS startups distinguish between gross and net revenue retention. If expansion MRR outpaces churn, NRR stays above 100%. Practiced evaluating product backlogs.',
+    subjectsCovered: ['Product Management', 'Microeconomics'],
+    hoursStudied: 3.5,
+    keyTakeaway: 'Always prioritize features with high confidence percentages rather than speculative reach.',
+    createdAt: '2026-10-29T22:30:00.000Z'
+  },
+  {
+    id: 'diary-2',
+    date: '2026-10-28',
+    mood: 'inspired',
+    title: 'Fitts Law and Nielsen Heuristics lab',
+    content: 'Mapped out mobile screen ergonomics. Bottom navigation bars are ergonomically superior for single-thumb mobile usage because distance D is minimized according to Fitts Law.',
+    subjectsCovered: ['Introduction to UI/UX'],
+    hoursStudied: 2.5,
+    keyTakeaway: 'Corners and screen edges have infinite effective target width on desktop mouse displays.',
+    createdAt: '2026-10-28T21:45:00.000Z'
+  }
+];
+
+// ============================================
+// EXAM COUNTDOWNS
+// ============================================
+
+export const initialExamCountdowns: ExamCountdownItem[] = [
+  {
+    id: 'exam-cd-1',
+    subject: 'Product Management',
+    title: 'Mid-Term Case Evaluation',
+    examDate: '2026-11-20T10:00:00.000Z',
+    location: 'Main Exam Hall A',
+    weightage: '30% of Term Grade'
+  },
+  {
+    id: 'exam-cd-2',
+    subject: 'Microeconomics',
+    title: 'Quantitative Mid-Term Exam',
+    examDate: '2026-11-25T14:00:00.000Z',
+    location: 'Auditorium 1',
+    weightage: '35% of Term Grade'
+  }
+];
+
 

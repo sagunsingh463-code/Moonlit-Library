@@ -92,6 +92,10 @@ class SoundEngine {
     this.playCelestialChime();
   }
 
+  public playCardClick() {
+    this.playSparkle();
+  }
+
 
   // Soft page flip sound
   public playPageTurn() {

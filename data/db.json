@@ -786,7 +786,7 @@
       "id": "user_sagun",
       "email": "Sagun@463gmail.com",
       "aliasEmail": "Sagunsingh463@gmail.com",
-      "passwordHash": "$2b$10$cdGDj5KDKhz5IR3GhQ7lle9989FfnhzQvrPp4bKsCZKFXjNvHagDq",
+      "passwordHash": "$2b$10$nqCGcpuhPUnvLlgLlfrhFeaDhfsRzwyKlvI29cyFo6M14K656EYRm",
       "name": "Sagun Singh",
       "avatar": "cat-luna",
       "phone": "+91 9988776655",
@@ -795,5 +795,12 @@
       "createdAt": "2026-10-30T00:00:00.000Z",
       "updatedAt": "2026-10-29T20:32:32.714Z"
     }
-  ]
+  ],
+  "terms": [],
+  "subjects": [],
+  "calendar": [],
+  "youtube": [],
+  "diary": [],
+  "scores": [],
+  "achievements": []
 }

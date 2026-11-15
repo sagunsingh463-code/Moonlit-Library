@@ -10,7 +10,16 @@ import {
   StudyPlanTask,
   GardenItem,
   UserStudyStats,
-  AppSettings
+  AppSettings,
+  AcademicTerm,
+  SubjectItem,
+  CalendarEvent,
+  YouTubeResource,
+  YouTubeTimestampNote,
+  GameScoreRecord,
+  AchievementItem,
+  LearningDiaryEntry,
+  ExamCountdownItem
 } from '../types';
 import {
   initialNotes,
@@ -22,12 +31,19 @@ import {
   initialPlannerTasks,
   initialGardenItems,
   initialStats,
-  initialSettings
+  initialSettings,
+  initialTerms,
+  initialSubjects,
+  initialCalendarEvents,
+  initialYouTubeResources,
+  initialAchievements,
+  initialDiaryEntries,
+  initialExamCountdowns
 } from './seedData';
 import { authService, getApiBase } from './auth';
 
 const DB_NAME = 'MoonlitLibraryDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 class MoonlitDatabase {
   private dbPromise: Promise<IDBDatabase> | null = null;
@@ -85,7 +101,8 @@ class MoonlitDatabase {
         const stores = [
           'files', 'notes', 'assignments', 'lectures', 
           'questions', 'quizzes', 'customQuizzes', 'constellations', 
-          'planner', 'garden', 'stats', 'settings'
+          'planner', 'garden', 'stats', 'settings',
+          'terms', 'subjects', 'calendar', 'youtube', 'diary', 'scores', 'achievements'
         ];
 
         stores.forEach(storeName => {
@@ -97,10 +114,8 @@ class MoonlitDatabase {
 
       request.onsuccess = async () => {
         const db = request.result;
-        // Don't auto-seed default MBA records into local store if user is logged into their private account
-        if (!authService.isAuthenticated()) {
-          await this.initializeDefaults(db);
-        }
+        // Seed default records if stores are freshly created
+        await this.initializeDefaults(db);
         resolve(db);
       };
 
@@ -118,7 +133,8 @@ class MoonlitDatabase {
       const stores = [
         'files', 'notes', 'assignments', 'lectures', 
         'questions', 'quizzes', 'customQuizzes', 'constellations', 
-        'planner', 'garden', 'stats', 'settings'
+        'planner', 'garden', 'stats', 'settings',
+        'terms', 'subjects', 'calendar', 'youtube', 'diary', 'scores', 'achievements'
       ];
       const tx = db.transaction(stores, 'readwrite');
       stores.forEach(s => tx.objectStore(s).clear());
@@ -131,32 +147,47 @@ class MoonlitDatabase {
   }
 
   private async initializeDefaults(db: IDBDatabase) {
-    const tx = db.transaction([
-      'notes', 'assignments', 'lectures', 'questions', 
-      'customQuizzes', 'constellations', 'planner', 
-      'garden', 'stats', 'settings'
-    ], 'readwrite');
-    
-    const countCheck = (storeName: string): Promise<number> => {
-      return new Promise((res) => {
-        const req = tx.objectStore(storeName).count();
-        req.onsuccess = () => res(req.result);
-        req.onerror = () => res(0);
-      });
-    };
+    try {
+      const tx = db.transaction([
+        'notes', 'assignments', 'lectures', 'questions', 
+        'customQuizzes', 'constellations', 'planner', 
+        'garden', 'stats', 'settings',
+        'terms', 'subjects', 'calendar', 'youtube', 'diary', 'achievements'
+      ], 'readwrite');
+      
+      const countCheck = (storeName: string): Promise<number> => {
+        return new Promise((res) => {
+          const req = tx.objectStore(storeName).count();
+          req.onsuccess = () => res(req.result);
+          req.onerror = () => res(0);
+        });
+      };
 
-    const notesCount = await countCheck('notes');
-    if (notesCount === 0) {
-      initialNotes.forEach(n => tx.objectStore('notes').put(n));
-      initialAssignments.forEach(a => tx.objectStore('assignments').put(a));
-      initialLectures.forEach(l => tx.objectStore('lectures').put(l));
-      initialQuestions.forEach(q => tx.objectStore('questions').put(q));
-      initialCustomQuizzes.forEach(cq => tx.objectStore('customQuizzes').put(cq));
-      initialConstellations.forEach(c => tx.objectStore('constellations').put(c));
-      initialPlannerTasks.forEach(p => tx.objectStore('planner').put(p));
-      initialGardenItems.forEach(g => tx.objectStore('garden').put(g));
-      tx.objectStore('stats').put({ id: 'current', ...initialStats });
-      tx.objectStore('settings').put({ id: 'current', ...initialSettings });
+      const notesCount = await countCheck('notes');
+      if (notesCount === 0) {
+        initialNotes.forEach(n => tx.objectStore('notes').put(n));
+        initialAssignments.forEach(a => tx.objectStore('assignments').put(a));
+        initialLectures.forEach(l => tx.objectStore('lectures').put(l));
+        initialQuestions.forEach(q => tx.objectStore('questions').put(q));
+        initialCustomQuizzes.forEach(cq => tx.objectStore('customQuizzes').put(cq));
+        initialConstellations.forEach(c => tx.objectStore('constellations').put(c));
+        initialPlannerTasks.forEach(p => tx.objectStore('planner').put(p));
+        initialGardenItems.forEach(g => tx.objectStore('garden').put(g));
+        tx.objectStore('stats').put({ id: 'current', ...initialStats });
+        tx.objectStore('settings').put({ id: 'current', ...initialSettings });
+      }
+
+      const termsCount = await countCheck('terms');
+      if (termsCount === 0) {
+        initialTerms.forEach(t => tx.objectStore('terms').put(t));
+        initialSubjects.forEach(s => tx.objectStore('subjects').put(s));
+        initialCalendarEvents.forEach(e => tx.objectStore('calendar').put(e));
+        initialYouTubeResources.forEach(y => tx.objectStore('youtube').put(y));
+        initialDiaryEntries.forEach(d => tx.objectStore('diary').put(d));
+        initialAchievements.forEach(ac => tx.objectStore('achievements').put(ac));
+      }
+    } catch (initErr) {
+      console.warn('Default store initialization caught:', initErr);
     }
   }
 
@@ -842,6 +873,172 @@ class MoonlitDatabase {
       body: JSON.stringify(settings)
     });
     await this.putInStore('settings', { id: 'current', ...settings });
+  }
+
+  // --- 13. ACADEMIC TERMS ---
+  public async getTerms(): Promise<AcademicTerm[]> {
+    const serverTerms = await this.fetchApi<AcademicTerm[]>('/terms');
+    if (serverTerms && serverTerms.length > 0) {
+      for (const t of serverTerms) await this.putInStore('terms', t);
+      return serverTerms;
+    }
+    const local = await this.getAllFromStore<AcademicTerm>('terms');
+    if (local.length > 0) return local.sort((a, b) => a.termNumber - b.termNumber);
+    // Seed to store
+    for (const t of initialTerms) await this.putInStore('terms', t);
+    return initialTerms;
+  }
+
+  public async saveTerm(term: AcademicTerm): Promise<void> {
+    await this.fetchApi(`/terms/${term.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(term)
+    });
+    await this.putInStore('terms', term);
+  }
+
+  // --- 14. SUBJECTS ---
+  public async getSubjects(): Promise<SubjectItem[]> {
+    const serverSubjects = await this.fetchApi<SubjectItem[]>('/subjects');
+    if (serverSubjects && serverSubjects.length > 0) {
+      for (const s of serverSubjects) await this.putInStore('subjects', s);
+      return serverSubjects;
+    }
+    const local = await this.getAllFromStore<SubjectItem>('subjects');
+    if (local.length > 0) return local;
+    for (const s of initialSubjects) await this.putInStore('subjects', s);
+    return initialSubjects;
+  }
+
+  public async saveSubject(subject: SubjectItem): Promise<void> {
+    await this.fetchApi('/subjects', {
+      method: 'POST',
+      body: JSON.stringify(subject)
+    });
+    await this.putInStore('subjects', subject);
+  }
+
+  public async deleteSubject(id: string): Promise<void> {
+    await this.fetchApi(`/subjects/${id}`, { method: 'DELETE' });
+    await this.deleteFromStore('subjects', id);
+  }
+
+  // --- 15. CALENDAR & TIMETABLE ---
+  public async getCalendarEvents(): Promise<CalendarEvent[]> {
+    const serverEvents = await this.fetchApi<CalendarEvent[]>('/calendar');
+    if (serverEvents && serverEvents.length > 0) {
+      for (const e of serverEvents) await this.putInStore('calendar', e);
+      return serverEvents;
+    }
+    const local = await this.getAllFromStore<CalendarEvent>('calendar');
+    if (local.length > 0) return local;
+    for (const e of initialCalendarEvents) await this.putInStore('calendar', e);
+    return initialCalendarEvents;
+  }
+
+  public async saveCalendarEvent(event: CalendarEvent): Promise<void> {
+    await this.fetchApi('/calendar', {
+      method: 'POST',
+      body: JSON.stringify(event)
+    });
+    await this.putInStore('calendar', event);
+  }
+
+  public async deleteCalendarEvent(id: string): Promise<void> {
+    await this.fetchApi(`/calendar/${id}`, { method: 'DELETE' });
+    await this.deleteFromStore('calendar', id);
+  }
+
+  // --- 16. YOUTUBE LEARNING RESOURCES ---
+  public async getYouTubeResources(): Promise<YouTubeResource[]> {
+    const serverYt = await this.fetchApi<YouTubeResource[]>('/youtube');
+    if (serverYt && serverYt.length > 0) {
+      for (const y of serverYt) await this.putInStore('youtube', y);
+      return serverYt;
+    }
+    const local = await this.getAllFromStore<YouTubeResource>('youtube');
+    if (local.length > 0) return local;
+    for (const y of initialYouTubeResources) await this.putInStore('youtube', y);
+    return initialYouTubeResources;
+  }
+
+  public async saveYouTubeResource(res: YouTubeResource): Promise<void> {
+    await this.fetchApi('/youtube', {
+      method: 'POST',
+      body: JSON.stringify(res)
+    });
+    await this.putInStore('youtube', res);
+  }
+
+  public async deleteYouTubeResource(id: string): Promise<void> {
+    await this.fetchApi(`/youtube/${id}`, { method: 'DELETE' });
+    await this.deleteFromStore('youtube', id);
+  }
+
+  // --- 17. LEARNING DIARY ---
+  public async getDiaryEntries(): Promise<LearningDiaryEntry[]> {
+    const serverDiary = await this.fetchApi<LearningDiaryEntry[]>('/diary');
+    if (serverDiary && serverDiary.length > 0) {
+      for (const d of serverDiary) await this.putInStore('diary', d);
+      return serverDiary;
+    }
+    const local = await this.getAllFromStore<LearningDiaryEntry>('diary');
+    if (local.length > 0) return local.sort((a, b) => b.date.localeCompare(a.date));
+    for (const d of initialDiaryEntries) await this.putInStore('diary', d);
+    return initialDiaryEntries;
+  }
+
+  public async saveDiaryEntry(entry: LearningDiaryEntry): Promise<void> {
+    await this.fetchApi('/diary', {
+      method: 'POST',
+      body: JSON.stringify(entry)
+    });
+    await this.putInStore('diary', entry);
+  }
+
+  public async deleteDiaryEntry(id: string): Promise<void> {
+    await this.fetchApi(`/diary/${id}`, { method: 'DELETE' });
+    await this.deleteFromStore('diary', id);
+  }
+
+  // --- 18. MOONLIGHT ARCADE SCORES ---
+  public async getGameScores(): Promise<GameScoreRecord[]> {
+    const serverScores = await this.fetchApi<GameScoreRecord[]>('/arcade/scores');
+    if (serverScores && serverScores.length > 0) {
+      for (const s of serverScores) await this.putInStore('scores', s);
+      return serverScores;
+    }
+    const local = await this.getAllFromStore<GameScoreRecord>('scores');
+    return local.sort((a, b) => b.completedAt.localeCompare(a.completedAt));
+  }
+
+  public async saveGameScore(score: GameScoreRecord): Promise<void> {
+    await this.fetchApi('/arcade/scores', {
+      method: 'POST',
+      body: JSON.stringify(score)
+    });
+    await this.putInStore('scores', score);
+  }
+
+  // --- 19. ACHIEVEMENTS ---
+  public async getAchievements(): Promise<AchievementItem[]> {
+    const serverAch = await this.fetchApi<AchievementItem[]>('/achievements');
+    if (serverAch && serverAch.length > 0) {
+      for (const a of serverAch) await this.putInStore('achievements', a);
+      return serverAch;
+    }
+    const local = await this.getAllFromStore<AchievementItem>('achievements');
+    if (local.length > 0) return local;
+    for (const a of initialAchievements) await this.putInStore('achievements', a);
+    return initialAchievements;
+  }
+
+  public async saveAchievement(item: AchievementItem): Promise<void> {
+    await this.fetchApi('/achievements', {
+      method: 'POST',
+      body: JSON.stringify(item)
+    });
+    await this.putInStore('achievements', item);
   }
 }
 

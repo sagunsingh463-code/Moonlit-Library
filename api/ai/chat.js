@@ -65,12 +65,14 @@ Your goals:
         parts: [{ text: m.content }]
       }));
 
-      // 1. Query available models for this specific API key via ListModels
+      // 1. Compile prioritized model candidates
       let modelCandidates = [
-        'models/gemini-1.5-flash-latest',
         'models/gemini-2.0-flash',
+        'models/gemini-1.5-flash-latest',
+        'models/gemini-2.5-flash',
         'models/gemini-1.5-flash-002',
-        'models/gemini-pro'
+        'models/gemini-pro',
+        'models/gemini-1.5-pro'
       ];
 
       try {
@@ -80,16 +82,14 @@ Your goals:
           const contentModels = (listData.models || []).filter(m => 
             Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent')
           );
-          if (contentModels.length > 0) {
-            const preferred = contentModels.find(m => m.name?.includes('flash') && !m.name?.includes('8b') && !m.name?.includes('thinking'))
-              || contentModels.find(m => m.name?.includes('flash'))
-              || contentModels.find(m => m.name?.includes('gemini'))
-              || contentModels[0];
-            if (preferred?.name) {
-              const fullPath = preferred.name.startsWith('models/') ? preferred.name : `models/${preferred.name}`;
-              modelCandidates = [fullPath, ...modelCandidates.filter(c => c !== fullPath)];
+          contentModels.forEach(m => {
+            const name = m.name?.startsWith('models/') ? m.name : `models/${m.name}`;
+            if (!name.includes('8b') && !name.includes('thinking') && !modelCandidates.includes(name)) {
+              if (name.includes('flash') || name.includes('2.0') || name.includes('gemini')) {
+                modelCandidates.push(name);
+              }
             }
-          }
+          });
         }
       } catch (e) {
         // Fallback to predefined candidate list
@@ -97,29 +97,32 @@ Your goals:
 
       let lastErrorData = null;
       for (const target of modelCandidates) {
-        try {
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/${target}:generateContent?key=${geminiKey}`;
-          const apiRes = await fetch(geminiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              systemInstruction: { parts: [{ text: systemPrompt }] },
-              contents,
-              generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
-            })
-          });
-
-          const data = await apiRes.json();
-          if (apiRes.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-            return res.status(200).json({
-              reply: data.candidates[0].content.parts[0].text,
-              provider: 'gemini',
-              model: target
+        for (const apiVer of ['v1beta', 'v1']) {
+          try {
+            const geminiUrl = `https://generativelanguage.googleapis.com/${apiVer}/${target}:generateContent?key=${geminiKey}`;
+            const apiRes = await fetch(geminiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents,
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
+              })
             });
+
+            const data = await apiRes.json();
+            if (apiRes.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              return res.status(200).json({
+                reply: data.candidates[0].content.parts[0].text,
+                provider: 'gemini',
+                model: target,
+                apiVersion: apiVer
+              });
+            }
+            lastErrorData = data;
+          } catch (e) {
+            // try next candidate
           }
-          lastErrorData = data;
-        } catch (e) {
-          // try next candidate
         }
       }
 

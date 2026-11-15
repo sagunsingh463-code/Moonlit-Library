@@ -43,10 +43,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { id: 'home' as ViewMode, label: 'Home', icon: Home, badge: null },
-    { id: 'files' as ViewMode, label: 'My Files', icon: FolderGit2, badge: null },
+    { id: 'terms' as ViewMode, label: 'Academic Terms', icon: GraduationCap, badge: '6 Terms' },
+    { id: 'calendar' as ViewMode, label: 'Timetable & Cal', icon: Calendar, badge: 'Live' },
+    { id: 'arcade' as ViewMode, label: 'Moonlight Arcade', icon: Sparkles, badge: '50 Qs' },
+    { id: 'youtube' as ViewMode, label: 'YouTube Centre', icon: GraduationCap, badge: null },
+    { id: 'diary' as ViewMode, label: 'Learning Diary', icon: BookMarked, badge: null },
+    { id: 'achievements' as ViewMode, label: 'Achievements', icon: Flower2, badge: null },
+    { id: 'files' as ViewMode, label: 'My Files & PDFs', icon: FolderGit2, badge: null },
     { id: 'notes' as ViewMode, label: 'Notes', icon: BookMarked, badge: null },
     { id: 'assignments' as ViewMode, label: 'Assignments', icon: FileCheck2, badge: 'Due' },
-    { id: 'lectures' as ViewMode, label: 'Lectures', icon: GraduationCap, badge: null },
     { id: 'quiz' as ViewMode, label: 'Quiz Room', icon: HelpCircle, badge: 'Practice' },
     { id: 'question-bank' as ViewMode, label: 'Question Bank', icon: Database, badge: null },
     { id: 'planner' as ViewMode, label: 'Study Planner', icon: Calendar, badge: null },

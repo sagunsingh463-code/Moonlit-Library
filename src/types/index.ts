@@ -1,5 +1,12 @@
 export type ViewMode = 
   | 'home'
+  | 'terms'
+  | 'subject'
+  | 'calendar'
+  | 'arcade'
+  | 'youtube'
+  | 'diary'
+  | 'achievements'
   | 'files'
   | 'reader'
   | 'notes'
@@ -111,8 +118,8 @@ export interface QuestionItem {
   difficulty: 'Easy' | 'Medium' | 'Hard';
   isBookmarked: boolean;
   lastPracticed?: string;
-  timesPracticed: number;
-  timesCorrect: number;
+  timesPracticed?: number;
+  timesCorrect?: number;
   timesIncorrect?: number;
   lastAnsweredCorrectly?: boolean;
 }
@@ -231,4 +238,176 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
+
+// ============================================
+// ACADEMIC TERMS & SUBJECTS
+// ============================================
+
+export type TermStatus = 'completed' | 'in-progress' | 'upcoming';
+
+export interface AcademicTerm {
+  id: string;
+  termNumber: number; // 1 to 6
+  title: string;      // e.g. "Term 1", "Term 2"
+  status: TermStatus;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  creditsTotal?: number;
+}
+
+export interface SubjectItem {
+  id: string;
+  termId: string;
+  termNumber: number; // 1 to 6
+  name: string;       // e.g. "Design Thinking", "Product Management"
+  code: string;       // e.g. "DT101", "PM205"
+  description: string;
+  credits: number;
+  professor?: string;
+  color: string;      // Tailwind / hex color gradient
+  icon?: string;      // Icon identifier or emoji
+  syllabus?: string[];
+  completionPercentage?: number; // 0 to 100
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ============================================
+// ACADEMIC CALENDAR & TIMETABLE
+// ============================================
+
+export type CalendarEventType = 'class' | 'lecture' | 'exam' | 'assignment' | 'reminder';
+
+export interface CalendarEvent {
+  id: string;
+  subjectId?: string;
+  subjectName: string;
+  title: string;
+  type: CalendarEventType;
+  dayOfWeek?: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  startTime: string; // "09:00"
+  endTime: string;   // "10:30"
+  date?: string;      // "YYYY-MM-DD" for specific date events
+  room?: string;      // e.g. "Auditorium B", "Online Zoom"
+  professor?: string;
+  isRecurring: boolean;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface TimetableExtractionRow {
+  day: string;
+  timeSlot: string;
+  subject: string;
+  room?: string;
+  professor?: string;
+  type?: string;
+}
+
+// ============================================
+// YOUTUBE LEARNING CENTRE
+// ============================================
+
+export interface YouTubeTimestampNote {
+  id: string;
+  timestampSeconds: number;
+  timestampDisplay: string; // "05:24"
+  note: string;
+  createdAt: string;
+}
+
+export interface YouTubeResource {
+  id: string;
+  subjectId?: string;
+  subjectName: string;
+  title: string;
+  description?: string;
+  youtubeUrl: string;
+  videoId: string; // Extracted 11-char ID
+  playlistName?: string;
+  durationMinutes?: number;
+  isWatched: boolean;
+  watchedAt?: string;
+  notes: YouTubeTimestampNote[];
+  createdAt: string;
+}
+
+// ============================================
+// MOONLIGHT ARCADE & GAMIFICATION
+// ============================================
+
+export type ArcadeGameType = 'wheel' | 'memory' | 'flashcard' | 'speed' | 'concept' | 'true-false' | 'streak';
+
+export interface GameScoreRecord {
+  id: string;
+  gameType: ArcadeGameType;
+  subjectId?: string;
+  subjectName: string;
+  score: number;
+  maxScore?: number;
+  accuracy: number;
+  timeTakenSeconds: number;
+  xpEarned: number;
+  completedAt: string;
+}
+
+export interface FlashcardItem {
+  id: string;
+  subject: string;
+  frontPrompt: string;
+  backAnswer: string;
+  category?: string;
+  masteryLevel?: 'novice' | 'learning' | 'mastered';
+}
+
+export interface ConceptPairItem {
+  id: string;
+  subject: string;
+  concept: string;
+  definition: string;
+  example?: string;
+}
+
+export interface AchievementItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  category: 'quizzes' | 'study' | 'arcade' | 'reading' | 'consistency';
+  unlocked: boolean;
+  unlockedAt?: string;
+  progress: number;
+  maxProgress: number;
+  xpReward: number;
+}
+
+// ============================================
+// LEARNING DIARY & SPECIAL FEATURES
+// ============================================
+
+export type DiaryMood = 'calm' | 'focused' | 'inspired' | 'tired' | 'victorious';
+
+export interface LearningDiaryEntry {
+  id: string;
+  date: string; // "YYYY-MM-DD"
+  mood: DiaryMood;
+  title: string;
+  content: string;
+  subjectsCovered: string[];
+  hoursStudied: number;
+  keyTakeaway: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ExamCountdownItem {
+  id: string;
+  subject: string;
+  title: string;
+  examDate: string; // ISO string
+  location?: string;
+  weightage?: string;
+}
+
 
