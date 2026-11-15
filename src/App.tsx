@@ -80,6 +80,11 @@ import { MoonlightArcadeView } from './components/Views/MoonlightArcadeView';
 import { YouTubeCentreView } from './components/Views/YouTubeCentreView';
 import { LearningDiaryView } from './components/Views/LearningDiaryView';
 import { AchievementsView } from './components/Views/AchievementsView';
+import { DailyQuestSystem } from './components/Quests/DailyQuestSystem';
+import { VirtualStudyPet } from './components/Pet/VirtualStudyPet';
+import { InteractiveKnowledgeMap } from './components/KnowledgeMap/InteractiveKnowledgeMap';
+import { FocusScoreDashboard } from './components/FocusScore/FocusScoreDashboard';
+import { GraduationWallView } from './components/Graduation/GraduationWallView';
 
 export function App() {
   const [showOpening, setShowOpening] = useState(() => {
@@ -850,6 +855,7 @@ export function App() {
                   onNavigate={handleNavigate}
                   onOpenFocusMode={() => setIsFocusModeOpen(true)}
                   onToggleTask={handleTogglePlannerTask}
+                  onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
                 />
               )}
 
@@ -930,6 +936,50 @@ export function App() {
                   achievements={achievements}
                   userStars={stats.starsCollected}
                   userStreak={stats.currentStreakDays}
+                />
+              )}
+
+              {currentView === 'quests' && (
+                <DailyQuestSystem
+                  onAwardXp={(xp) => handleAddStar(`Completed Daily Quest (+${xp} XP)`, 'focus', 'Daily Quest Reward')}
+                  onNavigate={handleNavigate}
+                  subjects={subjects}
+                />
+              )}
+
+              {currentView === 'pet' && (
+                <VirtualStudyPet
+                  userXp={stats.totalStudyMinutes * 2 + stats.starsCollected * 10}
+                  onFeed={() => handleAddStar('Fed Mochi sweet snack', 'focus', 'Virtual Pet Love')}
+                />
+              )}
+
+              {currentView === 'knowledge-map' && (
+                <InteractiveKnowledgeMap
+                  initialSubjectId={selectedItemId || 'microeconomics'}
+                  onOpenAiMentor={() => setIsAiAssistantOpen(true)}
+                  onNavigate={handleNavigate}
+                />
+              )}
+
+              {currentView === 'focus-score' && (
+                <FocusScoreDashboard
+                  onSessionComplete={(mins) => {
+                    setStats(prev => ({
+                      ...prev,
+                      totalStudyMinutes: prev.totalStudyMinutes + mins
+                    }));
+                  }}
+                  subjects={subjects}
+                />
+              )}
+
+              {currentView === 'graduation-wall' && (
+                <GraduationWallView
+                  terms={terms}
+                  subjects={subjects}
+                  studentName={currentUser?.name || settings.studentName || 'Sagun Singh'}
+                  onNavigate={handleNavigate}
                 />
               )}
 

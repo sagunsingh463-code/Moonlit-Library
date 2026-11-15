@@ -294,4 +294,79 @@ html.light-theme .text-glow {
   text-shadow: 0 0 12px rgba(142, 108, 229, 0.3);
 }
 
+/* ========================================================= */
+/* DARK ACADEMIA MOONLIT LIBRARY THEME (Vintage Library)      */
+/* ========================================================= */
+
+html.dark-academia,
+html.dark-academia body {
+  background-color: #121110 !important;
+  color: #F4EBE1 !important;
+}
+
+html.dark-academia ::-webkit-scrollbar-track {
+  background: #171513;
+}
+
+html.dark-academia ::-webkit-scrollbar-thumb {
+  background: #4A2E1B;
+  border-radius: 9999px;
+  border: 2px solid #171513;
+}
+
+html.dark-academia ::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}
+
+html.dark-academia .glass-panel {
+  background: rgba(26, 23, 20, 0.82) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.2) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark-academia .glass-panel-subtle {
+  background: rgba(22, 19, 16, 0.68) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.12) !important;
+}
+
+html.dark-academia .glass-panel-glow {
+  background: rgba(30, 26, 22, 0.9) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.35) !important;
+  box-shadow: 0 0 35px -5px rgba(212, 175, 55, 0.22) !important;
+}
+
+html.dark-academia .text-glow {
+  text-shadow: 0 0 18px rgba(212, 175, 55, 0.65) !important;
+}
+
+/* Dark Academia Vintage Decorative Borders */
+.vintage-gold-frame {
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.08), 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.vintage-book-edge {
+  box-shadow: -4px 0 0 #4A2E1B, -6px 0 0 #D4AF37;
+}
+
+.ambient-candlelight {
+  background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+}
+
+.retro-cassette-wheel {
+  animation: cassetteSpin 3.5s linear infinite;
+}
+
+@keyframes cassetteSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
 

@@ -16,7 +16,11 @@ import {
   ChevronLeft, 
   ChevronRight,
   User,
-  LogOut
+  LogOut,
+  Award,
+  Heart,
+  GitBranch,
+  TrendingUp
 } from 'lucide-react';
 import { MoonSticker, CatPawSticker } from '../Stickers/KawaiiStickers';
 
@@ -43,10 +47,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { id: 'home' as ViewMode, label: 'Home', icon: Home, badge: null },
-    { id: 'terms' as ViewMode, label: 'Academic Terms', icon: GraduationCap, badge: '6 Terms' },
+    { id: 'quests' as ViewMode, label: 'Daily Quests', icon: Award, badge: 'Missions' },
+    { id: 'pet' as ViewMode, label: 'Study Pet Mochi', icon: Heart, badge: 'Lv. 3' },
+    { id: 'knowledge-map' as ViewMode, label: 'Knowledge Map', icon: GitBranch, badge: 'Trees' },
+    { id: 'focus-score' as ViewMode, label: 'Focus Score', icon: TrendingUp, badge: 'Matrix' },
+    { id: 'graduation-wall' as ViewMode, label: 'Graduation Wall', icon: GraduationCap, badge: '6 Terms' },
+    { id: 'terms' as ViewMode, label: 'Academic Terms', icon: GraduationCap, badge: 'Terms' },
     { id: 'calendar' as ViewMode, label: 'Timetable & Cal', icon: Calendar, badge: 'Live' },
     { id: 'arcade' as ViewMode, label: 'Moonlight Arcade', icon: Sparkles, badge: '50 Qs' },
-    { id: 'youtube' as ViewMode, label: 'YouTube Centre', icon: GraduationCap, badge: null },
+    { id: 'youtube' as ViewMode, label: 'YouTube Centre', icon: BookMarked, badge: null },
     { id: 'diary' as ViewMode, label: 'Learning Diary', icon: BookMarked, badge: null },
     { id: 'achievements' as ViewMode, label: 'Achievements', icon: Flower2, badge: null },
     { id: 'files' as ViewMode, label: 'My Files & PDFs', icon: FolderGit2, badge: null },

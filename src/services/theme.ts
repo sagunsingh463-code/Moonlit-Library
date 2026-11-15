@@ -1,8 +1,8 @@
 // Theme management service for Moonlit Library LMS
 // Supports Automatic Day/Night schedule with user manual override and persistence
 
-export type ThemePreference = 'auto' | 'light' | 'dark';
-export type EffectiveTheme = 'light' | 'dark';
+export type ThemePreference = 'dark-academia' | 'celestial-midnight' | 'light' | 'dark' | 'auto';
+export type EffectiveTheme = 'dark-academia' | 'celestial-midnight' | 'light';
 
 export interface ThemeSchedule {
   dayStartHour: number; // e.g. 7 for 7 AM
@@ -23,22 +23,21 @@ class ThemeService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      // Periodic check for automatic day/night schedule transition
       this.checkInterval = window.setInterval(() => {
         if (this.getPreference() === 'auto') {
           this.applyTheme();
         }
-      }, 60000); // Check every minute
+      }, 60000);
     }
   }
 
   public getPreference(): ThemePreference {
-    if (typeof window === 'undefined') return 'auto';
+    if (typeof window === 'undefined') return 'dark-academia';
     const saved = localStorage.getItem(STORAGE_PREF_KEY) as ThemePreference;
-    if (saved === 'light' || saved === 'dark' || saved === 'auto') {
+    if (saved === 'dark-academia' || saved === 'celestial-midnight' || saved === 'light' || saved === 'dark' || saved === 'auto') {
       return saved;
     }
-    return 'auto';
+    return 'dark-academia'; // Default to Dark Academia
   }
 
   public setPreference(pref: ThemePreference): void {
@@ -72,7 +71,8 @@ class ThemeService {
   public getEffectiveTheme(): EffectiveTheme {
     const pref = this.getPreference();
     if (pref === 'light') return 'light';
-    if (pref === 'dark') return 'dark';
+    if (pref === 'celestial-midnight') return 'celestial-midnight';
+    if (pref === 'dark-academia' || pref === 'dark') return 'dark-academia';
 
     // Auto mode: evaluate local time
     const now = new Date();
@@ -80,30 +80,34 @@ class ThemeService {
     const schedule = this.getSchedule();
 
     const isDaytime = currentHour >= schedule.dayStartHour && currentHour < schedule.dayEndHour;
-    return isDaytime ? 'light' : 'dark';
+    return isDaytime ? 'light' : 'dark-academia';
   }
 
-  // Toggles between Light and Dark (manually overriding auto mode)
+  // Toggles between Dark Academia and Light (manually overriding auto mode)
   public toggleTheme(): EffectiveTheme {
     const current = this.getEffectiveTheme();
-    const next: ThemePreference = current === 'dark' ? 'light' : 'dark';
+    const next: ThemePreference = current === 'light' ? 'dark-academia' : 'light';
     this.setPreference(next);
-    return next;
+    return next === 'light' ? 'light' : 'dark-academia';
   }
 
   // Applies the effective theme class to the HTML document root
   public applyTheme(): EffectiveTheme {
-    if (typeof document === 'undefined') return 'dark';
+    if (typeof document === 'undefined') return 'dark-academia';
 
     const effective = this.getEffectiveTheme();
     const pref = this.getPreference();
 
+    document.documentElement.classList.remove('light-theme', 'dark-academia', 'celestial-midnight');
+
     if (effective === 'light') {
       document.documentElement.classList.add('light-theme');
       document.documentElement.classList.remove('dark');
+    } else if (effective === 'celestial-midnight') {
+      document.documentElement.classList.add('celestial-midnight', 'dark');
     } else {
-      document.documentElement.classList.remove('light-theme');
-      document.documentElement.classList.add('dark');
+      // dark-academia (default)
+      document.documentElement.classList.add('dark-academia', 'dark');
     }
 
     // Notify registered React component listeners
@@ -113,7 +117,6 @@ class ThemeService {
 
   public subscribe(fn: (theme: EffectiveTheme, pref: ThemePreference) => void): () => void {
     this.listeners.push(fn);
-    // Call immediately with current state
     fn(this.getEffectiveTheme(), this.getPreference());
     return () => {
       this.listeners = this.listeners.filter(l => l !== fn);

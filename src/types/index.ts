@@ -7,6 +7,11 @@ export type ViewMode =
   | 'youtube'
   | 'diary'
   | 'achievements'
+  | 'quests'
+  | 'pet'
+  | 'knowledge-map'
+  | 'focus-score'
+  | 'graduation-wall'
   | 'files'
   | 'reader'
   | 'notes'
@@ -410,5 +415,130 @@ export interface ExamCountdownItem {
   location?: string;
   weightage?: string;
 }
+
+// ============================================
+// 1. DAILY QUEST SYSTEM
+// ============================================
+
+export interface DailyQuest {
+  id: string;
+  title: string;
+  description: string;
+  subject: string;
+  category: 'reading' | 'revision' | 'quiz' | 'youtube' | 'assignment' | 'focus';
+  targetMinutes?: number;
+  xpReward: number;
+  completed: boolean;
+  completedAt?: string;
+  date: string; // YYYY-MM-DD
+  isCustom?: boolean;
+  suggestedByLuna?: boolean;
+}
+
+export interface QuestHistoryDay {
+  date: string;
+  completedCount: number;
+  totalCount: number;
+  totalXpEarned: number;
+}
+
+// ============================================
+// 2. VIRTUAL STUDY PET (Mochi)
+// ============================================
+
+export type PetMood = 'happy' | 'sleeping' | 'reading' | 'cheering' | 'eating';
+export type PetAccessory = 'none' | 'scholar_hat' | 'golden_monocle' | 'velvet_bowtie' | 'moon_amulet' | 'wizard_scarf';
+export type PetBackground = 'desk' | 'window' | 'fireplace' | 'archive';
+
+export interface VirtualPetState {
+  name: string;
+  level: number;
+  xp: number;
+  nextLevelXp: number;
+  mood: PetMood;
+  accessory: PetAccessory;
+  background: PetBackground;
+  unlockedAccessories: PetAccessory[];
+  unlockedBackgrounds: PetBackground[];
+  lastInteractedAt: string;
+  lastStudyReminderAt?: string;
+}
+
+// ============================================
+// 3. INTERACTIVE KNOWLEDGE MAP
+// ============================================
+
+export interface KnowledgeNode {
+  id: string;
+  subjectId: string;
+  label: string;
+  category: 'core' | 'subtopic' | 'case_study' | 'framework';
+  status: 'completed' | 'in_progress' | 'needs_revision';
+  x: number;
+  y: number;
+  notesSummary?: string;
+  weakScore?: number; // e.g. 45% if flagged by arcade / quiz
+  connections: string[]; // IDs of connected nodes
+}
+
+export interface SubjectKnowledgeMap {
+  subjectId: string;
+  subjectName: string;
+  nodes: KnowledgeNode[];
+  lastUpdated: string;
+}
+
+// ============================================
+// 4. FOCUS SCORE & PRODUCTIVITY DASHBOARD
+// ============================================
+
+export interface FocusSessionRecord {
+  id: string;
+  startTime: string;
+  endTime: string;
+  durationMinutes: number;
+  subject?: string;
+  sessionType: 'pomodoro' | 'deep_work' | 'reading' | 'quiz_prep';
+  breakMinutes: number;
+  completedTasksCount: number;
+  notes?: string;
+}
+
+export interface FocusProductivityReport {
+  overallScore: number; // 0 - 100
+  totalStudyHours: number;
+  completedTasks: number;
+  consistencyPercentage: number;
+  subjectDistribution: { subject: string; minutes: number; percentage: number }[];
+  weeklyTrend: { day: string; minutes: number }[];
+}
+
+// ============================================
+// 5. GRADUATION WALL
+// ============================================
+
+export interface GraduationMilestone {
+  id: string;
+  title: string;
+  termNumber: number;
+  description: string;
+  requirement: string;
+  unlocked: boolean;
+  unlockedAt?: string;
+  badgeIcon: string;
+}
+
+export interface GraduationWallData {
+  studentName: string;
+  degreeName: string;
+  totalTerms: number;
+  completedTerms: number;
+  totalSubjects: number;
+  completedSubjects: number;
+  graduationStatus: 'In Progress' | 'Graduated with Honors' | 'Pending Final Thesis';
+  overallGpaEstimate: string;
+  milestones: GraduationMilestone[];
+}
+
 
 

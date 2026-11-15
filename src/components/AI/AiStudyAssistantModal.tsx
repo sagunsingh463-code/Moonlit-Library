@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { sound } from '../../services/audio';
 import { authService, getApiBase } from '../../services/auth';
+import { getAcademicResponse } from '../../services/lunaAcademicEngine';
 
 export interface ChatMessage {
   id: string;
@@ -527,6 +528,22 @@ Be encouraging, clear, and structured with markdown formatting.`;
       }
     }
 
+    // Strategy 3: Academic Knowledge Engine Fallback (Instant authentic MBA tutoring)
+    if (!replySuccess) {
+      const academicFallback = getAcademicResponse(text, activeSubject);
+      if (academicFallback) {
+        sound.playCelestialChime();
+        const assistantReply: ChatMessage = {
+          id: `academic-ai-${Date.now()}`,
+          role: 'assistant',
+          content: `${academicFallback}\n\n*(💡 Answered via Moonlit Academic Knowledge Base. Connect your free Google Gemini API Key in the top drawer for unlimited freeform AI chat!)*`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, assistantReply]);
+        replySuccess = true;
+      }
+    }
+
     // If still not resolved, show clear actionable instructions to connect key
     if (!replySuccess) {
       sound.playPageTurn();
@@ -569,10 +586,11 @@ Be encouraging, clear, and structured with markdown formatting.`;
   if (!isOpen) return null;
 
   const quickPrompts = [
-    'Explain WACC formula in simple Hindi & English',
-    'Discounted Cash Flow (DCF) step-by-step with example',
-    'Help me understand difficult concepts with analogies',
-    'What study notes do I have in Corporate Finance?'
+    'Explain demand and supply in simple Hinglish',
+    'What are Nielsen’s 10 UI/UX Usability Heuristics?',
+    'How to structure an MBA Product Requirement Document (PRD)?',
+    'Situational Leadership model with real management examples',
+    'Generate a scenario-based Microeconomics practice question'
   ];
 
   return (

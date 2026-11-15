@@ -15,7 +15,8 @@ import {
   Save,
   Sun,
   Moon,
-  Clock
+  Clock,
+  BookOpen
 } from 'lucide-react';
 import { authService } from '../../services/auth';
 import { db } from '../../services/db';
@@ -417,21 +418,37 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </div>
 
           {/* Theme Mode Selector */}
-          <div className="grid grid-cols-3 gap-2 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
             <button
               type="button"
               onClick={() => {
-                setThemePref('auto');
-                themeService.setPreference('auto');
+                setThemePref('dark-academia');
+                themeService.setPreference('dark-academia');
               }}
               className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
-                themePref === 'auto'
-                  ? 'bg-lavender-600 text-white shadow-sm'
+                themePref === 'dark-academia' || themePref === 'dark'
+                  ? 'bg-amber-950/80 text-amber-200 border border-amber-400/50 shadow-sm'
                   : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
               }`}
             >
-              <Clock className="w-3 h-3 text-moon-gold" />
-              <span>Auto Schedule</span>
+              <BookOpen className="w-3 h-3 text-amber-400" />
+              <span>Dark Academia</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setThemePref('celestial-midnight');
+                themeService.setPreference('celestial-midnight');
+              }}
+              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+                themePref === 'celestial-midnight'
+                  ? 'bg-lavender-900/80 text-lavender-100 border border-lavender-400/50 shadow-sm'
+                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3 h-3 text-lavender-300" />
+              <span>Celestial Night</span>
             </button>
 
             <button
@@ -447,23 +464,23 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               }`}
             >
               <Sun className="w-3 h-3 text-amber-400" />
-              <span>Always Light</span>
+              <span>Light Parchment</span>
             </button>
 
             <button
               type="button"
               onClick={() => {
-                setThemePref('dark');
-                themeService.setPreference('dark');
+                setThemePref('auto');
+                themeService.setPreference('auto');
               }}
               className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
-                themePref === 'dark'
-                  ? 'bg-midnight-950 text-stargold-200 border border-stargold-400/40 shadow-sm'
+                themePref === 'auto'
+                  ? 'bg-lavender-600 text-white shadow-sm'
                   : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
               }`}
             >
-              <Moon className="w-3 h-3 text-lavender-300" />
-              <span>Always Dark</span>
+              <Clock className="w-3 h-3 text-moon-gold" />
+              <span>Auto Schedule</span>
             </button>
           </div>
 

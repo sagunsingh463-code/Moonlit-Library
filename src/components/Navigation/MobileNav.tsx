@@ -15,7 +15,11 @@ import {
   Moon, 
   User, 
   X,
-  LogOut
+  LogOut,
+  Award,
+  Heart,
+  GitBranch,
+  TrendingUp
 } from 'lucide-react';
 import { ViewMode, UserProfile } from '../../types';
 import { sound } from '../../services/audio';
@@ -46,6 +50,11 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   };
 
   const moreNavItems = [
+    { id: 'quests' as ViewMode, label: 'Daily Quests', icon: Award, badge: 'Missions' },
+    { id: 'pet' as ViewMode, label: 'Study Pet Mochi', icon: Heart, badge: 'Lv. 3' },
+    { id: 'knowledge-map' as ViewMode, label: 'Knowledge Map', icon: GitBranch, badge: 'Trees' },
+    { id: 'focus-score' as ViewMode, label: 'Focus Score', icon: TrendingUp, badge: 'Matrix' },
+    { id: 'graduation-wall' as ViewMode, label: 'Graduation Wall', icon: GraduationCap, badge: '6 Terms' },
     { id: 'terms' as ViewMode, label: 'Academic Terms', icon: GraduationCap, badge: '6 Terms' },
     { id: 'calendar' as ViewMode, label: 'Timetable & Cal', icon: Calendar, badge: 'Live' },
     { id: 'arcade' as ViewMode, label: 'Moonlight Arcade', icon: Sparkles, badge: '50 Qs' },

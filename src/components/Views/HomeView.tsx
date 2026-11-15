@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   UserStudyStats, 
   NoteItem, 
@@ -6,7 +6,6 @@ import {
   AssignmentItem, 
   StudyPlanTask, 
   ViewMode, 
-  MoonPhaseType,
   CalendarEvent,
   YouTubeResource,
   ExamCountdownItem,
@@ -25,13 +24,28 @@ import {
   Circle,
   Plus,
   Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  SkipForward,
   Gamepad2,
   Calendar,
   GraduationCap,
   Video,
-  AlertCircle
+  Award,
+  TrendingUp,
+  GitBranch,
+  Coffee,
+  Heart,
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
+import { DailyQuestSystem } from '../Quests/DailyQuestSystem';
+import { VirtualStudyPet } from '../Pet/VirtualStudyPet';
+import { InteractiveKnowledgeMap } from '../KnowledgeMap/InteractiveKnowledgeMap';
+import { FocusScoreDashboard } from '../FocusScore/FocusScoreDashboard';
+import { GraduationWallView } from '../Graduation/GraduationWallView';
 import { sound } from '../../services/audio';
 
 interface HomeViewProps {
@@ -48,10 +62,11 @@ interface HomeViewProps {
   onNavigate: (view: ViewMode, itemId?: string) => void;
   onOpenFocusMode: () => void;
   onToggleTask: (taskId: string) => Promise<void>;
+  onOpenAiAssistant?: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
-  studentName = 'Seraphina',
+  studentName = 'Sagun Singh',
   stats,
   notes,
   questions,
@@ -63,481 +78,608 @@ export const HomeView: React.FC<HomeViewProps> = ({
   subjects = [],
   onNavigate,
   onOpenFocusMode,
-  onToggleTask
+  onToggleTask,
+  onOpenAiAssistant
 }) => {
-  // Memory shelf items: Notes needing revision + Bookmarked questions
-  const revisionNotes = notes.filter(n => n.needsRevision || n.isBookmarked).slice(0, 3);
-  const bookmarkedQuestions = questions.filter(q => q.isBookmarked).slice(0, 3);
-  const upcomingAssignments = assignments.filter(a => a.status !== 'submitted' && a.status !== 'graded').slice(0, 3);
-  const todaysTasks = plannerTasks.slice(0, 4);
+  // Live Flip Clock State
+  const [currentTime, setCurrentTime] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  // Today's classes highlight
-  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const todayName = daysOfWeek[new Date().getDay()];
-  const todaysClasses = calendarEvents.filter(e => e.dayOfWeek === todayName);
-
-  const moonPhaseSymbols: Record<MoonPhaseType, string> = {
-    'new-moon': '🌑',
-    'waxing-crescent': '🌒',
-    'first-quarter': '🌓',
-    'waxing-gibbous': '🌔',
-    'full-moon': '🌕',
-    'waning-gibbous': '🌖',
-    'last-quarter': '🌗',
-    'waning-crescent': '🌘',
+  // Study Streak booster state
+  const [currentStreak, setCurrentStreak] = useState(stats.currentStreakDays || 5);
+  const handleBoostStreak = (delta: number) => {
+    sound.playSparkle();
+    setCurrentStreak(prev => Math.max(0, prev + delta));
   };
 
-  return (
-    <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
-      {/* Welcome Banner with Moon Cat Companion */}
-      <div className="relative rounded-3xl glass-panel-glow border border-lavender-400/30 p-5 sm:p-6 md:p-8 overflow-hidden shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-        {/* Soft background glow */}
-        <div className="absolute top-0 right-1/4 w-72 h-72 bg-lavender-600/10 rounded-full blur-3xl pointer-events-none" />
+  // Aesthetic Music Player State
+  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const playlist = [
+    { title: 'Achilles Come Down', artist: 'Dark Academia Ambience', duration: '7:02', audioType: 'lofi-sparkles' as const },
+    { title: 'Chopin - Nocturne in C Minor', artist: 'Soft Library Rain', duration: '3:45', audioType: 'night-breeze' as const },
+    { title: 'Clair de Lune (Debussy)', artist: 'Moonlit Velvet Piano', duration: '4:18', audioType: 'lofi-sparkles' as const },
+    { title: 'Deep Midnight Focus Beats', artist: 'Hades Study Lofi', duration: '2:24', audioType: 'night-breeze' as const }
+  ];
 
-        <div className="relative z-10 max-w-xl text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-midnight-900/80 border border-stargold-400/30 text-xs font-serif text-stargold-200 mb-3">
-            <span>✨ Sanctuary is Open</span>
-            <span>•</span>
-            <span>Personal Universe</span>
+  const handleTogglePlayMusic = () => {
+    sound.playSparkle();
+    const nextState = !isPlayingMusic;
+    setIsPlayingMusic(nextState);
+    if (nextState) {
+      sound.startAmbient(playlist[currentTrackIndex].audioType);
+    } else {
+      sound.stopAmbient();
+    }
+  };
+
+  const handleNextTrack = () => {
+    sound.playSparkle();
+    const nextIdx = (currentTrackIndex + 1) % playlist.length;
+    setCurrentTrackIndex(nextIdx);
+    if (isPlayingMusic) {
+      sound.startAmbient(playlist[nextIdx].audioType);
+    }
+  };
+
+  // Quotes rotation
+  const quotesList = [
+    {
+      quote: '"Philtatos," Achilles says. Sharply. Most beloved.',
+      author: 'Madeline Miller, The Song of Achilles'
+    },
+    {
+      quote: 'What gets measured gets managed. Efficiency is doing things right; effectiveness is doing the right things.',
+      author: 'Peter F. Drucker, Management Pioneer'
+    },
+    {
+      quote: 'Questions are places in your mind where answers fit. If you haven\'t asked the question, the answer has nowhere to go.',
+      author: 'Clayton M. Christensen, The Innovator\'s Dilemma'
+    },
+    {
+      quote: 'Dwell on the beauty of life. Watch the stars, and see yourself running with them.',
+      author: 'Marcus Aurelius, Meditations'
+    }
+  ];
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const handleNextQuote = () => {
+    sound.playSparkle();
+    setQuoteIndex(prev => (prev + 1) % quotesList.length);
+  };
+
+  // Custom to-do tasks
+  const [customTasks, setCustomTasks] = useState([
+    { id: 'c-1', text: 'my heart and other black holes (review notes)', done: true },
+    { id: 'c-2', text: 'microeconomics elasticity derivation problem set', done: false },
+    { id: 'c-3', text: 'draft PRD customer problem statements', done: false }
+  ]);
+
+  const handleToggleCustomTask = (id: string) => {
+    sound.playSparkle();
+    setCustomTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+
+  // Term 2 Subjects Gallery Cards
+  const gallerySubjects = [
+    { id: 'microeconomics', code: '01', title: 'Microeconomics', desc: 'Supply & Demand, Elasticity, Game Theory', count: '14 Notes • 5 Files', cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80' },
+    { id: 'ui-ux', code: '02', title: 'Introduction to UI/UX', desc: 'Design Thinking, Nielsen Heuristics, Figma', count: '18 Notes • 8 Files', cover: 'https://images.unsplash.com/photo-1507842229450-79779f62a6b2?auto=format&fit=crop&w=600&q=80' },
+    { id: 'leadership', code: '03', title: 'Leadership Accelerator', desc: 'Situational Leadership, EQ, Crucial Talks', count: '10 Notes • 4 Files', cover: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80' },
+    { id: 'market-research', code: '04', title: 'Market Research Methods', desc: 'Primary vs Secondary, Surveys, Conjoint', count: '12 Notes • 6 Files', cover: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80' },
+    { id: 'product-management', code: '05', title: 'Product Management', desc: 'PRD Structure, RICE Prioritization, JTBD', count: '22 Notes • 11 Files', cover: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80' },
+    { id: 'cv-interview', code: '06', title: 'CV Interview Workshop', desc: 'STAR Framework, Behavioral Questions, Resumes', count: '8 Notes • 7 Files', cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80' },
+    { id: 'entrepreneurship', code: '07', title: 'Entrepreneurial Mindset', desc: 'Lean Startup, Unit Economics, MVP Launch', count: '15 Notes • 6 Files', cover: 'https://images.unsplash.com/photo-1532012164546-f432f2e3edd4?auto=format&fit=crop&w=600&q=80' },
+    { id: 'term-1-review', code: '08', title: 'Term 1 Mastered Review', desc: 'Design Thinking, Finance, Vibe Coding, Statistics', count: '9 Subjects Completed', cover: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=600&q=80' },
+    { id: 'terms-3-6', code: '09', title: 'Terms 3–6 Roadmaps', desc: 'Digital Analytics, Corporate Strategy, Capstone', count: 'Future Curriculum', cover: 'https://images.unsplash.com/photo-1463320726281-696a485928c7?auto=format&fit=crop&w=600&q=80' }
+  ];
+
+  // Today's classes
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayName = daysOfWeek[currentTime.getDay()];
+  const todaysClasses = calendarEvents.filter(e => e.dayOfWeek === todayName);
+
+  return (
+    <div className="p-3.5 sm:p-6 space-y-6 max-w-7xl mx-auto overflow-x-hidden">
+      
+      {/* ======================================================== */}
+      {/* 1. WIDE VINTAGE LIBRARY COVER BANNER                     */}
+      {/* ======================================================== */}
+      <div className="relative rounded-3xl overflow-hidden border border-[#d4af37]/35 shadow-2xl bg-[#141210]">
+        {/* Vintage Library Banner Image */}
+        <div className="h-44 sm:h-56 md:h-64 w-full relative overflow-hidden">
+          <img
+            src="https://images.unsplash.com/photo-1507842229450-79779f62a6b2?auto=format&fit=crop&w=1600&q=85"
+            alt="Moonlit Library Vintage Panorama"
+            className="w-full h-full object-cover object-[center_35%] filter brightness-[0.72] contrast-[1.08]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#121110] via-[#121110]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#121110]/80 via-transparent to-[#121110]/80" />
+
+          {/* Golden Ambient Candlelight Glow */}
+          <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-[#d4af37]/15 rounded-full blur-3xl pointer-events-none" />
+        </div>
+
+        {/* Banner Content & Notion Style Header */}
+        <div className="p-5 sm:p-7 relative -mt-16 z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="text-xs sm:text-sm font-mono text-[#d4af37] tracking-widest flex items-center gap-2">
+              <span>library ˚୨୧⋆｡˚ ⋆</span>
+              <span>•</span>
+              <span className="text-stone-400">Sagun Singh’s MBA Sanctuary</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif font-bold text-[#f4ebe1] tracking-wide text-glow">
+              Welcome to Moonlit Library
+            </h1>
+            <p className="text-xs sm:text-sm text-[#e8d8c8]/90 font-sans max-w-xl leading-relaxed">
+              The candles are lit, the tea is warm, and vintage grimoires invite deep focus. What shall we master tonight?
+            </p>
           </div>
 
-          <h1 className="text-xl sm:text-2xl md:text-4xl font-serif font-bold text-white tracking-wide text-glow mb-2">
-            Welcome back, {studentName} 🌙
-          </h1>
-          <p className="text-xs md:text-sm text-lavender-200/90 font-sans leading-relaxed">
-            The candles are lit, the tea is warm, and a tranquil night sky invites deep learning. What shall we master tonight?
-          </p>
-
-
-          {/* Quick Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3 mt-5 justify-center md:justify-start">
+          {/* Quick Sanctuary Action Pills */}
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={onOpenFocusMode}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-stargold-500 to-amber-500 text-midnight-950 font-serif font-bold text-xs shadow-star-glow hover:brightness-110 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#c5a059] to-[#945c36] text-[#121110] font-serif font-bold text-xs shadow-lg shadow-[#d4af37]/20 hover:brightness-110 active:scale-95 transition-all"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Begin Midnight Focus</span>
             </button>
             <button
-              onClick={() => onNavigate('quiz')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel text-lavender-200 hover:text-white hover:border-lavender-400/40 text-xs font-medium transition-all"
+              onClick={() => onNavigate('arcade')}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#221e1a]/90 hover:bg-[#2b2520] border border-[#d4af37]/35 text-[#f4ebe1] text-xs font-serif font-bold transition-all"
             >
-              <HelpCircle className="w-3.5 h-3.5 text-lavender-300" />
-              <span>Quick Quiz Session</span>
+              <Gamepad2 className="w-3.5 h-3.5 text-[#d4af37]" />
+              <span>Moonlight Arcade</span>
             </button>
-            <button
-              onClick={() => onNavigate('notes')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel text-lavender-200 hover:text-white hover:border-lavender-400/40 text-xs font-medium transition-all"
-            >
-              <Plus className="w-3.5 h-3.5 text-rosemoon-300" />
-              <span>New Study Note</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Shagun Anime Girl Permanent Mascot & Companion */}
-        <div className="relative z-10 flex-shrink-0">
-          <ShagunAnimeGirl 
-            mood="welcome" 
-            size="lg" 
-            showSpeech={true}
-          />
-        </div>
-      </div>
-
-      {/* Key Real Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Total Study Time */}
-        <div className="p-4 rounded-2xl glass-panel-subtle border border-lavender-400/20 flex items-center gap-3.5">
-          <div className="p-3 rounded-xl bg-lavender-600/20 text-lavender-300 border border-lavender-400/30">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[11px] text-lavender-300/80 font-sans uppercase">Study Time</p>
-            <p className="text-lg md:text-xl font-serif font-bold text-white">
-              {Math.floor(stats.totalStudyMinutes / 60)}h {stats.totalStudyMinutes % 60}m
-            </p>
-          </div>
-        </div>
-
-        {/* Stars in Sky */}
-        <div 
-          onClick={() => onNavigate('constellation')}
-          className="p-4 rounded-2xl glass-panel-subtle border border-lavender-400/20 flex items-center gap-3.5 cursor-pointer hover:border-stargold-400/50 transition-colors"
-        >
-          <div className="p-3 rounded-xl bg-stargold-500/20 text-stargold-300 border border-stargold-400/30">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[11px] text-lavender-300/80 font-sans uppercase">Constellation</p>
-            <p className="text-lg md:text-xl font-serif font-bold text-stargold-100">
-              {stats.starsCollected} Stars
-            </p>
-          </div>
-        </div>
-
-        {/* Quiz Accuracy */}
-        <div 
-          onClick={() => onNavigate('quiz')}
-          className="p-4 rounded-2xl glass-panel-subtle border border-lavender-400/20 flex items-center gap-3.5 cursor-pointer hover:border-lavender-400/50 transition-colors"
-        >
-          <div className="p-3 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-400/30">
-            <HelpCircle className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[11px] text-lavender-300/80 font-sans uppercase">Quiz Mastery</p>
-            <p className="text-lg md:text-xl font-serif font-bold text-white">
-              {stats.quizAverageScore}% Accuracy
-            </p>
-          </div>
-        </div>
-
-        {/* Study Streak */}
-        <div className="p-4 rounded-2xl glass-panel-subtle border border-lavender-400/20 flex items-center gap-3.5">
-          <div className="p-3 rounded-xl bg-rosemoon-500/20 text-rosemoon-300 border border-rosemoon-400/30">
-            <Flame className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[11px] text-lavender-300/80 font-sans uppercase">Current Streak</p>
-            <p className="text-lg md:text-xl font-serif font-bold text-rosemoon-200">
-              {stats.currentStreakDays} Days Flow
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Signature Feature: Moon Phases Weekly Study Consistency Bar */}
-      <div className="p-5 rounded-3xl glass-panel-subtle border border-lavender-400/20">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🌙</span>
-            <h3 className="font-serif font-bold text-sm md:text-base text-white">
-              Weekly Moon Phases Consistency
-            </h3>
-          </div>
-          <span className="text-xs text-lavender-300/80 font-mono">
-            {stats.weeklyLogs.length} Days Tracked
-          </span>
-        </div>
-
-        <div className="grid grid-cols-7 gap-2 md:gap-3 text-center">
-          {stats.weeklyLogs.map((dayLog, i) => {
-            const symbol = moonPhaseSymbols[dayLog.phase] || '🌖';
-            return (
-              <div 
-                key={i} 
-                className="p-3 rounded-2xl bg-midnight-900/60 border border-lavender-400/15 flex flex-col items-center gap-1.5 hover:border-stargold-400/40 transition-colors"
+            {onOpenAiAssistant && (
+              <button
+                onClick={onOpenAiAssistant}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#221e1a]/90 hover:bg-[#2b2520] border border-[#d4af37]/35 text-[#d4af37] text-xs font-serif font-bold transition-all"
               >
-                <span className="text-xs font-mono text-lavender-300">{dayLog.dayName}</span>
-                <span className="text-2xl filter drop-shadow-sm">{symbol}</span>
-                <span className="text-[11px] font-semibold text-white">{dayLog.minutes}m</span>
-                <span className="text-[9px] text-lavender-400">{dayLog.tasksCount} tasks</span>
-              </div>
-            );
-          })}
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Ask Luna AI</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Dark Academia Color Palette Swatch Tiles Bar (From Reference!) */}
+        <div className="grid grid-cols-6 h-2 w-full border-t border-[#d4af37]/20">
+          <div className="bg-[#2b1810]" title="#2b1810 Mahogany" />
+          <div className="bg-[#4a2e1b]" title="#4a2e1b Chocolate" />
+          <div className="bg-[#6b4226]" title="#6b4226 Saddle Brown" />
+          <div className="bg-[#945c36]" title="#945c36 Warm Amber" />
+          <div className="bg-[#c5a059]" title="#c5a059 Antique Gold" />
+          <div className="bg-[#e8d8c8]" title="#e8d8c8 Vintage Parchment" />
         </div>
       </div>
 
-      {/* Main Split Grid: Memory Shelf & Today's Study Plan */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Signature Feature: Memory Shelf */}
-        <div className="p-6 rounded-3xl glass-panel-subtle border border-lavender-400/25 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-lavender-400/15 mb-4">
-              <div className="flex items-center gap-2.5">
-                <BookOpen className="w-5 h-5 text-stargold-300" />
-                <h3 className="font-serif font-bold text-base text-white">
-                  Memory Shelf
+      {/* ======================================================== */}
+      {/* 2. THREE-COLUMN DASHBOARD (Directly matching reference!)  */}
+      {/* ======================================================== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {/* ------------------------------------------------------ */}
+        {/* COLUMN 1: Quote, Stickers, Retro Player & Checklist     */}
+        {/* ------------------------------------------------------ */}
+        <div className="space-y-6">
+          {/* Literary / MBA Wisdom Quote Card */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3 relative group">
+            <div className="flex items-center justify-between text-[11px] font-mono text-[#d4af37]">
+              <span>Wisdom Shelf ˚୨୧⋆｡˚</span>
+              <button 
+                onClick={handleNextQuote}
+                className="hover:underline text-[10px] text-stone-400 hover:text-white"
+              >
+                Next Quote →
+              </button>
+            </div>
+            <p className="text-xs sm:text-sm font-serif italic text-[#f4ebe1] leading-relaxed">
+              {quotesList[quoteIndex].quote}
+            </p>
+            <span className="text-[11px] font-mono text-[#c5a059] block text-right font-medium">
+              — {quotesList[quoteIndex].author}
+            </span>
+
+            {/* Cute Food & Drink Stickers Row (From Reference!) */}
+            <div className="pt-2 border-t border-[#d4af37]/15 flex items-center justify-around text-lg">
+              <span title="Steaming Latte" className="hover:scale-125 transition-transform cursor-pointer">☕</span>
+              <span title="Butter Croissant" className="hover:scale-125 transition-transform cursor-pointer">🥐</span>
+              <span title="Pancake Stack" className="hover:scale-125 transition-transform cursor-pointer">🥞</span>
+              <span title="Custard Pudding" className="hover:scale-125 transition-transform cursor-pointer">🍮</span>
+              <span title="Matcha Dorayaki" className="hover:scale-125 transition-transform cursor-pointer">🍵</span>
+            </div>
+          </div>
+
+          {/* Retro Cassette / Vintage Dark Academia Music Player (From Reference!) */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/35 bg-[#1a1714] space-y-4 shadow-xl">
+            <div className="flex items-center justify-between text-xs font-serif font-bold text-[#f4ebe1]">
+              <div className="flex items-center gap-2">
+                <span className="text-base">📻</span>
+                <span>Dark Academia Cassette Player</span>
+              </div>
+              <span className="text-[10px] font-mono text-[#d4af37] px-2 py-0.5 rounded-full bg-[#2b221b] border border-[#d4af37]/30">
+                {isPlayingMusic ? 'Now Playing' : 'Paused'}
+              </span>
+            </div>
+
+            {/* Cassette Graphic with Spinning Wheels */}
+            <div className="p-3.5 rounded-2xl bg-[#12100e] border border-[#d4af37]/30 flex items-center justify-between relative overflow-hidden">
+              <div className="space-y-0.5 min-w-0 flex-1">
+                <span className="text-[10px] font-mono text-[#c5a059] block uppercase truncate">
+                  {playlist[currentTrackIndex].artist}
+                </span>
+                <p className="text-xs font-serif font-bold text-white truncate">
+                  {playlist[currentTrackIndex].title}
+                </p>
+              </div>
+
+              {/* Spinning Tape Wheels */}
+              <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                <div className={`w-6 h-6 rounded-full border-2 border-dashed border-[#d4af37] flex items-center justify-center ${isPlayingMusic ? 'retro-cassette-wheel' : ''}`}>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />
+                </div>
+                <div className={`w-6 h-6 rounded-full border-2 border-dashed border-[#d4af37] flex items-center justify-center ${isPlayingMusic ? 'retro-cassette-wheel' : ''}`}>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />
+                </div>
+              </div>
+            </div>
+
+            {/* Player Controls */}
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-[10px] font-mono text-stone-400">
+                {playlist[currentTrackIndex].duration}
+              </span>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleTogglePlayMusic}
+                  className="w-9 h-9 rounded-full bg-gradient-to-r from-[#d4af37] to-[#945c36] text-[#121110] flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all"
+                  title={isPlayingMusic ? 'Pause Music' : 'Play Ambient Track'}
+                >
+                  {isPlayingMusic ? <Pause size={14} className="fill-current" /> : <Play size={14} className="fill-current translate-x-0.5" />}
+                </button>
+                <button
+                  onClick={handleNextTrack}
+                  className="p-2 rounded-xl bg-[#26201b] border border-[#d4af37]/25 text-stone-300 hover:text-white"
+                  title="Next Track"
+                >
+                  <SkipForward size={14} />
+                </button>
+              </div>
+            </div>
+
+            {/* Playlist Tracklist Preview */}
+            <div className="space-y-1 pt-1 text-[11px] font-mono text-stone-400 border-t border-[#d4af37]/15">
+              {playlist.map((track, idx) => (
+                <div 
+                  key={track.title}
+                  onClick={() => {
+                    sound.playSparkle();
+                    setCurrentTrackIndex(idx);
+                    setIsPlayingMusic(true);
+                    sound.startAmbient(track.audioType);
+                  }}
+                  className={`flex items-center justify-between p-1.5 rounded-lg cursor-pointer transition-colors ${
+                    idx === currentTrackIndex ? 'bg-[#2b221b] text-[#d4af37] font-bold' : 'hover:bg-[#221e1a]'
+                  }`}
+                >
+                  <span className="truncate">{idx + 1}. {track.title}</span>
+                  <span className="text-[10px] ml-2 flex-shrink-0">{track.duration}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Aesthetic Checklist Widget (`books lent` / daily tasks from Reference!) */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#d4af37]/15">
+              <span className="text-xs font-serif font-bold text-[#f4ebe1]">
+                books lent & tasks ༉‧₊˚
+              </span>
+              <span className="text-[10px] font-mono text-[#d4af37]">
+                {customTasks.filter(t => t.done).length}/{customTasks.length} Done
+              </span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              {customTasks.map(task => (
+                <div
+                  key={task.id}
+                  onClick={() => handleToggleCustomTask(task.id)}
+                  className={`p-2 rounded-xl border cursor-pointer transition-all flex items-center gap-2.5 ${
+                    task.done
+                      ? 'bg-[#1a1714]/50 border-stone-800 text-stone-500 line-through'
+                      : 'bg-[#221e1a]/80 border-[#d4af37]/20 text-[#f4ebe1] hover:border-[#d4af37]/50'
+                  }`}
+                >
+                  {task.done ? (
+                    <CheckCircle2 size={14} className="text-[#d4af37] flex-shrink-0" />
+                  ) : (
+                    <Circle size={14} className="text-stone-500 flex-shrink-0" />
+                  )}
+                  <span className="truncate">{task.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ------------------------------------------------------ */}
+        {/* COLUMN 2: Shagun's Reading Nook & Retro Flip Clock      */}
+        {/* ------------------------------------------------------ */}
+        <div className="space-y-6">
+          {/* Shagun Permanent Mascot Reading Card */}
+          <div className="p-6 rounded-3xl glass-panel-glow border border-[#d4af37]/40 bg-[#181512] space-y-4 shadow-xl text-center relative overflow-hidden">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2a221b] border border-[#d4af37]/30 text-xs font-serif text-[#d4af37]">
+              <span>☕</span>
+              <span>Sanctuary Mascot & Companion</span>
+            </div>
+
+            {/* Permanent Mascot Shagun */}
+            <div className="py-2 flex items-center justify-center">
+              <ShagunAnimeGirl mood="reading" size="lg" showSpeech={true} />
+            </div>
+          </div>
+
+          {/* Retro Flip Clock Widget (From Reference!) */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3 text-center">
+            <span className="text-[11px] font-mono text-[#d4af37] block">
+              -- check the time ༉‧₊˚ --
+            </span>
+
+            {/* Flip Clock Big Digits Display */}
+            <div className="grid grid-cols-2 gap-3 max-w-[260px] mx-auto">
+              <div className="p-4 rounded-2xl bg-[#26201a] border border-[#d4af37]/35 shadow-inner">
+                <span className="text-3xl sm:text-4xl font-mono font-bold text-[#f4ebe1] tracking-wider">
+                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).split(' ')[0]}
+                </span>
+                <span className="text-[9px] font-mono text-stone-400 block mt-1 uppercase">
+                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).split(' ')[1] || 'HR : MIN'}
+                </span>
+              </div>
+              <div className="p-4 rounded-2xl bg-[#26201a] border border-[#d4af37]/35 shadow-inner">
+                <span className="text-2xl sm:text-3xl font-serif font-bold text-[#d4af37] block">
+                  {todayName.slice(0, 3).toUpperCase()}
+                </span>
+                <span className="text-[10px] font-mono text-stone-300 block mt-1">
+                  {currentTime.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+            </div>
+
+            {/* Mini Cake & Dessert Stickers Row (From Reference!) */}
+            <div className="pt-2 border-t border-[#d4af37]/15 flex items-center justify-center gap-3 text-lg">
+              <span title="Strawberry Cake">🍰</span>
+              <span title="Caramel Pudding">🍮</span>
+              <span title="Matcha Mochi">🍡</span>
+              <span title="Warm Waffle">🧇</span>
+            </div>
+          </div>
+
+          {/* Today's Classes & Timetable Preview */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#d4af37]/15">
+              <div className="flex items-center gap-2">
+                <Calendar size={15} className="text-[#d4af37]" />
+                <h3 className="font-serif font-bold text-xs text-white">
+                  Today's Classes ({todayName})
                 </h3>
               </div>
-              <span className="text-[11px] text-lavender-300/70 font-sans">
-                Spaced Revision & Saved Wisdom
-              </span>
+              <button
+                onClick={() => onNavigate('calendar')}
+                className="text-[10px] text-[#d4af37] hover:underline"
+              >
+                Full Calendar →
+              </button>
             </div>
 
-            {/* Revision Notes List */}
-            <div className="space-y-3">
-              <span className="text-[10px] uppercase font-semibold text-lavender-300 tracking-wider">
-                Topics Needing Active Recall
-              </span>
-
-              {revisionNotes.map(note => (
-                <div
-                  key={note.id}
-                  onClick={() => onNavigate('notes', note.id)}
-                  className="p-3 rounded-2xl bg-midnight-900/60 hover:bg-lavender-600/20 border border-lavender-400/20 hover:border-stargold-400/40 cursor-pointer transition-all flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <Bookmark className="w-4 h-4 text-stargold-300 fill-stargold-400/40 flex-shrink-0" />
-                    <div className="truncate">
-                      <p className="text-xs font-medium text-white truncate">{note.title}</p>
-                      <p className="text-[10px] text-lavender-300/80">{note.subject}</p>
+            <div className="space-y-2 text-xs">
+              {todaysClasses.length === 0 ? (
+                <p className="text-[11px] text-stone-400 py-2 text-center italic">
+                  No classes scheduled today. Perfect day for Midnight Focus!
+                </p>
+              ) : (
+                todaysClasses.map(c => (
+                  <div key={c.id} className="p-2.5 rounded-xl bg-[#221e1a] border border-[#d4af37]/15 flex items-center justify-between">
+                    <div>
+                      <span className="font-mono text-[#d4af37] text-[10px]">{c.startTime} - {c.endTime}</span>
+                      <p className="font-serif font-bold text-white text-xs">{c.title}</p>
                     </div>
+                    <span className="text-[9px] px-2 py-0.5 rounded bg-amber-950/70 text-amber-300 border border-amber-600/30">
+                      {c.type}
+                    </span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-lavender-400 flex-shrink-0 ml-2" />
-                </div>
-              ))}
-
-              <span className="text-[10px] uppercase font-semibold text-rosemoon-300 tracking-wider block pt-2">
-                Bookmarked Exam Questions
-              </span>
-
-              {bookmarkedQuestions.map(q => (
-                <div
-                  key={q.id}
-                  onClick={() => onNavigate('question-bank', q.id)}
-                  className="p-3 rounded-2xl bg-midnight-900/60 hover:bg-rosemoon-500/20 border border-lavender-400/20 hover:border-rosemoon-400/40 cursor-pointer transition-all flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <HelpCircle className="w-4 h-4 text-rosemoon-300 flex-shrink-0" />
-                    <p className="text-xs font-medium text-lavender-100 truncate">{q.question}</p>
-                  </div>
-                  <span className="text-[10px] text-rosemoon-200 px-2 py-0.5 rounded-full bg-rosemoon-500/20 border border-rosemoon-400/30 flex-shrink-0 ml-2">
-                    {q.difficulty}
-                  </span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
+        </div>
 
+        {/* ------------------------------------------------------ */}
+        {/* COLUMN 3: Streak, Pet & 9-Readings Subject Gallery     */}
+        {/* ------------------------------------------------------ */}
+        <div className="space-y-6">
+          {/* Study Streak Counter Box (From Reference!) */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/35 bg-[#1a1714] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-serif font-bold text-[#f4ebe1]">
+                study streak ༉‧₊˚
+              </span>
+              {/* Cute Ramen & Dango Stickers from Reference! */}
+              <div className="flex items-center gap-1.5 text-base">
+                <span title="Ramen">🍜</span>
+                <span title="Dango">🍡</span>
+              </div>
+            </div>
+
+            {/* Streak Counter [ - ] [ Count ] [ + ] */}
+            <div className="flex items-center justify-center gap-4 py-2">
+              <button
+                onClick={() => handleBoostStreak(-1)}
+                className="w-8 h-8 rounded-xl bg-[#2b221b] border border-[#d4af37]/30 text-[#d4af37] font-bold text-sm hover:bg-[#382b22] transition-colors"
+                title="Decrease streak"
+              >
+                -
+              </button>
+              <div className="px-5 py-2 rounded-2xl bg-[#12100e] border-2 border-[#d4af37]/50 text-2xl font-mono font-bold text-amber-200 min-w-[70px] text-center shadow-inner">
+                {currentStreak}
+              </div>
+              <button
+                onClick={() => handleBoostStreak(1)}
+                className="w-8 h-8 rounded-xl bg-[#2b221b] border border-[#d4af37]/30 text-[#d4af37] font-bold text-sm hover:bg-[#382b22] transition-colors"
+                title="Boost streak"
+              >
+                +
+              </button>
+            </div>
+            <p className="text-[10px] font-mono text-stone-400 text-center">
+              Consecutive days deep learning in Moonlit Library
+            </p>
+          </div>
+
+          {/* Virtual Study Pet Widget ("Mochi") */}
+          <VirtualStudyPet compact={true} onFeed={() => sound.playCelestialChime()} />
+
+          {/* Daily Quests Mini Preview */}
+          <DailyQuestSystem compact={true} onNavigate={onNavigate} />
+        </div>
+      </div>
+
+      {/* ======================================================== */}
+      {/* 3. 9—SUBJECTS / READINGS GALLERY (From Reference!)       */}
+      {/* ======================================================== */}
+      <div className="p-6 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#d4af37]/15">
+          <div>
+            <div className="text-[11px] font-mono text-[#d4af37] tracking-wider">
+              9—readings / subjects—༉
+            </div>
+            <h2 className="text-xl font-serif font-bold text-[#f4ebe1] mt-0.5">
+              Term 2 Academic Subjects & Curricula Gallery
+            </h2>
+          </div>
           <button
-            onClick={() => onNavigate('notes')}
-            className="mt-4 text-xs font-serif text-stargold-300 hover:text-stargold-100 flex items-center gap-1.5 transition-colors"
+            onClick={() => onNavigate('terms')}
+            className="text-xs font-serif text-[#d4af37] hover:underline flex items-center gap-1"
           >
-            <span>View All Notes & Grimoires</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>Explore All 6 Academic Terms</span>
+            <ChevronRight size={14} />
           </button>
         </div>
 
-        {/* Today's Goals & Urgent Assignments */}
-        <div className="p-6 rounded-3xl glass-panel-subtle border border-lavender-400/25 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-lavender-400/15 mb-4">
-              <div className="flex items-center gap-2.5">
-                <FileCheck2 className="w-5 h-5 text-rosemoon-300" />
-                <h3 className="font-serif font-bold text-base text-white">
-                  Today's Study Checklist
+        {/* 9 Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {gallerySubjects.map(sub => (
+            <div
+              key={sub.id}
+              onClick={() => {
+                sound.playSparkle();
+                if (sub.id === 'term-1-review' || sub.id === 'terms-3-6') {
+                  onNavigate('terms');
+                } else {
+                  onNavigate('knowledge-map', sub.id);
+                }
+              }}
+              className="group p-3 rounded-2xl bg-[#1e1a16] border border-[#d4af37]/25 hover:border-[#d4af37]/60 cursor-pointer transition-all space-y-3 shadow-md hover:shadow-xl"
+            >
+              {/* Cover Image Thumbnail */}
+              <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[#12100e]">
+                <img
+                  src={sub.cover}
+                  alt={sub.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90"
+                />
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#12100e]/80 border border-[#d4af37]/40 text-[10px] font-mono text-[#d4af37] font-bold">
+                  /{sub.code}
+                </div>
+              </div>
+
+              {/* Title & Description */}
+              <div className="space-y-1">
+                <h3 className="text-sm font-serif font-bold text-[#f4ebe1] group-hover:text-[#d4af37] transition-colors truncate">
+                  {sub.title}
                 </h3>
-              </div>
-              <button
-                onClick={() => onNavigate('planner')}
-                className="text-xs text-lavender-300 hover:text-white transition-colors"
-              >
-                Open Planner
-              </button>
-            </div>
-
-            {/* Checklist Tasks */}
-            <div className="space-y-2.5">
-              {todaysTasks.map(task => (
-                <div
-                  key={task.id}
-                  onClick={async () => {
-                    sound.playSparkle();
-                    await onToggleTask(task.id);
-                  }}
-                  className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                    task.completed
-                      ? 'bg-midnight-950/40 border-lavender-400/10 text-lavender-400/60 line-through'
-                      : 'bg-midnight-900/60 border-lavender-400/20 hover:border-stargold-300 text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {task.completed ? (
-                      <CheckCircle2 className="w-4 h-4 text-stargold-300 flex-shrink-0" />
-                    ) : (
-                      <Circle className="w-4 h-4 text-lavender-400 flex-shrink-0" />
-                    )}
-                    <div className="truncate">
-                      <p className="text-xs font-medium truncate">{task.title}</p>
-                      <p className="text-[10px] text-lavender-400">{task.subject} • {task.timeSlot}</p>
-                    </div>
-                  </div>
-                  {task.isExamPrep && (
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-stargold-400/20 text-stargold-300 border border-stargold-400/30 flex-shrink-0 ml-2">
-                      Exam Prep
-                    </span>
-                  )}
+                <p className="text-[11px] text-stone-400 font-sans line-clamp-1">
+                  {sub.desc}
+                </p>
+                <div className="flex items-center justify-between text-[10px] font-mono text-[#c5a059] pt-1">
+                  <span>{sub.count}</span>
+                  <span className="group-hover:translate-x-1 transition-transform">Study →</span>
                 </div>
-              ))}
-            </div>
-
-            {/* Upcoming High Priority Assignment Reminder */}
-            {upcomingAssignments.length > 0 && (
-              <div className="mt-5 p-3.5 rounded-2xl bg-rosemoon-900/20 border border-rosemoon-400/30 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-semibold uppercase text-rosemoon-300">
-                    Approaching Deadline
-                  </span>
-                  <p className="text-xs font-serif font-bold text-white mt-0.5">
-                    {upcomingAssignments[0].title}
-                  </p>
-                  <p className="text-[10px] text-lavender-300">
-                    Due {new Date(upcomingAssignments[0].dueDate).toLocaleDateString()} • {upcomingAssignments[0].weightage}
-                  </p>
-                </div>
-                <button
-                  onClick={() => onNavigate('assignments', upcomingAssignments[0].id)}
-                  className="px-3 py-1.5 rounded-xl bg-rosemoon-500/30 hover:bg-rosemoon-500/50 text-white text-xs font-medium transition-colors"
-                >
-                  Submit
-                </button>
               </div>
-            )}
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-lavender-400/15 flex items-center justify-between text-[11px] text-lavender-400">
-            <span>Every completed task adds a glowing star to your constellation ✨</span>
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* ======================================================== */}
-      {/* MOONLIGHT ARCADE HERO LAUNCHER */}
+      {/* 4. SANCTUARY SHORTCUTS ROW (5 New Features)              */}
       {/* ======================================================== */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-stargold-400/30 bg-gradient-to-r from-midnight-950 via-space-900 to-midnight-950 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-stargold-400 to-amber-500 text-midnight-950 flex items-center justify-center shadow-lg shadow-stargold-400/25 shrink-0">
-            <Gamepad2 size={28} />
-          </div>
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono text-stargold-300 font-bold uppercase mb-1">
-              <Sparkles size={13} /> Moonlight Arcade • Gamified Learning
-            </div>
-            <h3 className="text-xl font-serif font-bold text-white">
-              Spin the Subject Wheel for Today's 50-Question Challenge!
-            </h3>
-            <p className="text-xs text-lavender-300 mt-0.5">
-              Randomly select an active MBA subject, beat the countdown timer, earn XP, and test conceptual retention.
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => onNavigate('arcade')}
-          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-stargold-400 to-amber-500 text-midnight-950 font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-stargold-400/20 whitespace-nowrap flex items-center gap-2 shrink-0"
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div
+          onClick={() => onNavigate('quests')}
+          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
         >
-          <Play size={16} />
-          Enter Arcade & Spin →
-        </button>
-      </div>
-
-      {/* ======================================================== */}
-      {/* TODAY'S SCHEDULE & EXAM COUNTDOWN ROW */}
-      {/* ======================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Today's Classes */}
-        <div className="glass-panel p-6 rounded-3xl border border-lavender-400/20 bg-midnight-950/60 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-lavender-400/15">
-            <div className="flex items-center gap-2">
-              <Calendar size={18} className="text-stargold-300" />
-              <h3 className="font-serif font-bold text-base text-white">
-                Today's Class Schedule ({todayName})
-              </h3>
-            </div>
-            <button
-              onClick={() => onNavigate('calendar')}
-              className="text-xs text-lavender-300 hover:text-white"
-            >
-              Full Timetable →
-            </button>
-          </div>
-
-          <div className="space-y-2.5">
-            {todaysClasses.length === 0 ? (
-              <p className="text-xs text-lavender-400 py-3 text-center">
-                No classes scheduled for today. Great day for deep focus in Midnight Focus Room!
-              </p>
-            ) : (
-              todaysClasses.map(c => (
-                <div key={c.id} className="p-3 rounded-2xl bg-midnight-900/60 border border-lavender-400/15 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-mono text-stargold-300 text-[11px]">{c.startTime} - {c.endTime}</span>
-                    <div className="font-serif font-bold text-white mt-0.5">{c.title}</div>
-                    <div className="text-[10px] text-lavender-400">{c.room || 'Location TBD'} • Prof: {c.professor || 'Visiting Faculty'}</div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded bg-lavender-500/10 text-lavender-300 text-[10px] capitalize">
-                    {c.type}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
+          <Award className="w-5 h-5 mx-auto text-amber-400 group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-white">Daily Quests</h4>
+          <p className="text-[10px] text-stone-400">Earn XP & Missions</p>
         </div>
 
-        {/* Exam Countdown Cards */}
-        <div className="glass-panel p-6 rounded-3xl border border-lavender-400/20 bg-midnight-950/60 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-lavender-400/15">
-            <div className="flex items-center gap-2">
-              <Clock size={18} className="text-amber-400" />
-              <h3 className="font-serif font-bold text-base text-white">
-                Upcoming Exam Countdowns
-              </h3>
-            </div>
-            <button
-              onClick={() => onNavigate('terms')}
-              className="text-xs text-lavender-300 hover:text-white"
-            >
-              Curriculum Terms →
-            </button>
-          </div>
+        <div
+          onClick={() => onNavigate('pet')}
+          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+        >
+          <Heart className="w-5 h-5 mx-auto text-rose-400 group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-white">Study Pet Mochi</h4>
+          <p className="text-[10px] text-stone-400">Lv. 3 Scholar Cat</p>
+        </div>
 
-          <div className="space-y-3">
-            <div className="p-3.5 rounded-2xl bg-midnight-900/60 border border-amber-500/30 flex items-center justify-between">
-              <div>
-                <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold">
-                  8 DAYS REMAINING
-                </span>
-                <h4 className="text-sm font-serif font-bold text-white mt-1">
-                  Product Management Mid-Term Case Exam
-                </h4>
-                <p className="text-[10px] text-lavender-300">Main Exam Hall A • 30% Weight</p>
-              </div>
-              <button
-                onClick={() => onNavigate('arcade')}
-                className="px-3 py-1.5 rounded-xl bg-amber-400 text-midnight-950 text-xs font-bold hover:scale-105 transition-all"
-              >
-                Review
-              </button>
-            </div>
+        <div
+          onClick={() => onNavigate('knowledge-map')}
+          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+        >
+          <GitBranch className="w-5 h-5 mx-auto text-amber-300 group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-white">Knowledge Map</h4>
+          <p className="text-[10px] text-stone-400">Visual Concept Trees</p>
+        </div>
 
-            <div className="p-3.5 rounded-2xl bg-midnight-900/60 border border-lavender-400/20 flex items-center justify-between">
-              <div>
-                <span className="px-2 py-0.5 rounded bg-lavender-500/20 text-lavender-200 text-[10px] font-mono font-bold">
-                  13 DAYS REMAINING
-                </span>
-                <h4 className="text-sm font-serif font-bold text-white mt-1">
-                  Microeconomics Quantitative Evaluation
-                </h4>
-                <p className="text-[10px] text-lavender-300">Auditorium 1 • 35% Weight</p>
-              </div>
-              <button
-                onClick={() => onNavigate('arcade')}
-                className="px-3 py-1.5 rounded-xl bg-lavender-500/30 text-white text-xs hover:scale-105 transition-all"
-              >
-                Practice
-              </button>
-            </div>
-          </div>
+        <div
+          onClick={() => onNavigate('focus-score')}
+          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+        >
+          <TrendingUp className="w-5 h-5 mx-auto text-emerald-400 group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-white">Focus Score</h4>
+          <p className="text-[10px] text-stone-400">Productivity Matrix</p>
+        </div>
+
+        <div
+          onClick={() => onNavigate('graduation-wall')}
+          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+        >
+          <GraduationCap className="w-5 h-5 mx-auto text-purple-400 group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-white">Graduation Wall</h4>
+          <p className="text-[10px] text-stone-400">6-Term Degree Wall</p>
         </div>
       </div>
 
       {/* ======================================================== */}
-      {/* CONTINUE LEARNING: YOUTUBE MASTERCLASS SHELF */}
+      {/* 5. YOUTUBE MASTERCLASSES SHELF (Curated Lectures)        */}
       {/* ======================================================== */}
       {youtubeResources.length > 0 && (
-        <div className="glass-panel p-6 rounded-3xl border border-lavender-400/20 bg-midnight-950/60 space-y-4">
+        <div className="glass-panel p-6 rounded-3xl border border-[#d4af37]/30 bg-[#161412]/80 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Video size={18} className="text-pink-400" />
+              <Video size={18} className="text-[#d4af37]" />
               <h3 className="font-serif font-bold text-base text-white">
-                Continue Learning: Curated Video Lectures
+                Curated YouTube Masterclasses
               </h3>
             </div>
             <button
               onClick={() => onNavigate('youtube')}
-              className="text-xs text-lavender-300 hover:text-white"
+              className="text-xs text-[#d4af37] hover:underline"
             >
               Open YouTube Centre →
             </button>
@@ -548,23 +690,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div
                 key={yt.id}
                 onClick={() => onNavigate('youtube')}
-                className="p-3 rounded-2xl bg-midnight-900/60 border border-lavender-400/15 hover:border-pink-400/50 cursor-pointer group transition-all space-y-2"
+                className="p-3 rounded-2xl bg-[#1e1a16] border border-[#d4af37]/15 hover:border-[#d4af37]/50 cursor-pointer group transition-all space-y-2"
               >
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-midnight-950">
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-[#12100e]">
                   <img
                     src={`https://img.youtube.com/vi/${yt.videoId}/hqdefault.jpg`}
                     alt={yt.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-pink-500/90 text-white flex items-center justify-center">
-                      <Play size={14} className="translate-x-0.5" />
+                    <div className="w-8 h-8 rounded-full bg-[#d4af37] text-stone-950 flex items-center justify-center shadow-md">
+                      <Play size={14} className="translate-x-0.5 fill-current" />
                     </div>
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-mono text-stargold-300 uppercase">{yt.subjectName}</div>
-                  <h4 className="text-xs font-serif font-bold text-white truncate group-hover:text-pink-300">
+                  <div className="text-[10px] font-mono text-[#d4af37] uppercase">{yt.subjectName}</div>
+                  <h4 className="text-xs font-serif font-bold text-white truncate group-hover:text-[#d4af37]">
                     {yt.title}
                   </h4>
                 </div>
@@ -573,6 +715,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
       )}
+
     </div>
   );
 };
