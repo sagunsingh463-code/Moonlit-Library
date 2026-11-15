@@ -31,7 +31,7 @@ import {
   Video,
   AlertCircle
 } from 'lucide-react';
-import { MoonCat } from '../Mascot/MoonCat';
+import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
 import { sound } from '../../services/audio';
 
 interface HomeViewProps {
@@ -135,10 +135,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
 
-        {/* Mascot in studying / encouraging mood */}
+        {/* Shagun Anime Girl Permanent Mascot & Companion */}
         <div className="relative z-10 flex-shrink-0">
-          <MoonCat 
-            mood="studying" 
+          <ShagunAnimeGirl 
+            mood="welcome" 
             size="lg" 
             showSpeech={true}
           />

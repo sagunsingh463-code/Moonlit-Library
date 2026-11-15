@@ -14,6 +14,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { sound } from '../../services/sound';
+import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
 
 interface AchievementsViewProps {
   achievements: AchievementItem[];
@@ -59,15 +60,23 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="p-4 rounded-2xl bg-midnight-950/70 border border-stargold-400/30 text-center">
-              <div className="text-[10px] text-lavender-400 uppercase font-mono">Total XP</div>
-              <div className="text-2xl font-serif font-bold text-stargold-300">+{totalXp} XP</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-midnight-950/70 border border-lavender-400/30 text-center">
-              <div className="text-[10px] text-lavender-400 uppercase font-mono">Unlocked</div>
-              <div className="text-2xl font-serif font-bold text-white">
-                {unlockedCount} / {achievements.length}
+          <div className="flex flex-wrap items-center gap-4">
+            <ShagunAnimeGirl 
+              mood="celebrating" 
+              size="md" 
+              showSpeech={true}
+              customMessage="Every badge honors your dedication! Look how brightly your constellation glows 🌟"
+            />
+            <div className="flex items-center gap-3">
+              <div className="p-4 rounded-2xl bg-midnight-950/70 border border-stargold-400/30 text-center">
+                <div className="text-[10px] text-lavender-400 uppercase font-mono">Total XP</div>
+                <div className="text-2xl font-serif font-bold text-stargold-300">+{totalXp} XP</div>
+              </div>
+              <div className="p-4 rounded-2xl bg-midnight-950/70 border border-lavender-400/30 text-center">
+                <div className="text-[10px] text-lavender-400 uppercase font-mono">Unlocked</div>
+                <div className="text-2xl font-serif font-bold text-white">
+                  {unlockedCount} / {achievements.length}
+                </div>
               </div>
             </div>
           </div>

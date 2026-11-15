@@ -735,9 +735,42 @@ export function App() {
 
   if (isAwakening && (!settings || !stats)) {
     return (
-      <div className="min-h-screen bg-midnight-950 flex flex-col items-center justify-center text-stargold-200 font-serif text-lg gap-3">
-        <div className="text-4xl animate-pulse">🌙</div>
-        <div>Awakening Moonlit Library...</div>
+      <div className="min-h-screen bg-midnight-950 flex flex-col items-center justify-center p-6 text-center select-none relative overflow-hidden">
+        {/* Ambient celestial glow */}
+        <div className="absolute w-96 h-96 rounded-full bg-lavender-600/15 blur-3xl pointer-events-none animate-pulse" />
+        
+        {/* Shagun Anime Girl Mascot Loading Vignette */}
+        <div className="relative z-10 space-y-4 max-w-sm">
+          <div className="relative w-28 h-28 mx-auto rounded-3xl p-1 bg-gradient-to-tr from-stargold-400 via-lavender-400 to-amber-500 shadow-2xl shadow-lavender-500/30">
+            <div className="w-full h-full rounded-[22px] overflow-hidden bg-midnight-950">
+              <img 
+                src="/shagun/shagun_reading_portrait.jpg" 
+                alt="Shagun reading under moonlight" 
+                className="w-full h-full object-cover object-[center_20%]"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/shagun/shagun_reading.jpg';
+                }}
+              />
+            </div>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-midnight-950 border border-stargold-400/60 text-[10px] font-serif font-bold text-stargold-300 whitespace-nowrap shadow-md">
+              Shagun ✨
+            </div>
+          </div>
+
+          <div className="space-y-1.5 pt-2">
+            <h2 className="text-xl font-serif font-bold text-white tracking-wide flex items-center justify-center gap-2">
+              <span>Awakening Moonlit Library</span>
+              <span className="text-stargold-300 animate-pulse">🌙</span>
+            </h2>
+            <p className="text-xs text-lavender-300 font-sans">
+              Shagun is lighting the candles and opening the grimoires of wisdom...
+            </p>
+          </div>
+
+          <div className="w-32 h-1 bg-midnight-900 rounded-full mx-auto overflow-hidden">
+            <div className="w-full h-full bg-gradient-to-r from-stargold-400 via-lavender-400 to-amber-400 animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }

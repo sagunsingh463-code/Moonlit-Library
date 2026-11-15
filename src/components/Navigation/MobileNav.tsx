@@ -82,8 +82,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({
                 }}
                 className="flex items-center gap-3 cursor-pointer group"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-lavender-600 to-rose-400 flex items-center justify-center text-lg shadow-md border border-lavender-300/40">
-                  {currentUser?.avatar === 'cat-luna' ? '🐱' : '✨'}
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-lavender-600 to-rose-400 flex items-center justify-center text-lg shadow-md border border-lavender-300/40 overflow-hidden">
+                  {currentUser?.avatar === 'shagun-anime' ? (
+                    <img 
+                      src="/shagun/shagun_speaking_portrait.jpg" 
+                      alt="Shagun" 
+                      className="w-full h-full object-cover object-[center_20%]" 
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/shagun/shagun_speaking.jpg'; }}
+                    />
+                  ) : currentUser?.avatar === 'cat-luna' ? '🐱' : '✨'}
                 </div>
                 <div>
                   <h4 className="text-sm font-serif font-bold text-cream-100 group-hover:text-moon-gold transition-colors">

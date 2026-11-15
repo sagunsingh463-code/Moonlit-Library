@@ -100,6 +100,16 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
   const getAvatarEmoji = () => {
     if (!currentUser) return '🌙';
+    if (currentUser.avatar === 'shagun-anime') {
+      return (
+        <img 
+          src="/shagun/shagun_speaking_portrait.jpg" 
+          alt="Shagun" 
+          className="w-full h-full object-cover object-[center_20%] rounded-full" 
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/shagun/shagun_speaking.jpg'; }}
+        />
+      );
+    }
     switch (currentUser.avatar) {
       case 'cat-luna': return '🐱';
       case 'starlight': return '✨';

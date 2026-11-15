@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sound } from '../../services/audio';
-import { MoonCat } from '../Mascot/MoonCat';
+import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
 
 interface QuizRoomViewProps {
   questions: QuestionItem[];
@@ -309,7 +309,14 @@ export const QuizRoomView: React.FC<QuizRoomViewProps> = ({
         </div>
 
         {!inQuiz && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <ShagunAnimeGirl 
+              mood="exam" 
+              size="sm" 
+              showSpeech={true}
+              customMessage="Take deep breaths. Read every case carefully. Shagun is proctoring with you 📝"
+            />
+
             {incorrectCount > 0 && (
               <button
                 onClick={handleLaunchIncorrectDrill}

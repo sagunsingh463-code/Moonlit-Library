@@ -13,7 +13,7 @@ import {
   Minimize2 
 } from 'lucide-react';
 import { sound } from '../../services/audio';
-import { MoonCat } from '../Mascot/MoonCat';
+import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
 import { SkyBackground } from '../SkyBackground';
 
 interface MidnightFocusModeProps {
@@ -293,11 +293,11 @@ export const MidnightFocusMode: React.FC<MidnightFocusModeProps> = ({
         </div>
       </div>
 
-      {/* Bottom Companion Bar */}
+      {/* Bottom Shagun Companion Bar */}
       <div className="relative z-10 flex items-center justify-center">
-        <MoonCat 
+        <ShagunAnimeGirl 
           mood="meditating" 
-          customMessage={isActive ? "Breathe deeply... you are creating something magical." : "Whenever you are ready, step into the flow."}
+          customMessage={isActive ? "Breathe deeply... you are building mastery one moment at a time. Shagun is focusing with you ✨" : "Whenever you are ready, light the candle and step into the flow 🌙"}
           size="md"
         />
       </div>

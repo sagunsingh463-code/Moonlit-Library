@@ -11,7 +11,7 @@ import {
   TrendingUp,
   BookOpen
 } from 'lucide-react';
-import { MoonCat } from '../Mascot/MoonCat';
+import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
 
 interface ProgressViewProps {
   stats: UserStudyStats;
@@ -207,19 +207,19 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ stats }) => {
             </div>
           </div>
 
-          {/* Luna's Academic Evaluation */}
+          {/* Shagun's Academic Evaluation */}
           <div className="p-4 rounded-2xl bg-midnight-900/80 border border-lavender-400/20 flex flex-col sm:flex-row items-center gap-4">
-            <MoonCat 
-              mood="studying" 
+            <ShagunAnimeGirl 
+              mood="reading" 
               showSpeech={false}
-              size="sm"
+              size="avatar"
             />
             <div className="text-center sm:text-left">
               <p className="text-xs font-serif font-bold text-stargold-200">
-                Luna's Scholar Review:
+                Shagun's Academic Evaluation:
               </p>
               <p className="text-xs text-lavender-200/90 font-sans mt-0.5 leading-relaxed">
-                "Outstanding balance across Corporate Finance and Marketing. Keep your streak alive tonight to expand your glowing constellation!"
+                "Outstanding study balance across your MBA curriculum. Keep your daily streak alive tonight to expand your glowing constellation!"
               </p>
             </div>
           </div>

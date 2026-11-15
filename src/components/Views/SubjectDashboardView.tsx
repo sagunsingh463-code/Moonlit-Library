@@ -34,6 +34,7 @@ import {
   Share2
 } from 'lucide-react';
 import { sound } from '../../services/sound';
+import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
 
 interface SubjectDashboardViewProps {
   subject: SubjectItem;
@@ -385,6 +386,16 @@ export const SubjectDashboardView: React.FC<SubjectDashboardViewProps> = ({
 
           {/* Sidebar Info Card */}
           <div className="space-y-6">
+            {/* Shagun Study Partner */}
+            <div className="glass-panel p-5 rounded-3xl border border-lavender-400/25 flex flex-col items-center text-center space-y-3 bg-midnight-950/60">
+              <ShagunAnimeGirl 
+                mood="reading" 
+                size="md" 
+                showSpeech={true}
+                customMessage={`I'm reviewing ${subject.name} with you tonight! Let's master each module step-by-step 📖`}
+              />
+            </div>
+
             <div className="glass-panel p-6 rounded-3xl border border-lavender-400/20 space-y-4">
               <h3 className="text-base font-serif font-bold text-white">Course Credentials</h3>
               <div className="space-y-3 text-xs text-lavender-300">

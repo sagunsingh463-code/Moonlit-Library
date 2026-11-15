@@ -1,0 +1,19 @@
+{
+  "name": "Shagun",
+  "title": "Permanent Mascot & Academic Companion of Moonlight Library",
+  "permanentAssets": {
+    "readingLandscape": "/shagun/shagun_reading.jpg",
+    "readingPortrait": "/shagun/shagun_reading_portrait.jpg",
+    "speakingLandscape": "/shagun/shagun_speaking.jpg",
+    "speakingPortrait": "/shagun/shagun_speaking_portrait.jpg",
+    "welcomeAudio": "/shagun/shagun_welcome.mp3"
+  },
+  "visualIdentity": {
+    "character": "Shagun",
+    "style": "Atmospheric Makoto Shinkai / Studio Ghibli moonlit anime illustration",
+    "hair": "Long soft dark silky hair with natural bangs",
+    "eyes": "Warm dark amber/brown eyes with gentle starlight highlights",
+    "outfit": "Signature cozy lavender knit sweater and cream skirt",
+    "setting": "Sanctuary moonlit library, antique velvet armchair, arched gothic window, starry night"
+  }
+}

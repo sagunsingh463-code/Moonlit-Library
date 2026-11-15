@@ -40,6 +40,47 @@ interface AiStudyAssistantModalProps {
 const STORAGE_KEY = 'moonlit_ai_study_chat_history';
 const API_KEY_STORAGE = 'moonlit_gemini_api_key';
 
+function formatGeminiContents(rawMessages: { role: string; content: string }[]) {
+  const valid = (rawMessages || [])
+    .filter(m => m && typeof m.content === 'string' && m.content.trim().length > 0)
+    .map(m => ({
+      role: (m.role === 'assistant' || m.role === 'model') ? ('model' as const) : ('user' as const),
+      text: m.content.trim()
+    }));
+
+  if (valid.length === 0) {
+    return [{ role: 'user' as const, parts: [{ text: 'Hello' }] }];
+  }
+
+  // Gemini constraint 1: First item in contents must have role 'user'
+  let startIdx = 0;
+  while (startIdx < valid.length && valid[startIdx].role === 'model') {
+    startIdx++;
+  }
+  const slice = valid.slice(startIdx);
+  if (slice.length === 0) {
+    return [{ role: 'user' as const, parts: [{ text: 'Hello' }] }];
+  }
+
+  // Gemini constraint 2: Roles must strictly alternate (user -> model -> user)
+  const collapsed: { role: 'user' | 'model'; parts: { text: string }[] }[] = [];
+  for (const item of slice) {
+    const prev = collapsed[collapsed.length - 1];
+    if (prev && prev.role === item.role) {
+      prev.parts[0].text += `\n\n${item.text}`;
+    } else {
+      collapsed.push({ role: item.role, parts: [{ text: item.text }] });
+    }
+  }
+
+  // Ensure last message is from user
+  if (collapsed.length > 0 && collapsed[collapsed.length - 1].role === 'model') {
+    collapsed.push({ role: 'user' as const, parts: [{ text: 'Please continue.' }] });
+  }
+
+  return collapsed;
+}
+
 export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
   isOpen,
   onClose,
@@ -145,7 +186,7 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
 
   // Test and save custom Gemini API key with dynamic model discovery
   const handleSaveApiKey = async () => {
-    const cleanKey = keyInputVal.trim();
+    const cleanKey = keyInputVal.trim().replace(/^["']|["']$/g, '');
     if (!cleanKey) {
       setKeyFeedback({ type: 'error', message: 'Please enter a valid Gemini API key.' });
       return;
@@ -156,59 +197,82 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
 
     try {
       // 1. Query available models for this specific API key via ListModels
-      let contentModels: any[] = [];
+      const modelCandidates: string[] = [];
       try {
         const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${cleanKey}`);
         if (listRes.ok) {
           const listData = await listRes.json();
-          contentModels = (listData.models || []).filter((m: any) => 
+          const contentModels = (listData.models || []).filter((m: any) => 
             Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent')
           );
+          // Sort models: 2.0/1.5 flash models first, then other flash, then pro, then others
+          contentModels.sort((a: any, b: any) => {
+            const aName = (a.name || '').toLowerCase();
+            const bName = (b.name || '').toLowerCase();
+            const aScore = (aName.includes('flash') ? 10 : 0) + (aName.includes('2.0') ? 5 : 0) + (aName.includes('1.5') ? 3 : 0);
+            const bScore = (bName.includes('flash') ? 10 : 0) + (bName.includes('2.0') ? 5 : 0) + (bName.includes('1.5') ? 3 : 0);
+            return bScore - aScore;
+          });
+          contentModels.forEach((m: any) => {
+            const name = m.name?.startsWith('models/') ? m.name : `models/${m.name}`;
+            if (!modelCandidates.includes(name)) {
+              modelCandidates.push(name);
+            }
+          });
+        } else {
+          const errData = await listRes.json().catch(() => null);
+          if (errData?.error?.message && errData.error.message.toLowerCase().includes('api key not valid')) {
+            setKeyFeedback({
+              type: 'error',
+              message: 'Invalid Gemini API key. Please copy a valid key from Google AI Studio (https://aistudio.google.com/app/apikey).'
+            });
+            setIsVerifyingKey(false);
+            return;
+          }
         }
       } catch {
         // Fallback gracefully to default model list
       }
 
-      // Compile ranked candidates prioritizing 2.0-flash, 1.5-flash-latest, etc.
-      const rankedNames: string[] = [
+      // Add standard fallback candidates
+      const defaultCandidates = [
         'models/gemini-2.0-flash',
+        'models/gemini-2.0-flash-lite',
         'models/gemini-1.5-flash-latest',
-        'models/gemini-2.5-flash',
         'models/gemini-1.5-flash-002',
+        'models/gemini-1.5-flash-001',
+        'models/gemini-1.5-flash',
+        'models/gemini-2.5-flash',
         'models/gemini-pro',
         'models/gemini-1.5-pro'
       ];
-
-      // Insert any active flash/gemini models found from listModels that aren't already included
-      contentModels.forEach((m: any) => {
-        const name = m.name?.startsWith('models/') ? m.name : `models/${m.name}`;
-        if (!name.includes('8b') && !name.includes('thinking') && !rankedNames.includes(name)) {
-          if (name.includes('flash') || name.includes('2.0') || name.includes('gemini')) {
-            rankedNames.push(name);
-          }
+      for (const d of defaultCandidates) {
+        if (!modelCandidates.includes(d)) {
+          modelCandidates.push(d);
         }
-      });
+      }
 
       // 2. Perform test ping across candidate models and API versions until verified
       let verifiedModel = '';
       let verifiedEndpoint = 'v1beta';
       let lastErrorMessage = '';
 
-      for (const target of rankedNames) {
+      for (const target of modelCandidates) {
+        const targetPath = target.startsWith('models/') ? target : `models/${target}`;
         for (const apiVer of ['v1beta', 'v1']) {
           try {
-            const testUrl = `https://generativelanguage.googleapis.com/${apiVer}/${target}:generateContent?key=${cleanKey}`;
+            const testUrl = `https://generativelanguage.googleapis.com/${apiVer}/${targetPath}:generateContent?key=${cleanKey}`;
             const res = await fetch(testUrl, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                contents: [{ role: 'user', parts: [{ text: 'Ping' }] }]
+                contents: [{ role: 'user', parts: [{ text: 'Hello' }] }]
               })
             });
 
             const data = await res.json();
             if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-              verifiedModel = target;
+              verifiedModel = targetPath;
               verifiedEndpoint = apiVer;
               break;
             } else if (data.error?.message) {
@@ -389,10 +453,7 @@ export const AiStudyAssistantModal: React.FC<AiStudyAssistantModalProps> = ({
     // Strategy 2: Direct Client Fallback to Google Gemini API if user provided key
     if (!replySuccess && activeKey) {
       try {
-        const contents = apiPayloadMessages.map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }]
-        }));
+        const contents = formatGeminiContents(apiPayloadMessages);
 
         const systemPrompt = `You are Luna, the Moonlit Anime Library AI Study Assistant — an intellectual, warm, and supportive academic mentor.
 Help the student understand academic concepts step-by-step with intuitive explanations, analogies, and practical examples.
@@ -405,27 +466,40 @@ Be encouraging, clear, and structured with markdown formatting.`;
         const candidateModels = [
           primaryTarget,
           'models/gemini-2.0-flash',
+          'models/gemini-2.0-flash-lite',
           'models/gemini-1.5-flash-latest',
-          'models/gemini-2.5-flash',
           'models/gemini-1.5-flash-002',
-          'models/gemini-pro'
+          'models/gemini-1.5-flash-001',
+          'models/gemini-1.5-flash',
+          'models/gemini-2.5-flash',
+          'models/gemini-pro',
+          'models/gemini-1.5-pro'
         ];
         const uniqueDirectCandidates = Array.from(new Set(candidateModels));
         const apiVersions = savedApiVer === 'v1' ? ['v1', 'v1beta'] : ['v1beta', 'v1'];
 
         for (const target of uniqueDirectCandidates) {
           if (replySuccess) break;
+          const targetPath = target.startsWith('models/') ? target : `models/${target}`;
           for (const apiVer of apiVersions) {
             try {
-              const geminiUrl = `https://generativelanguage.googleapis.com/${apiVer}/${target}:generateContent?key=${activeKey}`;
+              const geminiUrl = `https://generativelanguage.googleapis.com/${apiVer}/${targetPath}:generateContent?key=${activeKey}`;
+              const reqContents = JSON.parse(JSON.stringify(contents));
+              const reqBody: any = {
+                contents: reqContents,
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
+              };
+
+              if (apiVer === 'v1beta') {
+                reqBody.systemInstruction = { parts: [{ text: systemPrompt }] };
+              } else if (reqContents[0]?.parts?.[0]) {
+                reqContents[0].parts[0].text = `[Instructions: ${systemPrompt}]\n\n${reqContents[0].parts[0].text}`;
+              }
+
               const res = await fetch(geminiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  systemInstruction: { parts: [{ text: systemPrompt }] },
-                  contents,
-                  generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
-                })
+                body: JSON.stringify(reqBody)
               });
 
               const data = await res.json();

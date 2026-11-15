@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import { sound } from '../../services/sound';
 import confetti from 'canvas-confetti';
+import { ShagunAnimeGirl } from '../Mascot/ShagunAnimeGirl';
 
 interface MoonlightArcadeViewProps {
   subjects: SubjectItem[];
@@ -800,6 +801,14 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                 </div>
               )}
 
+              <div className="flex justify-center">
+                <ShagunAnimeGirl 
+                  mood="arcade" 
+                  size="md" 
+                  showSpeech={true}
+                />
+              </div>
+
               <div className="max-w-md space-y-2">
                 <h3 className="text-2xl font-serif font-bold text-white">
                   Spin the Wheel of Destiny
@@ -873,15 +882,18 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                 <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-lavender-400/25 bg-midnight-950/70 space-y-6">
                   {/* Runner Header: Progress & Countdown Timer */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-lavender-400/15">
-                    <div>
-                      <div className="text-xs font-mono text-stargold-300 font-bold uppercase tracking-wider flex items-center gap-2">
-                        <span>{selectedSubjectName || 'Term 2 MBA Challenge'}</span>
-                        <span>•</span>
-                        <span>50 SCENARIO-BASED QUESTIONS</span>
+                    <div className="flex items-center gap-3">
+                      <ShagunAnimeGirl mood="cheering" size="avatar" interactive={false} />
+                      <div>
+                        <div className="text-xs font-mono text-stargold-300 font-bold uppercase tracking-wider flex items-center gap-2">
+                          <span>{selectedSubjectName || 'Term 2 MBA Challenge'}</span>
+                          <span>•</span>
+                          <span>50 SCENARIO-BASED QUESTIONS</span>
+                        </div>
+                        <h3 className="text-xl font-serif font-bold text-white mt-0.5">
+                          Question {currentQIndex + 1} of {challengeQuestions.length}
+                        </h3>
                       </div>
-                      <h3 className="text-xl font-serif font-bold text-white mt-0.5">
-                        Question {currentQIndex + 1} of {challengeQuestions.length}
-                      </h3>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -1018,9 +1030,18 @@ export const MoonlightArcadeView: React.FC<MoonlightArcadeViewProps> = ({
                 /* CHALLENGE COMPLETE: METRICS, WEAK TOPICS & RECOMMENDATIONS */
                 /* ========================================================= */
                 <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-stargold-400/40 bg-midnight-950/80 space-y-8 animate-fadeIn">
-                  <div className="text-center space-y-2">
-                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-stargold-400 to-amber-500 text-midnight-950 flex items-center justify-center shadow-xl shadow-stargold-400/25">
-                      <Trophy size={40} />
+                  <div className="text-center space-y-3">
+                    <div className="flex justify-center pb-1">
+                      <ShagunAnimeGirl 
+                        mood="celebrating" 
+                        size="lg" 
+                        showSpeech={true}
+                        customMessage={
+                          challengeAnalytics.accuracy >= 80
+                            ? `Splendid job! You scored ${challengeAnalytics.correctCount} / 50 with ${challengeAnalytics.accuracy}% accuracy on ${selectedSubjectName}! 🌟`
+                            : `Great effort! You finished all 50 questions on ${selectedSubjectName}. Check the weak topics below to turn mistakes into mastery! 📖`
+                        }
+                      />
                     </div>
                     <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white">
                       50-Question Scenario Challenge Completed!

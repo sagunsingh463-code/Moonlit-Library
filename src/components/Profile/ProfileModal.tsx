@@ -31,6 +31,7 @@ interface ProfileModalProps {
 }
 
 const AVATAR_OPTIONS = [
+  { id: 'shagun-anime', label: 'Shagun (Permanent Mascot)', emoji: '🌙', image: '/shagun/shagun_speaking_portrait.jpg', bg: 'from-stargold-400/40 to-lavender-500/30' },
   { id: 'cat-luna', label: 'Luna the Moon Cat', emoji: '🐱', bg: 'from-lavender-500/30 to-moon-gold/20' },
   { id: 'starlight', label: 'Starlight Scholar', emoji: '✨', bg: 'from-blue-500/30 to-lavender-500/20' },
   { id: 'bunny-star', label: 'Celestial Bunny', emoji: '🐰', bg: 'from-rose-500/30 to-lavender-400/20' },
@@ -197,20 +198,26 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </div>
 
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            {AVATAR_OPTIONS.map((av) => (
+            {AVATAR_OPTIONS.map((av: any) => (
               <button
                 key={av.id}
                 type="button"
                 onClick={() => setSelectedAvatar(av.id)}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-2xl border transition-all ${
+                className={`flex flex-col items-center justify-center p-2 rounded-2xl border transition-all ${
                   selectedAvatar === av.id
                     ? 'border-moon-gold bg-moon-gold/15 shadow-lg shadow-moon-gold/10 scale-105'
                     : 'border-lavender-500/20 bg-white/5 hover:bg-white/10'
                 }`}
               >
-                <span className="text-2xl mb-1">{av.emoji}</span>
+                {av.image ? (
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-stargold-400/60 mb-1">
+                    <img src={av.image} alt={av.label} className="w-full h-full object-cover object-[center_20%]" />
+                  </div>
+                ) : (
+                  <span className="text-2xl mb-1">{av.emoji}</span>
+                )}
                 <span className="text-[9px] text-lavender-200 truncate w-full text-center">
-                  {av.label.split(' ')[0]}
+                  {av.id === 'shagun-anime' ? 'Shagun ✨' : av.label.split(' ')[0]}
                 </span>
               </button>
             ))}
