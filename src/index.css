@@ -201,116 +201,132 @@
 }
 
 /* ========================================================= */
-/* LIGHT MODE THEME OVERRIDES (Anime Celestial Daylight)     */
+/* LIGHT MODE THEME OVERRIDES (Pinterest Dreamy Daydream)     */
 /* ========================================================= */
 html.light-theme,
 html.light-theme body {
-  background-color: #F4F6FC !important;
-  color: #1A1F36 !important;
+  background-color: #FAF5F0 !important; /* Soft warm dreamy cream */
+  color: #30243D !important; /* Rich deep plum */
 }
 
 html.light-theme ::-webkit-scrollbar-track {
-  background: #EAF0FB;
+  background: #F3EBF7;
 }
 
 html.light-theme ::-webkit-scrollbar-thumb {
-  background: #C4B5FD;
-  border: 2px solid #EAF0FB;
+  background: #C7B6E8;
+  border: 2px solid #F3EBF7;
+  border-radius: 9999px;
 }
 
 html.light-theme ::-webkit-scrollbar-thumb:hover {
-  background: #8B5CF6;
+  background: #A895D1;
 }
 
-/* Glass Panels in Light Mode */
+/* Glass & Card Surfaces in Light Mode (No pure white, soft pastel sanctuary) */
 html.light-theme .glass-panel {
-  background: rgba(255, 255, 255, 0.90) !important;
-  border-color: rgba(167, 139, 250, 0.25) !important;
-  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.08) !important;
+  background: rgba(246, 239, 252, 0.90) !important; /* Delicate lavender tint */
+  border: 1px solid rgba(199, 182, 232, 0.45) !important;
+  box-shadow: 0 10px 28px -4px rgba(48, 36, 61, 0.08) !important;
+  backdrop-filter: blur(16px);
 }
 
 html.light-theme .glass-panel-subtle {
-  background: rgba(255, 255, 255, 0.82) !important;
-  border-color: rgba(167, 139, 250, 0.18) !important;
+  background: rgba(253, 245, 250, 0.88) !important; /* Delicate blush pink tint */
+  border: 1px solid rgba(243, 216, 229, 0.55) !important;
+  box-shadow: 0 6px 20px rgba(48, 36, 61, 0.05) !important;
 }
 
 html.light-theme .glass-panel-glow {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(139, 92, 246, 0.35) !important;
-  box-shadow: 0 12px 35px rgba(124, 58, 237, 0.12) !important;
+  background: rgba(255, 250, 245, 0.95) !important; /* Soft cream surface */
+  border: 1px solid rgba(201, 155, 155, 0.45) !important; /* Rose gold border */
+  box-shadow: 0 0 25px rgba(201, 155, 155, 0.22), 0 8px 30px rgba(48, 36, 61, 0.08) !important;
 }
 
-/* Midnight & Navy Background Overrides */
-html.light-theme .bg-midnight-950 {
-  background-color: #F4F6FC !important;
+html.light-theme .pinterest-card {
+  background: rgba(248, 242, 253, 0.92) !important;
+  border: 1px solid rgba(199, 182, 232, 0.42) !important;
+  box-shadow: 0 10px 26px -4px rgba(48, 36, 61, 0.09) !important;
 }
 
-html.light-theme .bg-midnight-900 {
-  background-color: #FFFFFF !important;
+/* Background Containers in Light Mode */
+html.light-theme .bg-midnight-950,
+html.light-theme [class*="bg-[#1E1528]"],
+html.light-theme [class*="bg-[#181512]"],
+html.light-theme [class*="bg-[#12100e]"] {
+  background-color: #F4EDF9 !important; /* Soft lavender surface */
+}
+
+html.light-theme .bg-midnight-900,
+html.light-theme [class*="bg-[#241A30]"],
+html.light-theme [class*="bg-[#20162B]"] {
+  background-color: #FBF2F7 !important; /* Soft blush cream surface */
 }
 
 html.light-theme .bg-midnight-850,
 html.light-theme .bg-midnight-800,
-html.light-theme .bg-midnight-700 {
-  background-color: #F8F9FE !important;
+html.light-theme [class*="bg-[#30243D]"] {
+  background-color: #F1E9F7 !important; /* Subtle plum-lavender surface */
 }
 
 html.light-theme .bg-navy-950,
-html.light-theme .bg-navy-950\/70,
-html.light-theme .bg-navy-950\/80 {
-  background-color: #F1F4FB !important;
-}
-
-html.light-theme .bg-navy-900,
-html.light-theme .bg-navy-900\/60,
-html.light-theme .bg-navy-900\/70,
-html.light-theme .bg-navy-900\/80 {
-  background-color: #FFFFFF !important;
+html.light-theme .bg-navy-900 {
+  background-color: #FFF8F1 !important; /* Soft cream */
 }
 
 html.light-theme .bg-white\/5 {
-  background-color: rgba(124, 58, 237, 0.06) !important;
+  background-color: rgba(199, 182, 232, 0.15) !important;
 }
 
 html.light-theme .bg-white\/10 {
-  background-color: rgba(124, 58, 237, 0.1) !important;
+  background-color: rgba(199, 182, 232, 0.25) !important;
 }
 
-/* High-contrast Text in Light Mode */
-html.light-theme .text-white {
-  color: #11162B !important;
-}
-
+/* High-contrast Typography on Light Cards */
+html.light-theme h1,
+html.light-theme h2,
+html.light-theme h3,
+html.light-theme h4,
+html.light-theme .text-white,
 html.light-theme .text-cream-50,
-html.light-theme .text-cream-100 {
-  color: #171D33 !important;
+html.light-theme .text-cream-100,
+html.light-theme [class*="text-[#FFF7ED]"],
+html.light-theme [class*="text-[#f5efe6]"],
+html.light-theme [class*="text-[#f4ebe1]"] {
+  color: #241733 !important; /* Dark plum / deep charcoal */
 }
 
-html.light-theme .text-moonlight-silver {
-  color: #272E46 !important;
-}
-
-html.light-theme .text-lavender-100 {
-  color: #3B2E63 !important;
-}
-
+html.light-theme p,
+html.light-theme [class*="text-[#E8DDF8]"],
+html.light-theme [class*="text-[#F3D8E5]"],
+html.light-theme .text-lavender-100,
 html.light-theme .text-lavender-200,
-html.light-theme .text-lavender-200\/90,
-html.light-theme .text-lavender-200\/80 {
-  color: #4A3A7C !important;
-}
-
 html.light-theme .text-lavender-300,
-html.light-theme .text-lavender-300\/80,
-html.light-theme .text-lavender-300\/90 {
-  color: #58468E !important;
-}
-
 html.light-theme .text-lavender-400 {
-  color: #6A56A3 !important;
+  color: #48345B !important; /* Highly readable rich plum */
 }
 
-/* Border Adaptations */
+html.light-theme [class*="text-[#C7B6E8]"],
+html.light-theme [class*="text-[#8C7A9E]"],
+html.light-theme .text-stone-400,
+html.light-theme .text-stone-300,
+html.light-theme .text-moonlight-silver {
+  color: #5B4372 !important; /* Crisp medium-dark plum for labels/metadata */
+  font-weight: 500;
+}
+
+html.light-theme [class*="text-[#C99B9B]"] {
+  color: #8E495D !important; /* Rich rose-plum */
+}
+
+html.light-theme input,
+html.light-theme select,
+html.light-theme textarea {
+  background-color: #FFFFFF !important;
+  color: #241733 !important;
+  border-color: rgba(199, 182, 232, 0.5) !important;
+}
+
 html.light-theme .border-lavender-400\/20,
 html.light-theme .border-lavender-400\/25,
 html.light-theme .border-lavender-400\/30,
@@ -318,13 +334,13 @@ html.light-theme .border-lavender-400\/40,
 html.light-theme .border-lavender-500\/15,
 html.light-theme .border-lavender-500\/20,
 html.light-theme .border-lavender-500\/25,
-html.light-theme .border-lavender-500\/30 {
-  border-color: rgba(142, 108, 229, 0.22) !important;
+html.light-theme .border-lavender-500\/30,
+html.light-theme [class*="border-[#C7B6E8]"] {
+  border-color: rgba(199, 182, 232, 0.45) !important;
 }
 
-/* Text glow adjustment in light mode */
 html.light-theme .text-glow {
-  text-shadow: 0 0 12px rgba(142, 108, 229, 0.3);
+  text-shadow: 0 0 12px rgba(199, 182, 232, 0.4);
 }
 
 /* ========================================================= */
@@ -400,6 +416,19 @@ html.celestial-midnight .text-glow {
 
 .ambient-candlelight {
   background: radial-gradient(circle at 50% 30%, rgba(201, 155, 155, 0.15) 0%, transparent 70%);
+}
+
+/* Ensure buttons and pills with light/pastel backgrounds always have dark plum text */
+button[class*="from-[#F3D8E5]"],
+button[class*="from-[#C7B6E8]"],
+button[class*="bg-[#F3D8E5]"],
+button[class*="bg-[#C7B6E8]"] {
+  color: #241530 !important;
+}
+
+/* Subtle floral & star sparkle details */
+.sparkle-icon {
+  filter: drop-shadow(0 0 6px rgba(243, 216, 229, 0.7));
 }
 
 .retro-cassette-wheel {

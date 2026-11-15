@@ -608,34 +608,34 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                       <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md border ${
                         isTodayTask 
                           ? 'bg-[#30243D] text-[#F3D8E5] border-[#C99B9B]/40 font-bold' 
-                          : 'bg-[#1E1528] text-[#8C7A9E] border-[#C7B6E8]/10'
+                          : 'bg-[#1E1528] text-[#E8DDF8] border-[#C7B6E8]/15 font-medium'
                       }`}>
                         {task.day}
                       </span>
                     )}
 
                     {task.isExamPrep && (
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#C99B9B]/20 text-[#F3D8E5] border border-[#C99B9B]/30 flex items-center gap-1">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#C99B9B]/20 text-[#F3D8E5] border border-[#C99B9B]/30 flex items-center gap-1 font-medium">
                         <Timer className="w-2.5 h-2.5" />
                         Exam Prep
                       </span>
                     )}
 
                     {task.priority === 'high' && (
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-200 border border-rose-500/30 font-semibold">
                         High Priority
                       </span>
                     )}
 
                     {task.category && (
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#1E1528] text-[#8C7A9E] border border-[#C7B6E8]/15">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#1E1528] text-[#E8DDF8] border border-[#C7B6E8]/20 font-medium">
                         {task.category}
                       </span>
                     )}
                   </div>
 
                   <h3 className={`font-serif font-bold text-sm md:text-base leading-snug transition-all ${
-                    task.completed ? 'line-through text-[#8C7A9E]' : 'text-[#FFF7ED]'
+                    task.completed ? 'line-through text-[#C7B6E8]/70' : 'text-[#FFF7ED]'
                   }`}>
                     {task.title}
                   </h3>
@@ -644,10 +644,10 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
 
               {/* Right Section: Time Slot, Focus Play Button & Actions */}
               <div className="flex items-center justify-between md:justify-end gap-3 flex-shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#C7B6E8]/15">
-                <div className="flex items-center gap-1.5 text-xs font-mono text-[#8C7A9E] bg-[#1E1528] px-2.5 py-1.5 rounded-xl border border-[#C7B6E8]/15">
+                <div className="flex items-center gap-1.5 text-xs font-mono text-[#E8DDF8] bg-[#1E1528] px-2.5 py-1.5 rounded-xl border border-[#C7B6E8]/20 font-medium">
                   <Clock className="w-3.5 h-3.5 text-[#C7B6E8]" />
                   <span>{task.timeSlot}</span>
-                  <span className="text-[#8C7A9E]/70">({task.durationMinutes}m)</span>
+                  <span className="text-[#C7B6E8]">({task.durationMinutes}m)</span>
                 </div>
 
                 <div className="flex items-center gap-1.5">
