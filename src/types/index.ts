@@ -186,6 +186,9 @@ export interface StudyPlanTask {
   durationMinutes: number;
   completed: boolean;
   isExamPrep?: boolean;
+  priority?: 'high' | 'medium' | 'normal';
+  category?: string;
+  notes?: string;
 }
 
 export interface GardenItem {

@@ -177,6 +177,11 @@ class MoonlitDatabase {
         tx.objectStore('settings').put({ id: 'current', ...initialSettings });
       }
 
+      const plannerCount = await countCheck('planner');
+      if (plannerCount === 0) {
+        initialPlannerTasks.forEach(p => tx.objectStore('planner').put(p));
+      }
+
       const termsCount = await countCheck('terms');
       if (termsCount === 0) {
         initialTerms.forEach(t => tx.objectStore('terms').put(t));
@@ -778,32 +783,38 @@ class MoonlitDatabase {
 
   // --- 9. STUDY PLANNER ---
   public async getPlannerTasks(): Promise<StudyPlanTask[]> {
+    const local = await this.getAllFromStore<StudyPlanTask>('planner');
+    if (local.length > 0) return local;
+
     const serverTasks = await this.fetchApi<StudyPlanTask[]>('/planner');
-    if (serverTasks !== null) {
+    if (serverTasks && Array.isArray(serverTasks) && serverTasks.length > 0) {
+      for (const t of serverTasks) await this.putInStore('planner', t);
       return serverTasks;
     }
-    return this.getAllFromStore<StudyPlanTask>('planner');
+
+    for (const p of initialPlannerTasks) await this.putInStore('planner', p);
+    return initialPlannerTasks;
   }
 
   public async savePlannerTask(task: StudyPlanTask): Promise<void> {
-    await this.fetchApi('/planner', {
+    await this.putInStore('planner', task);
+    this.fetchApi('/planner', {
       method: 'POST',
       body: JSON.stringify(task)
-    });
-    await this.putInStore('planner', task);
+    }).catch(() => {});
   }
 
   public async updatePlannerTask(task: StudyPlanTask): Promise<void> {
-    await this.fetchApi(`/planner/${task.id}`, {
+    await this.putInStore('planner', task);
+    this.fetchApi(`/planner/${task.id}`, {
       method: 'PUT',
       body: JSON.stringify(task)
-    });
-    await this.putInStore('planner', task);
+    }).catch(() => {});
   }
 
   public async deletePlannerTask(id: string): Promise<void> {
-    await this.fetchApi(`/planner/${id}`, { method: 'DELETE' });
     await this.deleteFromStore('planner', id);
+    this.fetchApi(`/planner/${id}`, { method: 'DELETE' }).catch(() => {});
   }
 
   // --- 10. GARDEN ---

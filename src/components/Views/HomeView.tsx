@@ -376,33 +376,79 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Aesthetic Checklist Widget (`books lent` / daily tasks from Reference!) */}
           <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-[#d4af37]/15">
-              <span className="text-xs font-serif font-bold text-[#f4ebe1]">
-                books lent & tasks ༉‧₊˚
+              <span 
+                onClick={() => onNavigate('planner')}
+                className="text-xs font-serif font-bold text-[#f4ebe1] hover:text-[#d4af37] cursor-pointer flex items-center gap-1.5 transition-colors"
+                title="Open Study Planner"
+              >
+                books lent & study tasks ༉‧₊˚
               </span>
-              <span className="text-[10px] font-mono text-[#d4af37]">
-                {customTasks.filter(t => t.done).length}/{customTasks.length} Done
-              </span>
+              <button
+                onClick={() => onNavigate('planner')}
+                className="text-[10px] font-mono text-[#d4af37] hover:underline"
+              >
+                {plannerTasks && plannerTasks.length > 0
+                  ? `${plannerTasks.filter(t => t.completed).length}/${plannerTasks.length} Done`
+                  : `${customTasks.filter(t => t.done).length}/${customTasks.length} Done`}
+              </button>
             </div>
 
             <div className="space-y-2 text-xs">
-              {customTasks.map(task => (
-                <div
-                  key={task.id}
-                  onClick={() => handleToggleCustomTask(task.id)}
-                  className={`p-2 rounded-xl border cursor-pointer transition-all flex items-center gap-2.5 ${
-                    task.done
-                      ? 'bg-[#1a1714]/50 border-stone-800 text-stone-500 line-through'
-                      : 'bg-[#221e1a]/80 border-[#d4af37]/20 text-[#f4ebe1] hover:border-[#d4af37]/50'
-                  }`}
-                >
-                  {task.done ? (
-                    <CheckCircle2 size={14} className="text-[#d4af37] flex-shrink-0" />
-                  ) : (
-                    <Circle size={14} className="text-stone-500 flex-shrink-0" />
-                  )}
-                  <span className="truncate">{task.text}</span>
-                </div>
-              ))}
+              {plannerTasks && plannerTasks.length > 0 ? (
+                plannerTasks.slice(0, 4).map(task => (
+                  <div
+                    key={task.id}
+                    onClick={async () => {
+                      sound.playSparkle();
+                      await onToggleTask(task.id);
+                    }}
+                    className={`p-2 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-2.5 ${
+                      task.completed
+                        ? 'bg-[#1a1714]/50 border-stone-800 text-stone-500 line-through'
+                        : 'bg-[#221e1a]/80 border-[#d4af37]/20 text-[#f4ebe1] hover:border-[#d4af37]/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      {task.completed ? (
+                        <CheckCircle2 size={14} className="text-[#d4af37] flex-shrink-0" />
+                      ) : (
+                        <Circle size={14} className="text-stone-500 flex-shrink-0" />
+                      )}
+                      <span className="truncate">{task.title}</span>
+                    </div>
+                    <span className="text-[9px] font-mono text-[#a09485] flex-shrink-0">{task.day}</span>
+                  </div>
+                ))
+              ) : (
+                customTasks.map(task => (
+                  <div
+                    key={task.id}
+                    onClick={() => handleToggleCustomTask(task.id)}
+                    className={`p-2 rounded-xl border cursor-pointer transition-all flex items-center gap-2.5 ${
+                      task.done
+                        ? 'bg-[#1a1714]/50 border-stone-800 text-stone-500 line-through'
+                        : 'bg-[#221e1a]/80 border-[#d4af37]/20 text-[#f4ebe1] hover:border-[#d4af37]/50'
+                    }`}
+                  >
+                    {task.done ? (
+                      <CheckCircle2 size={14} className="text-[#d4af37] flex-shrink-0" />
+                    ) : (
+                      <Circle size={14} className="text-stone-500 flex-shrink-0" />
+                    )}
+                    <span className="truncate">{task.text}</span>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="pt-1 text-center">
+              <button
+                onClick={() => onNavigate('planner')}
+                className="text-[10px] text-[#d4af37] hover:underline font-serif inline-flex items-center gap-1"
+              >
+                <span>Open Full Study Planner</span>
+                <ChevronRight size={10} />
+              </button>
             </div>
           </div>
         </div>

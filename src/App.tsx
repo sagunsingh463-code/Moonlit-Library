@@ -1054,9 +1054,11 @@ export function App() {
               {currentView === 'planner' && (
                 <StudyPlannerView
                   tasks={plannerTasks}
+                  subjects={subjects}
                   onSaveTask={handleSavePlannerTask}
                   onToggleTask={handleTogglePlannerTask}
                   onDeleteTask={handleDeletePlannerTask}
+                  onOpenFocusMode={() => setIsFocusModeOpen(true)}
                 />
               )}
 
