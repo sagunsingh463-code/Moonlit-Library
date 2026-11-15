@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   User, 
@@ -70,6 +70,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [introEnabled, setIntroEnabled] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('moonlit_skip_intro') !== 'true' : true);
   const [themePref, setThemePref] = useState<ThemePreference>(() => themeService.getPreference());
   const [themeSchedule, setThemeSchedule] = useState<ThemeSchedule>(() => themeService.getSchedule());
+
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -150,15 +163,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const currentAvatarObj = AVATAR_OPTIONS.find(a => a.id === selectedAvatar) || AVATAR_OPTIONS[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg my-8 bg-gradient-to-b from-navy-900 via-navy-900 to-navy-950 rounded-3xl border border-lavender-500/30 shadow-2xl p-6 sm:p-8 backdrop-blur-xl text-cream-50 animate-fadeIn">
+    <div 
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-6 bg-[#1E1528]/85 backdrop-blur-md overflow-y-auto"
+    >
+      <div className="relative w-full max-w-lg my-6 sm:my-8 bg-gradient-to-b from-[#241A30] via-[#241A30] to-[#1E1528] rounded-3xl border border-[#C7B6E8]/30 shadow-2xl p-6 sm:p-8 backdrop-blur-xl text-cream-50 animate-fadeIn">
         
-        {/* Header Close */}
+        {/* Prominent Header Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-lavender-300 hover:text-white hover:bg-white/10 transition-colors"
+          className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#30243D] border border-[#C7B6E8]/40 text-[#FFF7ED] hover:bg-[#C7B6E8] hover:text-[#30243D] transition-all shadow-md text-xs font-serif font-bold group"
+          title="Close profile and return to library (Esc)"
         >
-          <X className="w-5 h-5" />
+          <span>Close</span>
+          <X className="w-4 h-4 group-hover:rotate-90 transition-transform" />
         </button>
 
         {/* Title */}
@@ -578,14 +598,23 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           )}
         </div>
 
-        {/* Sign Out & Delete Zone */}
-        <div className="mt-6 pt-5 border-t border-lavender-500/20 flex flex-col sm:flex-row items-center gap-3">
+        {/* Return to Library, Sign Out & Delete Zone */}
+        <div className="mt-6 pt-5 border-t border-[#C7B6E8]/20 flex flex-col sm:flex-row items-center gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full sm:flex-1 py-2.5 px-4 bg-[#30243D] hover:bg-[#3D2C4E] border border-[#C7B6E8]/40 text-[#FFF7ED] text-xs font-serif font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
+          >
+            <X className="w-4 h-4 text-[#C7B6E8]" />
+            <span>Return to Library</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setShowLogoutConfirm(true)}
-            className="w-full sm:flex-1 py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-lavender-400/20 text-lavender-200 hover:text-white text-xs font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:flex-1 py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-[#C7B6E8]/20 text-[#C7B6E8] hover:text-white text-xs font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-3.5 h-3.5 text-[#F3D8E5]" />
             <span>Sign Out</span>
           </button>
 
@@ -595,7 +624,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             className="w-full sm:w-auto py-2.5 px-4 bg-red-950/30 hover:bg-red-950/60 border border-red-500/30 text-red-300 hover:text-red-200 text-xs font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Delete Account</span>
+            <span>Delete</span>
           </button>
         </div>
       </div>
