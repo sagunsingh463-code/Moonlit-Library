@@ -122,18 +122,18 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   };
 
   return (
-    <header className="h-16 px-3 sm:px-6 glass-panel border-b border-lavender-400/20 flex items-center justify-between gap-2 sm:gap-4 sticky top-0 z-30 select-none max-w-full overflow-hidden">
+    <header className="h-16 px-3 sm:px-6 bg-[#241A30]/85 backdrop-blur-2xl border-b border-[#C7B6E8]/20 flex items-center justify-between gap-2 sm:gap-4 sticky top-0 z-30 select-none max-w-full overflow-hidden shadow-sm">
       {/* Search Bar Input */}
       <div className="flex-1 max-w-md min-w-0">
         <button
           onClick={onOpenSearch}
-          className="w-full min-h-[44px] flex items-center justify-between px-3 sm:px-4 py-2 rounded-xl bg-midnight-900/70 border border-lavender-400/25 text-lavender-200/70 hover:text-white hover:border-lavender-400/50 hover:bg-midnight-800/80 transition-all text-xs sm:text-sm group shadow-inner"
+          className="w-full min-h-[44px] flex items-center justify-between px-3 sm:px-4 py-2 rounded-2xl bg-[#30243D]/70 border border-[#C7B6E8]/25 text-[#E8DDF8]/70 hover:text-[#FFF7ED] hover:border-[#C7B6E8]/50 hover:bg-[#30243D] transition-all text-xs sm:text-sm group shadow-inner"
         >
           <div className="flex items-center gap-2 truncate">
-            <Search className="w-4 h-4 text-lavender-300 group-hover:text-stargold-300 transition-colors shrink-0" />
-            <span className="truncate">Search library...</span>
+            <Search className="w-4 h-4 text-[#C7B6E8] group-hover:text-[#F3D8E5] transition-colors shrink-0" />
+            <span className="truncate">Search library & notes...</span>
           </div>
-          <kbd className="hidden sm:inline-block px-2 py-0.5 text-[10px] rounded bg-midnight-800 text-lavender-300/80 border border-lavender-400/20 font-mono shrink-0 ml-2">
+          <kbd className="hidden sm:inline-block px-2 py-0.5 text-[10px] rounded-lg bg-[#241A30] text-[#C7B6E8] border border-[#C7B6E8]/20 font-mono shrink-0 ml-2">
             ⌘K
           </kbd>
         </button>
@@ -143,7 +143,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         {/* Moon Phase Widget */}
         <div 
-          className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-midnight-900/60 border border-stargold-400/25 text-xs text-stargold-200"
+          className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#30243D]/70 border border-[#C7B6E8]/25 text-xs text-[#FFF7ED]"
           title="Current Celestial Moon Phase"
         >
           <span className="text-sm">{phaseInfo.symbol}</span>
@@ -154,7 +154,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {onOpenQuickAdd && (
           <button
             onClick={onOpenQuickAdd}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-stargold-400 to-amber-500 hover:from-stargold-300 hover:to-amber-400 text-midnight-950 text-xs font-bold transition-all shadow-md hover:scale-105"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-gradient-to-r from-[#F3D8E5] via-[#C7B6E8] to-[#C99B9B] hover:opacity-95 text-[#30243D] text-xs font-serif font-bold transition-all shadow-md hover:scale-105"
             title="Quick Add Note, Task, Class, or Video"
           >
             <Plus className="w-4 h-4 shrink-0 stroke-[2.5]" />
@@ -165,39 +165,39 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Bookmarks Quick Drawer Button */}
         <button
           onClick={onOpenBookmarks}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-midnight-900/60 hover:bg-lavender-500/20 border border-lavender-400/25 text-lavender-200 hover:text-stargold-200 text-xs transition-colors"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-[#30243D]/70 hover:bg-[#C7B6E8]/20 border border-[#C7B6E8]/25 text-[#E8DDF8] hover:text-[#FFF7ED] text-xs transition-colors"
           title="Open Magical Moon Bookmarks"
         >
-          <Bookmark className="w-4 h-4 text-rosemoon-300 fill-rosemoon-400/30 shrink-0" />
-          <span className="hidden md:inline">Bookmarks</span>
+          <Bookmark className="w-4 h-4 text-[#C99B9B] fill-[#C99B9B]/30 shrink-0" />
+          <span className="hidden md:inline font-medium">Bookmarks</span>
         </button>
 
         {/* Luna AI Study Assistant Button */}
         {onOpenAiAssistant && (
           <button
             onClick={onOpenAiAssistant}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-lavender-600/30 to-indigo-600/30 hover:from-lavender-600/50 hover:to-indigo-600/50 border border-lavender-400/30 text-stargold-200 text-xs transition-colors shadow-sm"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-gradient-to-r from-[#C7B6E8]/20 to-[#F3D8E5]/20 hover:from-[#C7B6E8]/35 hover:to-[#F3D8E5]/35 border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs transition-colors shadow-sm"
             title="Open Luna AI Study Assistant (Hindi & English)"
           >
-            <Sparkles className="w-4 h-4 text-stargold-300 shrink-0" />
-            <span className="hidden md:inline font-medium">Ask AI</span>
+            <Sparkles className="w-4 h-4 text-[#F3D8E5] shrink-0" />
+            <span className="hidden md:inline font-serif font-semibold">Ask AI</span>
           </button>
         )}
 
         {/* Ambient Sound Dropdown */}
         <div className="relative group">
           <button 
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl bg-midnight-900/60 hover:bg-midnight-800 border border-lavender-400/25 text-lavender-300 hover:text-white text-xs transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-2xl bg-[#30243D]/70 hover:bg-[#30243D] border border-[#C7B6E8]/25 text-[#E8DDF8] hover:text-[#FFF7ED] text-xs transition-colors"
             title="Ambient Atmosphere"
           >
-            {settings.ambientSound === 'night-breeze' && <Wind className="w-4 h-4 text-stargold-300" />}
-            {settings.ambientSound === 'library-rain' && <CloudRain className="w-4 h-4 text-lavender-300" />}
-            {settings.ambientSound === 'lofi-sparkles' && <Music className="w-4 h-4 text-rosemoon-300" />}
+            {settings.ambientSound === 'night-breeze' && <Wind className="w-4 h-4 text-[#C7B6E8]" />}
+            {settings.ambientSound === 'library-rain' && <CloudRain className="w-4 h-4 text-[#E8DDF8]" />}
+            {settings.ambientSound === 'lofi-sparkles' && <Music className="w-4 h-4 text-[#F3D8E5]" />}
             {settings.ambientSound === 'none' && <Wind className="w-4 h-4 opacity-50" />}
           </button>
           
-          <div className="absolute right-0 mt-2 w-48 p-2 rounded-2xl glass-panel-glow border border-lavender-400/30 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 z-50 text-xs space-y-1">
-            <p className="px-2 py-1 text-[10px] uppercase font-bold text-lavender-300/70">Ambient Atmosphere</p>
+          <div className="absolute right-0 mt-2 w-48 p-2 rounded-2xl glass-panel-glow border border-[#C7B6E8]/30 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 z-50 text-xs space-y-1">
+            <p className="px-2 py-1 text-[10px] uppercase font-bold text-[#C7B6E8]">Ambient Atmosphere</p>
             <button
               onClick={() => handleAmbientChange('none')}
               className={`w-full text-left px-2 py-1.5 rounded-lg transition-colors ${settings.ambientSound === 'none' ? 'bg-lavender-500/30 text-white' : 'hover:bg-white/5 text-lavender-200'}`}
@@ -218,9 +218,9 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             </button>
             <button
               onClick={() => handleAmbientChange('lofi-sparkles')}
-              className={`w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2 transition-colors ${settings.ambientSound === 'lofi-sparkles' ? 'bg-lavender-500/30 text-white' : 'hover:bg-white/5 text-lavender-200'}`}
+              className={`w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2 transition-colors ${settings.ambientSound === 'lofi-sparkles' ? 'bg-[#C7B6E8]/30 text-[#FFF7ED]' : 'hover:bg-white/5 text-[#E8DDF8]'}`}
             >
-              <Music className="w-3.5 h-3.5 text-rosemoon-300" /> Lofi Sparkles
+              <Music className="w-3.5 h-3.5 text-[#F3D8E5]" /> Lofi Sparkles
             </button>
           </div>
         </div>
@@ -228,25 +228,25 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Visible Light Mode / Dark Mode Toggle Button */}
         <button
           onClick={handleToggleTheme}
-          className={`min-h-[44px] min-w-[44px] relative flex items-center justify-center p-2 rounded-xl border transition-all ${
+          className={`min-h-[44px] min-w-[44px] relative flex items-center justify-center p-2 rounded-2xl border transition-all ${
             effectiveTheme === 'light'
-              ? 'bg-amber-100/90 border-amber-400/60 text-amber-600 hover:text-amber-700 shadow-sm'
-              : 'bg-midnight-900/60 border-lavender-400/25 text-stargold-300 hover:text-white'
+              ? 'bg-[#FFF7ED] border-[#C99B9B]/60 text-[#30243D] hover:bg-[#F3D8E5]/30 shadow-sm'
+              : 'bg-[#30243D]/70 border-[#C7B6E8]/25 text-[#E8DDF8] hover:text-[#FFF7ED] hover:border-[#C7B6E8]/50'
           }`}
           title={
             themePref === 'auto'
-              ? `Current: ${effectiveTheme === 'light' ? 'Light Mode (Daytime ☀️)' : 'Dark Mode (Nighttime 🌙)'} [Automatic 7 AM-6 PM Schedule]. Click to toggle.`
-              : `Current: ${effectiveTheme === 'light' ? 'Light Mode (Daytime ☀️)' : 'Dark Mode (Nighttime 🌙)'} [Manual Override]. Click to toggle.`
+              ? `Current: ${effectiveTheme === 'light' ? 'Light Mode (Daytime ☀️)' : 'Dark Sanctuary (Nighttime 🌙)'} [Automatic 7 AM-6 PM Schedule]. Click to toggle.`
+              : `Current: ${effectiveTheme === 'light' ? 'Light Mode (Daytime ☀️)' : 'Dark Sanctuary (Nighttime 🌙)'} [Manual Override]. Click to toggle.`
           }
         >
           {effectiveTheme === 'light' ? (
-            <Sun className="w-4 h-4 text-amber-500 fill-amber-400" />
+            <Sun className="w-4 h-4 text-[#C99B9B] fill-[#F3D8E5]" />
           ) : (
-            <Moon className="w-4 h-4 text-lavender-300 fill-lavender-300/30" />
+            <Moon className="w-4 h-4 text-[#C7B6E8] fill-[#C7B6E8]/30" />
           )}
           {themePref === 'auto' && (
             <span 
-              className="absolute -top-1 -right-1 text-[8px] font-mono px-1 rounded-full bg-lavender-600 text-white font-bold"
+              className="absolute -top-1 -right-1 text-[8px] font-mono px-1 rounded-full bg-[#C7B6E8] text-[#30243D] font-bold"
               title="Auto Day/Night Mode Active"
             >
               A
@@ -257,10 +257,10 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Master Sound FX Toggle */}
         <button
           onClick={toggleSound}
-          className={`min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl border transition-colors ${
+          className={`min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-2xl border transition-colors ${
             settings.soundEnabled 
-              ? 'bg-midnight-900/60 border-lavender-400/25 text-stargold-300 hover:text-white' 
-              : 'bg-midnight-950/80 border-red-400/30 text-red-300'
+              ? 'bg-[#30243D]/70 border-[#C7B6E8]/25 text-[#C7B6E8] hover:text-[#FFF7ED]' 
+              : 'bg-[#1E1528] border-red-400/30 text-red-300'
           }`}
           title={settings.soundEnabled ? 'Sound Effects Enabled' : 'Sound Effects Muted'}
         >
@@ -270,10 +270,10 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Motion Reduction Toggle (Desktop) */}
         <button
           onClick={toggleReduceMotion}
-          className={`hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center p-2 rounded-xl border transition-colors ${
+          className={`hidden sm:flex min-h-[44px] min-w-[44px] items-center justify-center p-2 rounded-2xl border transition-colors ${
             settings.reduceMotion 
-              ? 'bg-rosemoon-500/20 border-rosemoon-400/40 text-rosemoon-300' 
-              : 'bg-midnight-900/60 border-lavender-400/25 text-lavender-300 hover:text-white'
+              ? 'bg-[#F3D8E5]/20 border-[#F3D8E5]/40 text-[#F3D8E5]' 
+              : 'bg-[#30243D]/70 border-[#C7B6E8]/25 text-[#E8DDF8] hover:text-[#FFF7ED]'
           }`}
           title={settings.reduceMotion ? 'Reduced Motion: ON' : 'Reduce Motion (Accessibility)'}
         >
@@ -283,7 +283,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Revisit Shagun's Moonlit Welcome Scene */}
         <button
           onClick={onReopenOpening}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-xl bg-midnight-900/60 hover:bg-midnight-800 border border-lavender-400/25 text-stargold-300 hover:text-stargold-200 transition-colors shadow-sm"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-2xl bg-[#30243D]/70 hover:bg-[#30243D] border border-[#C7B6E8]/25 text-[#FFF7ED] transition-colors shadow-sm"
           title="Revisit Shagun's Moonlit Welcome Scene 🌙"
         >
           <span className="text-sm">🌙</span>
@@ -292,17 +292,19 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* User Profile Button */}
         <button
           onClick={onOpenProfile}
-          className="min-h-[44px] flex items-center gap-2 pl-2 pr-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-lavender-400/30 transition-all cursor-pointer group"
+          className="min-h-[44px] flex items-center gap-2 pl-2 pr-3 py-1 rounded-2xl bg-[#30243D]/70 hover:bg-[#30243D] border border-[#C7B6E8]/25 hover:border-[#C7B6E8]/45 transition-all cursor-pointer group shadow-sm"
           title="Manage Account & Profile"
         >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-lavender-600 to-rosemoon-400 flex items-center justify-center text-sm shadow-md group-hover:scale-105 transition-transform">
-            {getAvatarEmoji()}
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#C7B6E8] to-[#F3D8E5] p-[1.5px] shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-full h-full rounded-full overflow-hidden bg-[#241A30] flex items-center justify-center text-sm">
+              {getAvatarEmoji()}
+            </div>
           </div>
           <div className="hidden sm:block text-left max-w-[120px] truncate">
-            <p className="text-xs font-medium text-white truncate leading-tight">
+            <p className="text-xs font-serif font-medium text-[#FFF7ED] truncate leading-tight">
               {currentUser?.name || settings.studentName}
             </p>
-            <p className="text-[10px] text-lavender-300/80 truncate leading-tight">
+            <p className="text-[10px] text-[#C7B6E8] truncate leading-tight">
               {currentUser?.email ? 'Account 🌙' : settings.targetDegree}
             </p>
           </div>

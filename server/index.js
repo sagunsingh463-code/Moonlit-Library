@@ -1631,7 +1631,7 @@ app.get('/api/ai/status', (req, res) => {
   res.json({
     configured,
     provider,
-    model: geminiKey ? 'gemini-1.5-flash' : (openAiKey ? 'gpt-4o-mini' : null)
+    model: geminiKey ? 'gemini-2.0-flash' : (openAiKey ? 'gpt-4o-mini' : null)
   });
 });
 

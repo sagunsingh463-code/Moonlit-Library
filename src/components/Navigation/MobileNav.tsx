@@ -160,14 +160,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({
       )}
 
       {/* ---------------- FIXED BOTTOM NAVIGATION BAR ---------------- */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-gradient-to-t from-navy-950/98 via-navy-950/95 to-navy-900/90 backdrop-blur-lg border-t border-lavender-500/25 px-2 py-1 flex items-center justify-around safe-area-inset-bottom shadow-2xl">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-[#241A30]/95 backdrop-blur-2xl border-t border-[#C7B6E8]/25 px-2 py-1 flex items-center justify-around safe-area-inset-bottom shadow-2xl">
         {/* 1. Home */}
         <button
           onClick={() => handleNavClick('home')}
           className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-all ${
             currentView === 'home'
-              ? 'text-moon-gold scale-105'
-              : 'text-lavender-300 hover:text-white'
+              ? 'text-[#F3D8E5] scale-105 font-bold'
+              : 'text-[#C7B6E8]/80 hover:text-[#FFF7ED]'
           }`}
         >
           <Home className="w-5 h-5" />
@@ -179,8 +179,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           onClick={() => handleNavClick('files')}
           className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-all ${
             currentView === 'files'
-              ? 'text-moon-gold scale-105'
-              : 'text-lavender-300 hover:text-white'
+              ? 'text-[#F3D8E5] scale-105 font-bold'
+              : 'text-[#C7B6E8]/80 hover:text-[#FFF7ED]'
           }`}
         >
           <FolderGit2 className="w-5 h-5" />
@@ -192,8 +192,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           onClick={() => handleNavClick('notes')}
           className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-all ${
             currentView === 'notes'
-              ? 'text-moon-gold scale-105'
-              : 'text-lavender-300 hover:text-white'
+              ? 'text-[#F3D8E5] scale-105 font-bold'
+              : 'text-[#C7B6E8]/80 hover:text-[#FFF7ED]'
           }`}
         >
           <BookMarked className="w-5 h-5" />
@@ -205,8 +205,8 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           onClick={() => handleNavClick('quiz')}
           className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-all ${
             currentView === 'quiz'
-              ? 'text-moon-gold scale-105'
-              : 'text-lavender-300 hover:text-white'
+              ? 'text-[#F3D8E5] scale-105 font-bold'
+              : 'text-[#C7B6E8]/80 hover:text-[#FFF7ED]'
           }`}
         >
           <HelpCircle className="w-5 h-5" />
@@ -221,13 +221,13 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           }}
           className={`min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-all ${
             isMoreOpen || (currentView !== 'home' && currentView !== 'files' && currentView !== 'notes' && currentView !== 'quiz')
-              ? 'text-lavender-200'
-              : 'text-lavender-400 hover:text-white'
+              ? 'text-[#FFF7ED]'
+              : 'text-[#C7B6E8]/80 hover:text-[#FFF7ED]'
           }`}
         >
           <div className="relative">
             <MoreHorizontal className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-moon-gold" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#F3D8E5]" />
           </div>
           <span className="text-[10px] font-medium">More</span>
         </button>

@@ -184,36 +184,37 @@ export const HomeView: React.FC<HomeViewProps> = ({
     <div className="p-3.5 sm:p-6 space-y-6 max-w-7xl mx-auto overflow-x-hidden">
       
       {/* ======================================================== */}
-      {/* 1. WIDE VINTAGE LIBRARY COVER BANNER                     */}
+      {/* 1. WIDE DREAMY PINTEREST LIBRARY COVER BANNER            */}
       {/* ======================================================== */}
-      <div className="relative rounded-3xl overflow-hidden border border-[#d4af37]/35 shadow-2xl bg-[#141210]">
-        {/* Vintage Library Banner Image */}
+      <div className="relative rounded-3xl overflow-hidden border border-[#C7B6E8]/35 shadow-2xl bg-[#20162B]">
+        {/* Dreamy Library Banner Image */}
         <div className="h-44 sm:h-56 md:h-64 w-full relative overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1507842229450-79779f62a6b2?auto=format&fit=crop&w=1600&q=85"
             alt="Moonlit Library Vintage Panorama"
-            className="w-full h-full object-cover object-[center_35%] filter brightness-[0.72] contrast-[1.08]"
+            className="w-full h-full object-cover object-[center_35%] filter brightness-[0.78] contrast-[1.05]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#121110] via-[#121110]/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#121110]/80 via-transparent to-[#121110]/80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#20162B] via-[#20162B]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#20162B]/85 via-transparent to-[#20162B]/70" />
 
-          {/* Golden Ambient Candlelight Glow */}
-          <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-[#d4af37]/15 rounded-full blur-3xl pointer-events-none" />
+          {/* Dreamy Ambient Moonlight & Lilac Glow */}
+          <div className="absolute top-1/4 left-1/3 w-72 h-72 bg-[#C7B6E8]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 right-1/4 w-60 h-60 bg-[#F3D8E5]/12 rounded-full blur-3xl pointer-events-none" />
         </div>
 
         {/* Banner Content & Notion Style Header */}
         <div className="p-5 sm:p-7 relative -mt-16 z-10 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="text-xs sm:text-sm font-mono text-[#d4af37] tracking-widest flex items-center gap-2">
+            <div className="text-xs sm:text-sm font-mono text-[#F3D8E5] tracking-widest flex items-center gap-2">
               <span>library ˚୨୧⋆｡˚ ⋆</span>
               <span>•</span>
-              <span className="text-stone-400">Sagun Singh’s MBA Sanctuary</span>
+              <span className="text-[#E8DDF8]/80 font-sans">Sagun Singh’s Dreamy Study Sanctuary</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif font-bold text-[#f4ebe1] tracking-wide text-glow">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif font-bold text-[#FFF7ED] tracking-wide text-glow">
               Welcome to Moonlit Library
             </h1>
-            <p className="text-xs sm:text-sm text-[#e8d8c8]/90 font-sans max-w-xl leading-relaxed">
-              The candles are lit, the tea is warm, and vintage grimoires invite deep focus. What shall we master tonight?
+            <p className="text-xs sm:text-sm text-[#E8DDF8]/90 font-sans max-w-xl leading-relaxed">
+              The candles are lit, the tea is warm, and a tranquil twilight sanctuary invites deep focus. What shall we master tonight?
             </p>
           </div>
 
@@ -221,38 +222,38 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={onOpenFocusMode}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#c5a059] to-[#945c36] text-[#121110] font-serif font-bold text-xs shadow-lg shadow-[#d4af37]/20 hover:brightness-110 active:scale-95 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#F3D8E5] via-[#C7B6E8] to-[#C99B9B] text-[#30243D] font-serif font-bold text-xs shadow-md shadow-[#C7B6E8]/20 hover:scale-105 active:scale-95 transition-all"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Begin Midnight Focus</span>
             </button>
             <button
               onClick={() => onNavigate('arcade')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#221e1a]/90 hover:bg-[#2b2520] border border-[#d4af37]/35 text-[#f4ebe1] text-xs font-serif font-bold transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#30243D]/90 hover:bg-[#3D2E4E] border border-[#C7B6E8]/35 text-[#FFF7ED] text-xs font-serif font-bold transition-all hover:scale-105"
             >
-              <Gamepad2 className="w-3.5 h-3.5 text-[#d4af37]" />
+              <Gamepad2 className="w-3.5 h-3.5 text-[#C7B6E8]" />
               <span>Moonlight Arcade</span>
             </button>
             {onOpenAiAssistant && (
               <button
                 onClick={onOpenAiAssistant}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#221e1a]/90 hover:bg-[#2b2520] border border-[#d4af37]/35 text-[#d4af37] text-xs font-serif font-bold transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#30243D]/90 hover:bg-[#3D2E4E] border border-[#F3D8E5]/35 text-[#F3D8E5] text-xs font-serif font-bold transition-all hover:scale-105"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-3.5 h-3.5 text-[#F3D8E5]" />
                 <span>Ask Luna AI</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Dark Academia Color Palette Swatch Tiles Bar (From Reference!) */}
-        <div className="grid grid-cols-6 h-2 w-full border-t border-[#d4af37]/20">
-          <div className="bg-[#2b1810]" title="#2b1810 Mahogany" />
-          <div className="bg-[#4a2e1b]" title="#4a2e1b Chocolate" />
-          <div className="bg-[#6b4226]" title="#6b4226 Saddle Brown" />
-          <div className="bg-[#945c36]" title="#945c36 Warm Amber" />
-          <div className="bg-[#c5a059]" title="#c5a059 Antique Gold" />
-          <div className="bg-[#e8d8c8]" title="#e8d8c8 Vintage Parchment" />
+        {/* Pinterest Dreamy Aesthetic Color Palette Swatch Bar */}
+        <div className="grid grid-cols-6 h-2 w-full border-t border-[#C7B6E8]/20">
+          <div className="bg-[#C7B6E8]" title="#C7B6E8 Dusty Lavender" />
+          <div className="bg-[#F3D8E5]" title="#F3D8E5 Pastel Pink" />
+          <div className="bg-[#E8DDF8]" title="#E8DDF8 Soft Lilac" />
+          <div className="bg-[#FFF7ED]" title="#FFF7ED Cream" />
+          <div className="bg-[#30243D]" title="#30243D Deep Plum" />
+          <div className="bg-[#C99B9B]" title="#C99B9B Muted Rose Gold" />
         </div>
       </div>
 
@@ -266,25 +267,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* ------------------------------------------------------ */}
         <div className="space-y-6">
           {/* Literary / MBA Wisdom Quote Card */}
-          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3 relative group">
-            <div className="flex items-center justify-between text-[11px] font-mono text-[#d4af37]">
+          <div className="p-5 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#30243D]/75 space-y-3 relative group shadow-md">
+            <div className="flex items-center justify-between text-[11px] font-mono text-[#C7B6E8]">
               <span>Wisdom Shelf ˚୨୧⋆｡˚</span>
               <button 
                 onClick={handleNextQuote}
-                className="hover:underline text-[10px] text-stone-400 hover:text-white"
+                className="hover:underline text-[10px] text-[#E8DDF8]/70 hover:text-[#FFF7ED]"
               >
                 Next Quote →
               </button>
             </div>
-            <p className="text-xs sm:text-sm font-serif italic text-[#f4ebe1] leading-relaxed">
+            <p className="text-xs sm:text-sm font-serif italic text-[#FFF7ED] leading-relaxed">
               {quotesList[quoteIndex].quote}
             </p>
-            <span className="text-[11px] font-mono text-[#c5a059] block text-right font-medium">
+            <span className="text-[11px] font-mono text-[#C99B9B] block text-right font-medium">
               — {quotesList[quoteIndex].author}
             </span>
 
-            {/* Cute Food & Drink Stickers Row (From Reference!) */}
-            <div className="pt-2 border-t border-[#d4af37]/15 flex items-center justify-around text-lg">
+            {/* Cute Food & Drink Stickers Row */}
+            <div className="pt-2 border-t border-[#C7B6E8]/15 flex items-center justify-around text-lg">
               <span title="Steaming Latte" className="hover:scale-125 transition-transform cursor-pointer">☕</span>
               <span title="Butter Croissant" className="hover:scale-125 transition-transform cursor-pointer">🥐</span>
               <span title="Pancake Stack" className="hover:scale-125 transition-transform cursor-pointer">🥞</span>
@@ -293,57 +294,57 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* Retro Cassette / Vintage Dark Academia Music Player (From Reference!) */}
-          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/35 bg-[#1a1714] space-y-4 shadow-xl">
-            <div className="flex items-center justify-between text-xs font-serif font-bold text-[#f4ebe1]">
+          {/* Retro Cassette / Dreamy Sanctuary Music Player */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#C99B9B]/35 bg-[#30243D]/80 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between text-xs font-serif font-bold text-[#FFF7ED]">
               <div className="flex items-center gap-2">
                 <span className="text-base">📻</span>
-                <span>Dark Academia Cassette Player</span>
+                <span>Dreamy Study Sanctuary Player</span>
               </div>
-              <span className="text-[10px] font-mono text-[#d4af37] px-2 py-0.5 rounded-full bg-[#2b221b] border border-[#d4af37]/30">
+              <span className="text-[10px] font-mono text-[#C7B6E8] px-2 py-0.5 rounded-full bg-[#241A30] border border-[#C7B6E8]/30">
                 {isPlayingMusic ? 'Now Playing' : 'Paused'}
               </span>
             </div>
 
             {/* Cassette Graphic with Spinning Wheels */}
-            <div className="p-3.5 rounded-2xl bg-[#12100e] border border-[#d4af37]/30 flex items-center justify-between relative overflow-hidden">
+            <div className="p-3.5 rounded-2xl bg-[#241A30] border border-[#C7B6E8]/30 flex items-center justify-between relative overflow-hidden">
               <div className="space-y-0.5 min-w-0 flex-1">
-                <span className="text-[10px] font-mono text-[#c5a059] block uppercase truncate">
+                <span className="text-[10px] font-mono text-[#C99B9B] block uppercase truncate">
                   {playlist[currentTrackIndex].artist}
                 </span>
-                <p className="text-xs font-serif font-bold text-white truncate">
+                <p className="text-xs font-serif font-bold text-[#FFF7ED] truncate">
                   {playlist[currentTrackIndex].title}
                 </p>
               </div>
 
               {/* Spinning Tape Wheels */}
               <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                <div className={`w-6 h-6 rounded-full border-2 border-dashed border-[#d4af37] flex items-center justify-center ${isPlayingMusic ? 'retro-cassette-wheel' : ''}`}>
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />
+                <div className={`w-6 h-6 rounded-full border-2 border-dashed border-[#C99B9B] flex items-center justify-center ${isPlayingMusic ? 'retro-cassette-wheel' : ''}`}>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#F3D8E5]" />
                 </div>
-                <div className={`w-6 h-6 rounded-full border-2 border-dashed border-[#d4af37] flex items-center justify-center ${isPlayingMusic ? 'retro-cassette-wheel' : ''}`}>
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />
+                <div className={`w-6 h-6 rounded-full border-2 border-dashed border-[#C99B9B] flex items-center justify-center ${isPlayingMusic ? 'retro-cassette-wheel' : ''}`}>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#F3D8E5]" />
                 </div>
               </div>
             </div>
 
             {/* Player Controls */}
             <div className="flex items-center justify-between pt-1">
-              <span className="text-[10px] font-mono text-stone-400">
+              <span className="text-[10px] font-mono text-[#E8DDF8]/70">
                 {playlist[currentTrackIndex].duration}
               </span>
 
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleTogglePlayMusic}
-                  className="w-9 h-9 rounded-full bg-gradient-to-r from-[#d4af37] to-[#945c36] text-[#121110] flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all"
+                  className="w-9 h-9 rounded-full bg-gradient-to-r from-[#F3D8E5] via-[#C7B6E8] to-[#C99B9B] text-[#30243D] flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all"
                   title={isPlayingMusic ? 'Pause Music' : 'Play Ambient Track'}
                 >
                   {isPlayingMusic ? <Pause size={14} className="fill-current" /> : <Play size={14} className="fill-current translate-x-0.5" />}
                 </button>
                 <button
                   onClick={handleNextTrack}
-                  className="p-2 rounded-xl bg-[#26201b] border border-[#d4af37]/25 text-stone-300 hover:text-white"
+                  className="p-2 rounded-xl bg-[#241A30] border border-[#C7B6E8]/25 text-[#E8DDF8] hover:text-[#FFF7ED] transition-colors"
                   title="Next Track"
                 >
                   <SkipForward size={14} />
@@ -352,7 +353,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             {/* Playlist Tracklist Preview */}
-            <div className="space-y-1 pt-1 text-[11px] font-mono text-stone-400 border-t border-[#d4af37]/15">
+            <div className="space-y-1 pt-1 text-[11px] font-mono text-[#E8DDF8]/70 border-t border-[#C7B6E8]/15">
               {playlist.map((track, idx) => (
                 <div 
                   key={track.title}
@@ -362,8 +363,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     setIsPlayingMusic(true);
                     sound.startAmbient(track.audioType);
                   }}
-                  className={`flex items-center justify-between p-1.5 rounded-lg cursor-pointer transition-colors ${
-                    idx === currentTrackIndex ? 'bg-[#2b221b] text-[#d4af37] font-bold' : 'hover:bg-[#221e1a]'
+                  className={`flex items-center justify-between p-1.5 rounded-xl cursor-pointer transition-colors ${
+                    idx === currentTrackIndex ? 'bg-[#3D2E4E] text-[#F3D8E5] font-bold' : 'hover:bg-[#241A30]'
                   }`}
                 >
                   <span className="truncate">{idx + 1}. {track.title}</span>
@@ -373,19 +374,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* Aesthetic Checklist Widget (`books lent` / daily tasks from Reference!) */}
-          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-[#d4af37]/15">
+          {/* Aesthetic Checklist Widget (`books lent` / daily tasks) */}
+          <div className="p-5 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#30243D]/75 space-y-3 shadow-md">
+            <div className="flex items-center justify-between pb-2 border-b border-[#C7B6E8]/15">
               <span 
                 onClick={() => onNavigate('planner')}
-                className="text-xs font-serif font-bold text-[#f4ebe1] hover:text-[#d4af37] cursor-pointer flex items-center gap-1.5 transition-colors"
+                className="text-xs font-serif font-bold text-[#FFF7ED] hover:text-[#F3D8E5] cursor-pointer flex items-center gap-1.5 transition-colors"
                 title="Open Study Planner"
               >
                 books lent & study tasks ༉‧₊˚
               </span>
               <button
                 onClick={() => onNavigate('planner')}
-                className="text-[10px] font-mono text-[#d4af37] hover:underline"
+                className="text-[10px] font-mono text-[#C7B6E8] hover:underline"
               >
                 {plannerTasks && plannerTasks.length > 0
                   ? `${plannerTasks.filter(t => t.completed).length}/${plannerTasks.length} Done`
@@ -402,21 +403,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       sound.playSparkle();
                       await onToggleTask(task.id);
                     }}
-                    className={`p-2 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-2.5 ${
+                    className={`p-2.5 rounded-2xl border cursor-pointer transition-all flex items-center justify-between gap-2.5 ${
                       task.completed
-                        ? 'bg-[#1a1714]/50 border-stone-800 text-stone-500 line-through'
-                        : 'bg-[#221e1a]/80 border-[#d4af37]/20 text-[#f4ebe1] hover:border-[#d4af37]/50'
+                        ? 'bg-[#241A30]/50 border-stone-800 text-[#8C7A9E] line-through'
+                        : 'bg-[#241A30]/80 border-[#C7B6E8]/20 text-[#FFF7ED] hover:border-[#C7B6E8]/50 hover:bg-[#30243D]'
                     }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       {task.completed ? (
-                        <CheckCircle2 size={14} className="text-[#d4af37] flex-shrink-0" />
+                        <CheckCircle2 size={14} className="text-[#F3D8E5] flex-shrink-0" />
                       ) : (
-                        <Circle size={14} className="text-stone-500 flex-shrink-0" />
+                        <Circle size={14} className="text-[#8C7A9E] flex-shrink-0" />
                       )}
                       <span className="truncate">{task.title}</span>
                     </div>
-                    <span className="text-[9px] font-mono text-[#a09485] flex-shrink-0">{task.day}</span>
+                    <span className="text-[9px] font-mono text-[#C7B6E8] flex-shrink-0">{task.day}</span>
                   </div>
                 ))
               ) : (
@@ -424,16 +425,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <div
                     key={task.id}
                     onClick={() => handleToggleCustomTask(task.id)}
-                    className={`p-2 rounded-xl border cursor-pointer transition-all flex items-center gap-2.5 ${
+                    className={`p-2.5 rounded-2xl border cursor-pointer transition-all flex items-center gap-2.5 ${
                       task.done
-                        ? 'bg-[#1a1714]/50 border-stone-800 text-stone-500 line-through'
-                        : 'bg-[#221e1a]/80 border-[#d4af37]/20 text-[#f4ebe1] hover:border-[#d4af37]/50'
+                        ? 'bg-[#241A30]/50 border-stone-800 text-[#8C7A9E] line-through'
+                        : 'bg-[#241A30]/80 border-[#C7B6E8]/20 text-[#FFF7ED] hover:border-[#C7B6E8]/50 hover:bg-[#30243D]'
                     }`}
                   >
                     {task.done ? (
-                      <CheckCircle2 size={14} className="text-[#d4af37] flex-shrink-0" />
+                      <CheckCircle2 size={14} className="text-[#F3D8E5] flex-shrink-0" />
                     ) : (
-                      <Circle size={14} className="text-stone-500 flex-shrink-0" />
+                      <Circle size={14} className="text-[#8C7A9E] flex-shrink-0" />
                     )}
                     <span className="truncate">{task.text}</span>
                   </div>
@@ -444,7 +445,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="pt-1 text-center">
               <button
                 onClick={() => onNavigate('planner')}
-                className="text-[10px] text-[#d4af37] hover:underline font-serif inline-flex items-center gap-1"
+                className="text-[10px] text-[#C7B6E8] hover:text-[#FFF7ED] hover:underline font-serif inline-flex items-center gap-1 transition-colors"
               >
                 <span>Open Full Study Planner</span>
                 <ChevronRight size={10} />
@@ -458,8 +459,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* ------------------------------------------------------ */}
         <div className="space-y-6">
           {/* Shagun Permanent Mascot Reading Card */}
-          <div className="p-6 rounded-3xl glass-panel-glow border border-[#d4af37]/40 bg-[#181512] space-y-4 shadow-xl text-center relative overflow-hidden">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2a221b] border border-[#d4af37]/30 text-xs font-serif text-[#d4af37]">
+          <div className="p-6 rounded-3xl glass-panel-glow border border-[#C99B9B]/40 bg-[#241A30]/85 space-y-4 shadow-xl text-center relative overflow-hidden">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#30243D] border border-[#C7B6E8]/30 text-xs font-serif text-[#F3D8E5]">
               <span>☕</span>
               <span>Sanctuary Mascot & Companion</span>
             </div>
@@ -471,33 +472,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           {/* Retro Flip Clock Widget (From Reference!) */}
-          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3 text-center">
-            <span className="text-[11px] font-mono text-[#d4af37] block">
+          <div className="p-5 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#241A30]/80 space-y-3 text-center">
+            <span className="text-[11px] font-mono text-[#C7B6E8] block">
               -- check the time ༉‧₊˚ --
             </span>
 
             {/* Flip Clock Big Digits Display */}
             <div className="grid grid-cols-2 gap-3 max-w-[260px] mx-auto">
-              <div className="p-4 rounded-2xl bg-[#26201a] border border-[#d4af37]/35 shadow-inner">
-                <span className="text-3xl sm:text-4xl font-mono font-bold text-[#f4ebe1] tracking-wider">
+              <div className="p-4 rounded-2xl bg-[#1E1528] border border-[#C99B9B]/35 shadow-inner">
+                <span className="text-3xl sm:text-4xl font-mono font-bold text-[#FFF7ED] tracking-wider">
                   {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).split(' ')[0]}
                 </span>
-                <span className="text-[9px] font-mono text-stone-400 block mt-1 uppercase">
+                <span className="text-[9px] font-mono text-[#C7B6E8]/80 block mt-1 uppercase">
                   {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).split(' ')[1] || 'HR : MIN'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#26201a] border border-[#d4af37]/35 shadow-inner">
-                <span className="text-2xl sm:text-3xl font-serif font-bold text-[#d4af37] block">
+              <div className="p-4 rounded-2xl bg-[#1E1528] border border-[#C99B9B]/35 shadow-inner">
+                <span className="text-2xl sm:text-3xl font-serif font-bold text-[#F3D8E5] block">
                   {todayName.slice(0, 3).toUpperCase()}
                 </span>
-                <span className="text-[10px] font-mono text-stone-300 block mt-1">
+                <span className="text-[10px] font-mono text-[#E8DDF8] block mt-1">
                   {currentTime.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </span>
               </div>
             </div>
 
             {/* Mini Cake & Dessert Stickers Row (From Reference!) */}
-            <div className="pt-2 border-t border-[#d4af37]/15 flex items-center justify-center gap-3 text-lg">
+            <div className="pt-2 border-t border-[#C7B6E8]/15 flex items-center justify-center gap-3 text-lg">
               <span title="Strawberry Cake">🍰</span>
               <span title="Caramel Pudding">🍮</span>
               <span title="Matcha Mochi">🍡</span>
@@ -506,17 +507,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           {/* Today's Classes & Timetable Preview */}
-          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-[#d4af37]/15">
+          <div className="p-5 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#241A30]/80 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#C7B6E8]/15">
               <div className="flex items-center gap-2">
-                <Calendar size={15} className="text-[#d4af37]" />
-                <h3 className="font-serif font-bold text-xs text-white">
+                <Calendar size={15} className="text-[#C7B6E8]" />
+                <h3 className="font-serif font-bold text-xs text-[#FFF7ED]">
                   Today's Classes ({todayName})
                 </h3>
               </div>
               <button
                 onClick={() => onNavigate('calendar')}
-                className="text-[10px] text-[#d4af37] hover:underline"
+                className="text-[10px] text-[#C7B6E8] hover:text-[#FFF7ED] hover:underline"
               >
                 Full Calendar →
               </button>
@@ -524,17 +525,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             <div className="space-y-2 text-xs">
               {todaysClasses.length === 0 ? (
-                <p className="text-[11px] text-stone-400 py-2 text-center italic">
+                <p className="text-[11px] text-[#8C7A9E] py-2 text-center italic">
                   No classes scheduled today. Perfect day for Midnight Focus!
                 </p>
               ) : (
                 todaysClasses.map(c => (
-                  <div key={c.id} className="p-2.5 rounded-xl bg-[#221e1a] border border-[#d4af37]/15 flex items-center justify-between">
+                  <div key={c.id} className="p-2.5 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/20 flex items-center justify-between">
                     <div>
-                      <span className="font-mono text-[#d4af37] text-[10px]">{c.startTime} - {c.endTime}</span>
-                      <p className="font-serif font-bold text-white text-xs">{c.title}</p>
+                      <span className="font-mono text-[#C7B6E8] text-[10px]">{c.startTime} - {c.endTime}</span>
+                      <p className="font-serif font-bold text-[#FFF7ED] text-xs">{c.title}</p>
                     </div>
-                    <span className="text-[9px] px-2 py-0.5 rounded bg-amber-950/70 text-amber-300 border border-amber-600/30">
+                    <span className="text-[9px] px-2 py-0.5 rounded bg-[#30243D] text-[#F3D8E5] border border-[#C99B9B]/30">
                       {c.type}
                     </span>
                   </div>
@@ -549,9 +550,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* ------------------------------------------------------ */}
         <div className="space-y-6">
           {/* Study Streak Counter Box (From Reference!) */}
-          <div className="p-5 rounded-3xl glass-panel border border-[#d4af37]/35 bg-[#1a1714] space-y-3">
+          <div className="p-5 rounded-3xl glass-panel border border-[#C99B9B]/35 bg-[#241A30]/85 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-serif font-bold text-[#f4ebe1]">
+              <span className="text-xs font-serif font-bold text-[#FFF7ED]">
                 study streak ༉‧₊˚
               </span>
               {/* Cute Ramen & Dango Stickers from Reference! */}
@@ -565,23 +566,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex items-center justify-center gap-4 py-2">
               <button
                 onClick={() => handleBoostStreak(-1)}
-                className="w-8 h-8 rounded-xl bg-[#2b221b] border border-[#d4af37]/30 text-[#d4af37] font-bold text-sm hover:bg-[#382b22] transition-colors"
+                className="w-8 h-8 rounded-xl bg-[#30243D] border border-[#C7B6E8]/30 text-[#C7B6E8] font-bold text-sm hover:bg-[#3D2C4E] hover:text-[#FFF7ED] transition-colors"
                 title="Decrease streak"
               >
                 -
               </button>
-              <div className="px-5 py-2 rounded-2xl bg-[#12100e] border-2 border-[#d4af37]/50 text-2xl font-mono font-bold text-amber-200 min-w-[70px] text-center shadow-inner">
+              <div className="px-5 py-2 rounded-2xl bg-[#1E1528] border-2 border-[#C99B9B]/50 text-2xl font-mono font-bold text-[#F3D8E5] min-w-[70px] text-center shadow-inner">
                 {currentStreak}
               </div>
               <button
                 onClick={() => handleBoostStreak(1)}
-                className="w-8 h-8 rounded-xl bg-[#2b221b] border border-[#d4af37]/30 text-[#d4af37] font-bold text-sm hover:bg-[#382b22] transition-colors"
+                className="w-8 h-8 rounded-xl bg-[#30243D] border border-[#C7B6E8]/30 text-[#C7B6E8] font-bold text-sm hover:bg-[#3D2C4E] hover:text-[#FFF7ED] transition-colors"
                 title="Boost streak"
               >
                 +
               </button>
             </div>
-            <p className="text-[10px] font-mono text-stone-400 text-center">
+            <p className="text-[10px] font-mono text-[#8C7A9E] text-center">
               Consecutive days deep learning in Moonlit Library
             </p>
           </div>
@@ -597,19 +598,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ======================================================== */}
       {/* 3. 9—SUBJECTS / READINGS GALLERY (From Reference!)       */}
       {/* ======================================================== */}
-      <div className="p-6 rounded-3xl glass-panel border border-[#d4af37]/30 bg-[#161412]/80 space-y-5">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#d4af37]/15">
+      <div className="p-6 rounded-3xl glass-panel border border-[#C7B6E8]/25 bg-[#241A30]/80 space-y-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#C7B6E8]/15">
           <div>
-            <div className="text-[11px] font-mono text-[#d4af37] tracking-wider">
+            <div className="text-[11px] font-mono text-[#C7B6E8] tracking-wider">
               9—readings / subjects—༉
             </div>
-            <h2 className="text-xl font-serif font-bold text-[#f4ebe1] mt-0.5">
+            <h2 className="text-xl font-serif font-bold text-[#FFF7ED] mt-0.5">
               Term 2 Academic Subjects & Curricula Gallery
             </h2>
           </div>
           <button
             onClick={() => onNavigate('terms')}
-            className="text-xs font-serif text-[#d4af37] hover:underline flex items-center gap-1"
+            className="text-xs font-serif text-[#F3D8E5] hover:text-[#FFF7ED] hover:underline flex items-center gap-1"
           >
             <span>Explore All 6 Academic Terms</span>
             <ChevronRight size={14} />
@@ -629,31 +630,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onNavigate('knowledge-map', sub.id);
                 }
               }}
-              className="group p-3 rounded-2xl bg-[#1e1a16] border border-[#d4af37]/25 hover:border-[#d4af37]/60 cursor-pointer transition-all space-y-3 shadow-md hover:shadow-xl"
+              className="group p-3 rounded-2xl bg-[#1E1528] border border-[#C7B6E8]/20 hover:border-[#C99B9B]/60 hover:bg-[#30243D]/50 cursor-pointer transition-all space-y-3 shadow-md hover:shadow-xl"
             >
               {/* Cover Image Thumbnail */}
-              <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[#12100e]">
+              <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[#1E1528]">
                 <img
                   src={sub.cover}
                   alt={sub.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90"
                 />
-                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#12100e]/80 border border-[#d4af37]/40 text-[10px] font-mono text-[#d4af37] font-bold">
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#241A30]/90 border border-[#C99B9B]/40 text-[10px] font-mono text-[#F3D8E5] font-bold">
                   /{sub.code}
                 </div>
               </div>
 
               {/* Title & Description */}
               <div className="space-y-1">
-                <h3 className="text-sm font-serif font-bold text-[#f4ebe1] group-hover:text-[#d4af37] transition-colors truncate">
+                <h3 className="text-sm font-serif font-bold text-[#FFF7ED] group-hover:text-[#F3D8E5] transition-colors truncate">
                   {sub.title}
                 </h3>
-                <p className="text-[11px] text-stone-400 font-sans line-clamp-1">
+                <p className="text-[11px] text-[#8C7A9E] font-sans line-clamp-1">
                   {sub.desc}
                 </p>
-                <div className="flex items-center justify-between text-[10px] font-mono text-[#c5a059] pt-1">
+                <div className="flex items-center justify-between text-[10px] font-mono text-[#C7B6E8] pt-1">
                   <span>{sub.count}</span>
-                  <span className="group-hover:translate-x-1 transition-transform">Study →</span>
+                  <span className="group-hover:translate-x-1 transition-transform text-[#F3D8E5]">Study →</span>
                 </div>
               </div>
             </div>
@@ -662,52 +663,52 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </div>
 
       {/* ======================================================== */}
-      {/* 4. SANCTUARY SHORTCUTS ROW (5 New Features)              */}
+      {/* 4. SANCTUARY SHORTCUTS ROW (5 Features)                  */}
       {/* ======================================================== */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div
           onClick={() => onNavigate('quests')}
-          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+          className="p-4 rounded-2xl glass-panel border border-[#C7B6E8]/20 bg-[#241A30]/80 hover:border-[#C99B9B]/60 hover:bg-[#30243D] cursor-pointer transition-all space-y-1 text-center group"
         >
-          <Award className="w-5 h-5 mx-auto text-amber-400 group-hover:scale-110 transition-transform" />
-          <h4 className="text-xs font-serif font-bold text-white">Daily Quests</h4>
-          <p className="text-[10px] text-stone-400">Earn XP & Missions</p>
+          <Award className="w-5 h-5 mx-auto text-[#F3D8E5] group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Daily Quests</h4>
+          <p className="text-[10px] text-[#8C7A9E]">Earn XP & Missions</p>
         </div>
 
         <div
           onClick={() => onNavigate('pet')}
-          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+          className="p-4 rounded-2xl glass-panel border border-[#C7B6E8]/20 bg-[#241A30]/80 hover:border-[#C99B9B]/60 hover:bg-[#30243D] cursor-pointer transition-all space-y-1 text-center group"
         >
-          <Heart className="w-5 h-5 mx-auto text-rose-400 group-hover:scale-110 transition-transform" />
-          <h4 className="text-xs font-serif font-bold text-white">Study Pet Mochi</h4>
-          <p className="text-[10px] text-stone-400">Lv. 3 Scholar Cat</p>
+          <Heart className="w-5 h-5 mx-auto text-[#C99B9B] group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Study Pet Mochi</h4>
+          <p className="text-[10px] text-[#8C7A9E]">Lv. 3 Scholar Cat</p>
         </div>
 
         <div
           onClick={() => onNavigate('knowledge-map')}
-          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+          className="p-4 rounded-2xl glass-panel border border-[#C7B6E8]/20 bg-[#241A30]/80 hover:border-[#C99B9B]/60 hover:bg-[#30243D] cursor-pointer transition-all space-y-1 text-center group"
         >
-          <GitBranch className="w-5 h-5 mx-auto text-amber-300 group-hover:scale-110 transition-transform" />
-          <h4 className="text-xs font-serif font-bold text-white">Knowledge Map</h4>
-          <p className="text-[10px] text-stone-400">Visual Concept Trees</p>
+          <GitBranch className="w-5 h-5 mx-auto text-[#C7B6E8] group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Knowledge Map</h4>
+          <p className="text-[10px] text-[#8C7A9E]">Visual Concept Trees</p>
         </div>
 
         <div
           onClick={() => onNavigate('focus-score')}
-          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+          className="p-4 rounded-2xl glass-panel border border-[#C7B6E8]/20 bg-[#241A30]/80 hover:border-[#C99B9B]/60 hover:bg-[#30243D] cursor-pointer transition-all space-y-1 text-center group"
         >
-          <TrendingUp className="w-5 h-5 mx-auto text-emerald-400 group-hover:scale-110 transition-transform" />
-          <h4 className="text-xs font-serif font-bold text-white">Focus Score</h4>
-          <p className="text-[10px] text-stone-400">Productivity Matrix</p>
+          <TrendingUp className="w-5 h-5 mx-auto text-[#E8DDF8] group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Focus Score</h4>
+          <p className="text-[10px] text-[#8C7A9E]">Productivity Matrix</p>
         </div>
 
         <div
           onClick={() => onNavigate('graduation-wall')}
-          className="p-4 rounded-2xl glass-panel border border-[#d4af37]/30 bg-[#1a1714] hover:border-[#d4af37] cursor-pointer transition-all space-y-1 text-center group"
+          className="p-4 rounded-2xl glass-panel border border-[#C7B6E8]/20 bg-[#241A30]/80 hover:border-[#C99B9B]/60 hover:bg-[#30243D] cursor-pointer transition-all space-y-1 text-center group"
         >
-          <GraduationCap className="w-5 h-5 mx-auto text-purple-400 group-hover:scale-110 transition-transform" />
-          <h4 className="text-xs font-serif font-bold text-white">Graduation Wall</h4>
-          <p className="text-[10px] text-stone-400">6-Term Degree Wall</p>
+          <GraduationCap className="w-5 h-5 mx-auto text-[#F3D8E5] group-hover:scale-110 transition-transform" />
+          <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Graduation Wall</h4>
+          <p className="text-[10px] text-[#8C7A9E]">6-Term Degree Wall</p>
         </div>
       </div>
 
@@ -715,17 +716,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* 5. YOUTUBE MASTERCLASSES SHELF (Curated Lectures)        */}
       {/* ======================================================== */}
       {youtubeResources.length > 0 && (
-        <div className="glass-panel p-6 rounded-3xl border border-[#d4af37]/30 bg-[#161412]/80 space-y-4">
+        <div className="glass-panel p-6 rounded-3xl border border-[#C7B6E8]/25 bg-[#241A30]/80 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Video size={18} className="text-[#d4af37]" />
-              <h3 className="font-serif font-bold text-base text-white">
+              <Video size={18} className="text-[#C7B6E8]" />
+              <h3 className="font-serif font-bold text-base text-[#FFF7ED]">
                 Curated YouTube Masterclasses
               </h3>
             </div>
             <button
               onClick={() => onNavigate('youtube')}
-              className="text-xs text-[#d4af37] hover:underline"
+              className="text-xs text-[#C7B6E8] hover:text-[#FFF7ED] hover:underline"
             >
               Open YouTube Centre →
             </button>
@@ -736,23 +737,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div
                 key={yt.id}
                 onClick={() => onNavigate('youtube')}
-                className="p-3 rounded-2xl bg-[#1e1a16] border border-[#d4af37]/15 hover:border-[#d4af37]/50 cursor-pointer group transition-all space-y-2"
+                className="p-3 rounded-2xl bg-[#1E1528] border border-[#C7B6E8]/15 hover:border-[#C99B9B]/50 hover:bg-[#30243D]/50 cursor-pointer group transition-all space-y-2"
               >
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-[#12100e]">
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-[#1E1528]">
                   <img
                     src={`https://img.youtube.com/vi/${yt.videoId}/hqdefault.jpg`}
                     alt={yt.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-[#d4af37] text-stone-950 flex items-center justify-center shadow-md">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#C7B6E8] to-[#F3D8E5] text-[#30243D] flex items-center justify-center shadow-md">
                       <Play size={14} className="translate-x-0.5 fill-current" />
                     </div>
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-mono text-[#d4af37] uppercase">{yt.subjectName}</div>
-                  <h4 className="text-xs font-serif font-bold text-white truncate group-hover:text-[#d4af37]">
+                  <div className="text-[10px] font-mono text-[#F3D8E5] uppercase">{yt.subjectName}</div>
+                  <h4 className="text-xs font-serif font-bold text-[#FFF7ED] truncate group-hover:text-[#F3D8E5]">
                     {yt.title}
                   </h4>
                 </div>

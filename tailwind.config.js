@@ -8,6 +8,16 @@ export default {
   theme: {
     extend: {
       colors: {
+        dreamy: {
+          lavender: '#C7B6E8',
+          pink: '#F3D8E5',
+          lilac: '#E8DDF8',
+          cream: '#FFF7ED',
+          plum: '#30243D',
+          deep: '#1E1528',
+          surface: '#291E36',
+          rosegold: '#C99B9B',
+        },
         midnight: {
           950: '#060814',
           900: '#0B0E1E',
@@ -56,6 +66,9 @@ export default {
         'star-glow': '0 0 15px 2px rgba(253, 224, 71, 0.45)',
         'glass-card': '0 8px 32px 0 rgba(11, 14, 30, 0.45)',
         'purple-glow': '0 0 30px rgba(142, 108, 229, 0.35)',
+        'dreamy-glow': '0 0 25px rgba(199, 182, 232, 0.35)',
+        'rosegold-glow': '0 0 20px rgba(201, 155, 155, 0.3)',
+        'pinterest-shadow': '0 12px 36px -4px rgba(24, 15, 36, 0.5), 0 4px 12px rgba(199, 182, 232, 0.15)',
       },
       animation: {
         'float-slow': 'float 7s ease-in-out infinite',

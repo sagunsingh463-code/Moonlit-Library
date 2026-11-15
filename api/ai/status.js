@@ -20,6 +20,6 @@ export default async function handler(req, res) {
   return res.status(200).json({
     configured,
     provider,
-    model: geminiKey ? 'gemini-1.5-flash' : (openAiKey ? 'gpt-4o-mini' : null)
+    model: geminiKey ? 'gemini-2.0-flash' : (openAiKey ? 'gpt-4o-mini' : null)
   });
 }

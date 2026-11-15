@@ -9,6 +9,7 @@ import {
   LogOut, 
   Trash2, 
   CheckCircle2, 
+  Check, 
   AlertTriangle,
   Calendar,
   Sparkles,
@@ -405,82 +406,134 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
 
         {/* Day / Night Theme Schedule & Override Settings */}
-        <div className="mt-4 p-4 rounded-2xl bg-white/5 border border-lavender-500/20 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sun className="w-4 h-4 text-amber-400" />
-              <Moon className="w-4 h-4 text-lavender-300" />
+        <div className="mt-4 p-4 rounded-3xl bg-[#30243D]/60 border border-[#C7B6E8]/25 space-y-3.5 shadow-md">
+          <div className="flex items-center justify-between pb-1">
+            <div className="flex items-center gap-2.5">
+              <span className="p-2 rounded-xl bg-[#241A30] text-[#C7B6E8] border border-[#C7B6E8]/25">
+                <Sparkles className="w-4 h-4 text-[#F3D8E5]" />
+              </span>
               <div>
-                <p className="text-xs font-medium text-cream-100">Theme & Lighting Schedule</p>
-                <p className="text-[10px] text-lavender-300">Automatic daytime light mode with nighttime dark mode</p>
+                <p className="text-xs font-serif font-bold text-[#FFF7ED]">Aesthetic Theme Sanctuary & Lighting</p>
+                <p className="text-[10px] text-[#E8DDF8]/70 font-sans">Pinterest dreamy palette, celestial ambiance & circadian schedule</p>
               </div>
             </div>
           </div>
 
-          {/* Theme Mode Selector */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+          {/* Theme Mode Selector Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            {/* 1. Dreamy Sanctuary (Dark Plum & Dusty Lavender) */}
             <button
               type="button"
               onClick={() => {
                 setThemePref('dark-academia');
                 themeService.setPreference('dark-academia');
               }}
-              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+              className={`p-3 rounded-2xl text-left border transition-all relative overflow-hidden group ${
                 themePref === 'dark-academia' || themePref === 'dark'
-                  ? 'bg-amber-950/80 text-amber-200 border border-amber-400/50 shadow-sm'
-                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+                  ? 'bg-[#30243D] border-[#C7B6E8] text-[#FFF7ED] shadow-[0_0_20px_rgba(199,182,232,0.25)] ring-1 ring-[#C7B6E8]/40'
+                  : 'bg-[#241A30]/80 border-[#C7B6E8]/20 text-[#E8DDF8]/80 hover:border-[#C7B6E8]/40 hover:bg-[#30243D]/60'
               }`}
             >
-              <BookOpen className="w-3 h-3 text-amber-400" />
-              <span>Dark Academia</span>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-[#30243D] border border-[#C7B6E8]" />
+                  <span className="w-3 h-3 rounded-full bg-[#C7B6E8]" />
+                  <span className="w-3 h-3 rounded-full bg-[#F3D8E5]" />
+                  <span className="w-3 h-3 rounded-full bg-[#C99B9B]" />
+                </div>
+                {(themePref === 'dark-academia' || themePref === 'dark') && (
+                  <Check className="w-3.5 h-3.5 text-[#C7B6E8]" />
+                )}
+              </div>
+              <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Dreamy Sanctuary</h4>
+              <p className="text-[10px] text-[#C7B6E8]/80 mt-0.5">Deep plum, dusty lavender & rose gold</p>
             </button>
 
+            {/* 2. Celestial Midnight */}
             <button
               type="button"
               onClick={() => {
                 setThemePref('celestial-midnight');
                 themeService.setPreference('celestial-midnight');
               }}
-              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+              className={`p-3 rounded-2xl text-left border transition-all relative overflow-hidden group ${
                 themePref === 'celestial-midnight'
-                  ? 'bg-lavender-900/80 text-lavender-100 border border-lavender-400/50 shadow-sm'
-                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+                  ? 'bg-[#1C203E] border-[#A5C9FF] text-[#FFF7ED] shadow-[0_0_20px_rgba(165,201,255,0.25)] ring-1 ring-[#A5C9FF]/40'
+                  : 'bg-[#241A30]/80 border-[#C7B6E8]/20 text-[#E8DDF8]/80 hover:border-[#C7B6E8]/40 hover:bg-[#30243D]/60'
               }`}
             >
-              <Sparkles className="w-3 h-3 text-lavender-300" />
-              <span>Celestial Night</span>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-[#0B0E1E] border border-[#A5C9FF]" />
+                  <span className="w-3 h-3 rounded-full bg-[#1B234B]" />
+                  <span className="w-3 h-3 rounded-full bg-[#A5C9FF]" />
+                  <span className="w-3 h-3 rounded-full bg-[#FDE047]" />
+                </div>
+                {themePref === 'celestial-midnight' && (
+                  <Check className="w-3.5 h-3.5 text-[#A5C9FF]" />
+                )}
+              </div>
+              <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Celestial Midnight</h4>
+              <p className="text-[10px] text-[#A5C9FF]/80 mt-0.5">Navy midnight, starlight & cosmic moon</p>
             </button>
 
+            {/* 3. Pastel Daydream Light */}
             <button
               type="button"
               onClick={() => {
                 setThemePref('light');
                 themeService.setPreference('light');
               }}
-              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+              className={`p-3 rounded-2xl text-left border transition-all relative overflow-hidden group ${
                 themePref === 'light'
-                  ? 'bg-amber-500/30 text-amber-200 border border-amber-400/50 shadow-sm'
-                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+                  ? 'bg-[#FAF5F8] border-[#C99B9B] text-[#30243D] shadow-[0_0_20px_rgba(201,155,155,0.25)] ring-1 ring-[#C99B9B]/40'
+                  : 'bg-[#241A30]/80 border-[#C7B6E8]/20 text-[#E8DDF8]/80 hover:border-[#C7B6E8]/40 hover:bg-[#30243D]/60'
               }`}
             >
-              <Sun className="w-3 h-3 text-amber-400" />
-              <span>Light Parchment</span>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-[#FFF7ED] border border-[#C99B9B]" />
+                  <span className="w-3 h-3 rounded-full bg-[#F3D8E5]" />
+                  <span className="w-3 h-3 rounded-full bg-[#E8DDF8]" />
+                  <span className="w-3 h-3 rounded-full bg-[#C99B9B]" />
+                </div>
+                {themePref === 'light' && (
+                  <Check className="w-3.5 h-3.5 text-[#C99B9B]" />
+                )}
+              </div>
+              <h4 className={`text-xs font-serif font-bold ${themePref === 'light' ? 'text-[#30243D]' : 'text-[#FFF7ED]'}`}>
+                Daydream Pastel Light
+              </h4>
+              <p className={`text-[10px] mt-0.5 ${themePref === 'light' ? 'text-[#6A567D]' : 'text-[#E8DDF8]/70'}`}>
+                Soft cream, blush pink & lavender daylight
+              </p>
             </button>
 
+            {/* 4. Auto Schedule */}
             <button
               type="button"
               onClick={() => {
                 setThemePref('auto');
                 themeService.setPreference('auto');
               }}
-              className={`py-1.5 px-2 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+              className={`p-3 rounded-2xl text-left border transition-all relative overflow-hidden group ${
                 themePref === 'auto'
-                  ? 'bg-lavender-600 text-white shadow-sm'
-                  : 'bg-navy-950/60 border border-lavender-500/20 text-lavender-300 hover:text-white'
+                  ? 'bg-[#30243D] border-[#F3D8E5] text-[#FFF7ED] shadow-[0_0_20px_rgba(243,216,229,0.25)] ring-1 ring-[#F3D8E5]/40'
+                  : 'bg-[#241A30]/80 border-[#C7B6E8]/20 text-[#E8DDF8]/80 hover:border-[#C7B6E8]/40 hover:bg-[#30243D]/60'
               }`}
             >
-              <Clock className="w-3 h-3 text-moon-gold" />
-              <span>Auto Schedule</span>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Sun className="w-3.5 h-3.5 text-[#C99B9B]" />
+                  <span className="text-[10px] text-[#C7B6E8]">⇄</span>
+                  <Moon className="w-3.5 h-3.5 text-[#C7B6E8]" />
+                </div>
+                {themePref === 'auto' && (
+                  <Check className="w-3.5 h-3.5 text-[#F3D8E5]" />
+                )}
+              </div>
+              <h4 className="text-xs font-serif font-bold text-[#FFF7ED]">Circadian Auto Sync</h4>
+              <p className="text-[10px] text-[#F3D8E5]/80 mt-0.5">Daytime pastel light, night plum sanctuary</p>
             </button>
           </div>
 

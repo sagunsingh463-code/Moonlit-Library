@@ -252,23 +252,23 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
 
   return (
     <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto font-sans text-[#f5efe6] animate-fade-in">
-      {/* Top Header & Dark Academia Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#d4af37]/20 pb-6">
+      {/* Top Header & Dreamy Aesthetic Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#C7B6E8]/20 pb-6">
         <div>
           <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-2xl bg-[#221e1a] border border-[#d4af37]/30 text-[#d4af37] shadow-sm">
+            <span className="p-2.5 rounded-2xl bg-[#241A30] border border-[#C7B6E8]/30 text-[#C7B6E8] shadow-sm">
               <Calendar className="w-6 h-6" />
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl md:text-3xl font-serif font-bold text-[#f5efe6] tracking-wide">
+                <h1 className="text-2xl md:text-3xl font-serif font-bold text-[#FFF7ED] tracking-wide">
                   Study Planner & Academic Rhythms
                 </h1>
-                <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30">
+                <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-[#30243D] text-[#F3D8E5] border border-[#C99B9B]/30">
                   Term 2 Active
                 </span>
               </div>
-              <p className="text-xs md:text-sm text-[#c8bcad] font-serif italic mt-0.5">
+              <p className="text-xs md:text-sm text-[#8C7A9E] font-serif italic mt-0.5">
                 Structured MBA time-blocks, disciplined deep focus routines & real-time exam countdowns.
               </p>
             </div>
@@ -282,16 +282,16 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                 sound.playSparkle();
                 onOpenFocusMode();
               }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#221e1a] hover:bg-[#2c2621] border border-[#d4af37]/40 text-[#f5efe6] text-xs font-serif font-semibold transition-all hover:scale-[1.02] shadow-sm"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#241A30] hover:bg-[#30243D] border border-[#C7B6E8]/40 text-[#FFF7ED] text-xs font-serif font-semibold transition-all hover:scale-[1.02] shadow-sm"
             >
-              <Play className="w-3.5 h-3.5 text-[#d4af37] fill-[#d4af37]" />
+              <Play className="w-3.5 h-3.5 text-[#C7B6E8] fill-[#C7B6E8]" />
               <span>Midnight Focus</span>
             </button>
           )}
 
           <button
             onClick={() => handleOpenAdd()}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8972e] text-[#141210] font-serif font-bold text-xs shadow-star-glow hover:brightness-110 transition-all hover:scale-[1.02]"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#C7B6E8] via-[#F3D8E5] to-[#C99B9B] text-[#30243D] font-serif font-bold text-xs shadow-star-glow hover:brightness-110 transition-all hover:scale-[1.02]"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Add Study Block</span>
@@ -300,16 +300,16 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
       </div>
 
       {/* Hero Exam Milestone Countdown Card */}
-      <div className="p-6 rounded-3xl bg-[#181512] border border-[#d4af37]/30 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="p-6 rounded-3xl bg-[#241A30]/85 border border-[#C99B9B]/35 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C7B6E8]/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-xl">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-[#d4af37]/20 text-[#d4af37]">
+              <span className="p-1.5 rounded-lg bg-[#30243D] text-[#F3D8E5] border border-[#C7B6E8]/20">
                 <Timer className="w-4 h-4 animate-pulse" />
               </span>
-              <span className="text-[10px] uppercase font-mono tracking-widest text-[#d4af37]">
+              <span className="text-[10px] uppercase font-mono tracking-widest text-[#C7B6E8]">
                 Upcoming Examination Milestone
               </span>
             </div>
@@ -318,7 +318,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
               <select
                 value={selectedExamId}
                 onChange={(e) => setSelectedExamId(e.target.value)}
-                className="bg-[#221e1a] border border-[#d4af37]/30 text-[#f5efe6] rounded-xl px-3 py-1.5 text-xs font-serif font-semibold focus:outline-none focus:border-[#d4af37]"
+                className="bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] rounded-xl px-3 py-1.5 text-xs font-serif font-semibold focus:outline-none focus:border-[#C7B6E8]"
               >
                 {UPCOMING_EXAMS.map(exam => (
                   <option key={exam.id} value={exam.id}>
@@ -326,47 +326,47 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                   </option>
                 ))}
               </select>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#322c26] text-[#d4af37] border border-[#d4af37]/20 font-mono">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#30243D] text-[#F3D8E5] border border-[#C99B9B]/30 font-mono">
                 {activeExam.type}
               </span>
             </div>
 
-            <p className="text-xs text-[#c8bcad] font-serif">
-              Target Date: <strong className="text-[#f5efe6]">{new Date(activeExam.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong>
+            <p className="text-xs text-[#8C7A9E] font-serif">
+              Target Date: <strong className="text-[#FFF7ED]">{new Date(activeExam.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong>
             </p>
           </div>
 
           {/* Countdown Clock Cubes */}
           <div className="flex items-center gap-2 sm:gap-3 font-mono">
-            <div className="p-3 sm:p-4 rounded-2xl bg-[#12100e] border border-[#d4af37]/30 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
-              <span className="text-2xl sm:text-3xl font-bold text-[#d4af37] block">
+            <div className="p-3 sm:p-4 rounded-2xl bg-[#1E1528] border border-[#C99B9B]/35 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
+              <span className="text-2xl sm:text-3xl font-bold text-[#F3D8E5] block">
                 {String(diffDays).padStart(2, '0')}
               </span>
-              <span className="block text-[9px] uppercase tracking-wider text-[#a09485] mt-0.5">Days</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[#8C7A9E] mt-0.5">Days</span>
             </div>
-            <span className="text-xl sm:text-2xl text-[#d4af37]/60 font-bold">:</span>
+            <span className="text-xl sm:text-2xl text-[#C7B6E8]/60 font-bold">:</span>
 
-            <div className="p-3 sm:p-4 rounded-2xl bg-[#12100e] border border-[#d4af37]/30 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
-              <span className="text-2xl sm:text-3xl font-bold text-[#f5efe6] block">
+            <div className="p-3 sm:p-4 rounded-2xl bg-[#1E1528] border border-[#C7B6E8]/30 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
+              <span className="text-2xl sm:text-3xl font-bold text-[#FFF7ED] block">
                 {String(diffHours).padStart(2, '0')}
               </span>
-              <span className="block text-[9px] uppercase tracking-wider text-[#a09485] mt-0.5">Hours</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[#8C7A9E] mt-0.5">Hours</span>
             </div>
-            <span className="text-xl sm:text-2xl text-[#d4af37]/60 font-bold">:</span>
+            <span className="text-xl sm:text-2xl text-[#C7B6E8]/60 font-bold">:</span>
 
-            <div className="p-3 sm:p-4 rounded-2xl bg-[#12100e] border border-[#d4af37]/30 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
-              <span className="text-2xl sm:text-3xl font-bold text-[#f5efe6] block">
+            <div className="p-3 sm:p-4 rounded-2xl bg-[#1E1528] border border-[#C7B6E8]/30 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
+              <span className="text-2xl sm:text-3xl font-bold text-[#FFF7ED] block">
                 {String(diffMins).padStart(2, '0')}
               </span>
-              <span className="block text-[9px] uppercase tracking-wider text-[#a09485] mt-0.5">Mins</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[#8C7A9E] mt-0.5">Mins</span>
             </div>
-            <span className="text-xl sm:text-2xl text-[#d4af37]/60 font-bold">:</span>
+            <span className="text-xl sm:text-2xl text-[#C7B6E8]/60 font-bold">:</span>
 
-            <div className="p-3 sm:p-4 rounded-2xl bg-[#12100e] border border-[#d4af37]/30 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
-              <span className="text-2xl sm:text-3xl font-bold text-[#d4af37] block">
+            <div className="p-3 sm:p-4 rounded-2xl bg-[#1E1528] border border-[#C99B9B]/35 text-center min-w-[65px] sm:min-w-[80px] shadow-inner">
+              <span className="text-2xl sm:text-3xl font-bold text-[#F3D8E5] block">
                 {String(diffSecs).padStart(2, '0')}
               </span>
-              <span className="block text-[9px] uppercase tracking-wider text-[#a09485] mt-0.5">Secs</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[#8C7A9E] mt-0.5">Secs</span>
             </div>
           </div>
         </div>
@@ -375,68 +375,68 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
       {/* Progress & Mascot Motivation Bar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Weekly Completion Card */}
-        <div className="p-4 rounded-2xl bg-[#1a1714] border border-[#d4af37]/20 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-[#241A30]/85 border border-[#C7B6E8]/20 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-[#c8bcad]">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-[#8C7A9E]">
               Weekly Progress
             </span>
             <div className="flex items-baseline gap-2">
-              <h3 className="text-xl font-bold font-serif text-[#f5efe6]">
+              <h3 className="text-xl font-bold font-serif text-[#FFF7ED]">
                 {completedTasks} / {totalTasks}
               </h3>
-              <span className="text-xs text-[#d4af37] font-mono">({completionPercentage}%)</span>
+              <span className="text-xs text-[#F3D8E5] font-mono">({completionPercentage}%)</span>
             </div>
             {/* Progress Bar */}
-            <div className="w-36 h-2 rounded-full bg-[#12100e] overflow-hidden mt-1 border border-[#d4af37]/20">
+            <div className="w-36 h-2 rounded-full bg-[#1E1528] overflow-hidden mt-1 border border-[#C7B6E8]/20">
               <div 
-                className="h-full bg-gradient-to-r from-[#d4af37] to-[#e6ca65] rounded-full transition-all duration-500"
+                className="h-full bg-gradient-to-r from-[#C7B6E8] via-[#F3D8E5] to-[#C99B9B] rounded-full transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
           </div>
-          <span className="p-3 rounded-xl bg-[#221e1a] text-[#d4af37] border border-[#d4af37]/20">
+          <span className="p-3 rounded-xl bg-[#30243D] text-[#C7B6E8] border border-[#C7B6E8]/20">
             <Award className="w-5 h-5" />
           </span>
         </div>
 
         {/* Today's Focus Routine */}
-        <div className="p-4 rounded-2xl bg-[#1a1714] border border-[#d4af37]/20 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-[#241A30]/85 border border-[#C7B6E8]/20 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-[#c8bcad]">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-[#8C7A9E]">
               Today ({todayName})
             </span>
             <div className="flex items-baseline gap-2">
-              <h3 className="text-xl font-bold font-serif text-[#f5efe6]">
+              <h3 className="text-xl font-bold font-serif text-[#FFF7ED]">
                 {todayCompleted} / {todayTasks.length} Blocks
               </h3>
-              <span className="text-xs text-[#d4af37] font-mono">
+              <span className="text-xs text-[#F3D8E5] font-mono">
                 {todayTasks.length > 0 ? `${Math.round((todayCompleted / todayTasks.length) * 100)}%` : 'Rest Day'}
               </span>
             </div>
-            <p className="text-[11px] text-[#a09485] font-serif italic">
+            <p className="text-[11px] text-[#8C7A9E] font-serif italic">
               {todayTasks.length - todayCompleted > 0 
                 ? `${todayTasks.length - todayCompleted} study sprint(s) remaining today` 
                 : 'All scheduled blocks conquered! ✨'}
             </p>
           </div>
-          <span className="p-3 rounded-xl bg-[#221e1a] text-[#d4af37] border border-[#d4af37]/20">
+          <span className="p-3 rounded-xl bg-[#30243D] text-[#C99B9B] border border-[#C7B6E8]/20">
             <Flame className="w-5 h-5" />
           </span>
         </div>
 
         {/* Mascot Study Tip */}
-        <div className="p-4 rounded-2xl bg-[#1a1714] border border-[#d4af37]/20 flex items-center gap-3">
+        <div className="p-4 rounded-2xl bg-[#241A30]/85 border border-[#C7B6E8]/20 flex items-center gap-3">
           <img 
             src="/shagun/shagun_speaking_portrait.jpg" 
             alt="Shagun" 
-            className="w-12 h-12 rounded-xl object-cover border border-[#d4af37]/30 flex-shrink-0"
+            className="w-12 h-12 rounded-xl object-cover border border-[#C99B9B]/40 flex-shrink-0"
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/shagun/shagun_speaking.jpg'; }}
           />
           <div className="text-xs">
-            <span className="text-[10px] uppercase font-mono text-[#d4af37] block font-semibold">
+            <span className="text-[10px] uppercase font-mono text-[#F3D8E5] block font-semibold">
               Shagun's Advice
             </span>
-            <p className="text-[#c8bcad] font-serif italic leading-snug mt-0.5">
+            <p className="text-[#8C7A9E] font-serif italic leading-snug mt-0.5">
               "Master 1 core topic deeply rather than skimming 5. Use the focus timer for uninterrupted flow!"
             </p>
           </div>
@@ -451,12 +451,12 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
             onClick={() => setSelectedDay(todayName)}
             className={`px-4 py-2 rounded-xl text-xs font-serif font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
               selectedDay === todayName
-                ? 'bg-[#d4af37] text-[#141210] shadow-star-glow scale-105'
-                : 'bg-[#1e1b18] text-[#c8bcad] hover:text-[#f5efe6] border border-[#d4af37]/20'
+                ? 'bg-gradient-to-r from-[#C7B6E8] to-[#F3D8E5] text-[#30243D] shadow-star-glow scale-105'
+                : 'bg-[#241A30] text-[#8C7A9E] hover:text-[#FFF7ED] border border-[#C7B6E8]/20'
             }`}
           >
             <span>Today • {todayName}</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#141210]/20 font-mono">
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#1E1528]/40 font-mono">
               {safeTasks.filter(t => t.day === todayName).length}
             </span>
           </button>
@@ -465,17 +465,17 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
             onClick={() => setSelectedDay('All')}
             className={`px-4 py-2 rounded-xl text-xs font-serif font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               selectedDay === 'All'
-                ? 'bg-[#d4af37] text-[#141210] shadow-star-glow font-bold'
-                : 'bg-[#1e1b18] text-[#c8bcad] hover:text-[#f5efe6] border border-[#d4af37]/20'
+                ? 'bg-gradient-to-r from-[#C7B6E8] to-[#F3D8E5] text-[#30243D] shadow-star-glow font-bold'
+                : 'bg-[#241A30] text-[#8C7A9E] hover:text-[#FFF7ED] border border-[#C7B6E8]/20'
             }`}
           >
             <span>Weekly Matrix (All Days)</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#141210]/20 font-mono">
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#1E1528]/40 font-mono">
               {safeTasks.length}
             </span>
           </button>
 
-          <div className="h-4 w-px bg-[#d4af37]/20 mx-1 flex-shrink-0" />
+          <div className="h-4 w-px bg-[#C7B6E8]/20 mx-1 flex-shrink-0" />
 
           {DAYS.map(day => {
             const count = safeTasks.filter(t => t.day === day).length;
@@ -486,13 +486,13 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                 onClick={() => setSelectedDay(day)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
                   selectedDay === day
-                    ? 'bg-[#2a241f] text-[#d4af37] border border-[#d4af37] font-semibold'
-                    : 'bg-[#181512] text-[#c8bcad] hover:text-[#f5efe6] border border-[#d4af37]/10'
+                    ? 'bg-[#30243D] text-[#F3D8E5] border border-[#C99B9B]/50 font-semibold'
+                    : 'bg-[#1E1528] text-[#8C7A9E] hover:text-[#FFF7ED] border border-[#C7B6E8]/10'
                 }`}
               >
                 <span>{day}</span>
-                {isToday && <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />}
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#12100e] text-[#a09485] font-mono">
+                {isToday && <span className="w-1.5 h-1.5 rounded-full bg-[#F3D8E5]" />}
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#1E1528] text-[#8C7A9E] font-mono">
                   {count}
                 </span>
               </button>
@@ -501,15 +501,15 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
         </div>
 
         {/* Filter bar: Subject & Status */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-[#1a1714] border border-[#d4af37]/20 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-[#241A30]/85 border border-[#C7B6E8]/20 text-xs">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
-              <Filter className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span className="text-[11px] font-mono uppercase text-[#c8bcad]">Subject:</span>
+              <Filter className="w-3.5 h-3.5 text-[#C7B6E8]" />
+              <span className="text-[11px] font-mono uppercase text-[#8C7A9E]">Subject:</span>
               <select
                 value={selectedSubjectFilter}
                 onChange={(e) => setSelectedSubjectFilter(e.target.value)}
-                className="bg-[#221e1a] border border-[#d4af37]/30 text-[#f5efe6] rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-[#d4af37]"
+                className="bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-[#C7B6E8]"
               >
                 <option value="All">All Subjects</option>
                 {availableSubjectOptions.map(subj => (
@@ -518,13 +518,13 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
               </select>
             </div>
 
-            <div className="flex items-center gap-1 bg-[#12100e] p-1 rounded-xl border border-[#d4af37]/20">
+            <div className="flex items-center gap-1 bg-[#1E1528] p-1 rounded-xl border border-[#C7B6E8]/20">
               <button
                 onClick={() => setStatusFilter('all')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] transition-all ${
                   statusFilter === 'all' 
-                    ? 'bg-[#d4af37] text-[#141210] font-bold' 
-                    : 'text-[#c8bcad] hover:text-[#f5efe6]'
+                    ? 'bg-gradient-to-r from-[#C7B6E8] to-[#F3D8E5] text-[#30243D] font-bold' 
+                    : 'text-[#8C7A9E] hover:text-[#FFF7ED]'
                 }`}
               >
                 All ({filteredTasks.length})
@@ -533,8 +533,8 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                 onClick={() => setStatusFilter('pending')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] transition-all ${
                   statusFilter === 'pending' 
-                    ? 'bg-[#d4af37] text-[#141210] font-bold' 
-                    : 'text-[#c8bcad] hover:text-[#f5efe6]'
+                    ? 'bg-gradient-to-r from-[#C7B6E8] to-[#F3D8E5] text-[#30243D] font-bold' 
+                    : 'text-[#8C7A9E] hover:text-[#FFF7ED]'
                 }`}
               >
                 Pending
@@ -543,8 +543,8 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                 onClick={() => setStatusFilter('completed')}
                 className={`px-2.5 py-1 rounded-lg text-[11px] transition-all ${
                   statusFilter === 'completed' 
-                    ? 'bg-[#d4af37] text-[#141210] font-bold' 
-                    : 'text-[#c8bcad] hover:text-[#f5efe6]'
+                    ? 'bg-gradient-to-r from-[#C7B6E8] to-[#F3D8E5] text-[#30243D] font-bold' 
+                    : 'text-[#8C7A9E] hover:text-[#FFF7ED]'
                 }`}
               >
                 Completed
@@ -553,12 +553,12 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono text-[#a09485]">
+            <span className="text-[11px] font-mono text-[#8C7A9E]">
               Showing {filteredTasks.length} study block(s)
             </span>
             <button
               onClick={() => handleOpenAdd(selectedDay === 'All' ? todayName : selectedDay)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2a241f] hover:bg-[#342d27] border border-[#d4af37]/40 text-[#d4af37] font-serif font-bold text-xs transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#30243D] hover:bg-[#3D2C4E] border border-[#C7B6E8]/40 text-[#F3D8E5] font-serif font-bold text-xs transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New Block</span>
@@ -577,8 +577,8 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
               key={task.id}
               className={`p-4 md:p-5 rounded-2xl border transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-4 group ${
                 task.completed
-                  ? 'bg-[#151311]/70 border-[#2e2924] text-[#7d7367]'
-                  : 'bg-[#1c1916] border-[#d4af37]/25 hover:border-[#d4af37]/60 hover:bg-[#221e1a] text-[#f5efe6] shadow-md'
+                  ? 'bg-[#1E1528]/50 border-[#30243D] text-[#8C7A9E]'
+                  : 'bg-[#241A30]/85 border-[#C7B6E8]/25 hover:border-[#C99B9B]/60 hover:bg-[#30243D]/50 text-[#FFF7ED] shadow-md'
               }`}
             >
               {/* Left Section: Checkbox + Details */}
@@ -592,50 +592,50 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                   title={task.completed ? "Mark as pending" : "Mark as completed"}
                 >
                   {task.completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-[#d4af37]" />
+                    <CheckCircle2 className="w-5 h-5 text-[#F3D8E5]" />
                   ) : (
-                    <Circle className="w-5 h-5 text-[#8c8072] group-hover:text-[#d4af37]" />
+                    <Circle className="w-5 h-5 text-[#8C7A9E] group-hover:text-[#F3D8E5]" />
                   )}
                 </button>
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <span className="text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded-md bg-[#2a241f] text-[#d4af37] border border-[#d4af37]/20">
+                    <span className="text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded-md bg-[#30243D] text-[#F3D8E5] border border-[#C7B6E8]/20">
                       {task.subject}
                     </span>
 
                     {selectedDay === 'All' && (
                       <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md border ${
                         isTodayTask 
-                          ? 'bg-[#d4af37]/20 text-[#d4af37] border-[#d4af37]/40 font-bold' 
-                          : 'bg-[#161412] text-[#a09485] border-[#322c26]'
+                          ? 'bg-[#30243D] text-[#F3D8E5] border-[#C99B9B]/40 font-bold' 
+                          : 'bg-[#1E1528] text-[#8C7A9E] border-[#C7B6E8]/10'
                       }`}>
                         {task.day}
                       </span>
                     )}
 
                     {task.isExamPrep && (
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#C99B9B]/20 text-[#F3D8E5] border border-[#C99B9B]/30 flex items-center gap-1">
                         <Timer className="w-2.5 h-2.5" />
                         Exam Prep
                       </span>
                     )}
 
                     {task.priority === 'high' && (
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 font-semibold">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
                         High Priority
                       </span>
                     )}
 
                     {task.category && (
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#12100e] text-[#a09485] border border-[#322c26]">
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#1E1528] text-[#8C7A9E] border border-[#C7B6E8]/15">
                         {task.category}
                       </span>
                     )}
                   </div>
 
                   <h3 className={`font-serif font-bold text-sm md:text-base leading-snug transition-all ${
-                    task.completed ? 'line-through text-[#7d7367]' : 'text-[#f5efe6]'
+                    task.completed ? 'line-through text-[#8C7A9E]' : 'text-[#FFF7ED]'
                   }`}>
                     {task.title}
                   </h3>
@@ -643,11 +643,11 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
               </div>
 
               {/* Right Section: Time Slot, Focus Play Button & Actions */}
-              <div className="flex items-center justify-between md:justify-end gap-3 flex-shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#2e2924]">
-                <div className="flex items-center gap-1.5 text-xs font-mono text-[#c8bcad] bg-[#12100e] px-2.5 py-1.5 rounded-xl border border-[#322c26]">
-                  <Clock className="w-3.5 h-3.5 text-[#d4af37]" />
+              <div className="flex items-center justify-between md:justify-end gap-3 flex-shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#C7B6E8]/15">
+                <div className="flex items-center gap-1.5 text-xs font-mono text-[#8C7A9E] bg-[#1E1528] px-2.5 py-1.5 rounded-xl border border-[#C7B6E8]/15">
+                  <Clock className="w-3.5 h-3.5 text-[#C7B6E8]" />
                   <span>{task.timeSlot}</span>
-                  <span className="text-[#8c8072]">({task.durationMinutes}m)</span>
+                  <span className="text-[#8C7A9E]/70">({task.durationMinutes}m)</span>
                 </div>
 
                 <div className="flex items-center gap-1.5">
@@ -658,7 +658,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                         sound.playSparkle();
                         onOpenFocusMode();
                       }}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#2a241f] hover:bg-[#d4af37] text-[#d4af37] hover:text-[#141210] border border-[#d4af37]/30 text-xs font-serif font-semibold transition-all hover:scale-105"
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#30243D] hover:bg-gradient-to-r hover:from-[#C7B6E8] hover:to-[#F3D8E5] text-[#F3D8E5] hover:text-[#30243D] border border-[#C7B6E8]/30 text-xs font-serif font-semibold transition-all hover:scale-105"
                       title="Start Focus Timer for this block"
                     >
                       <Play className="w-3 h-3 fill-current" />
@@ -669,7 +669,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                   {/* Edit Button */}
                   <button
                     onClick={() => handleOpenEdit(task)}
-                    className="p-2 rounded-xl text-[#a09485] hover:text-[#d4af37] hover:bg-[#221e1a] transition-colors"
+                    className="p-2 rounded-xl text-[#8C7A9E] hover:text-[#F3D8E5] hover:bg-[#30243D] transition-colors"
                     title="Edit block"
                   >
                     <Edit3 className="w-4 h-4" />
@@ -682,7 +682,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                         await onDeleteTask(task.id);
                       }
                     }}
-                    className="p-2 rounded-xl text-[#a09485] hover:text-red-400 hover:bg-red-950/20 transition-colors"
+                    className="p-2 rounded-xl text-[#8C7A9E] hover:text-rose-400 hover:bg-rose-950/20 transition-colors"
                     title="Delete block"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -694,21 +694,21 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
         })}
 
         {filteredTasks.length === 0 && (
-          <div className="p-12 text-center rounded-3xl bg-[#181512] border border-dashed border-[#d4af37]/30 text-[#a09485] space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#221e1a] border border-[#d4af37]/20 flex items-center justify-center text-[#d4af37]">
+          <div className="p-12 text-center rounded-3xl bg-[#241A30]/80 border border-dashed border-[#C7B6E8]/30 text-[#8C7A9E] space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#1E1528] border border-[#C7B6E8]/20 flex items-center justify-center text-[#C7B6E8]">
               <BookOpen className="w-7 h-7 stroke-1" />
             </div>
             <div>
-              <h3 className="font-serif font-bold text-base text-[#f5efe6]">
+              <h3 className="font-serif font-bold text-base text-[#FFF7ED]">
                 No study blocks found for {selectedDay === 'All' ? 'selected filters' : selectedDay}
               </h3>
-              <p className="text-xs text-[#a09485] font-serif mt-1 max-w-md mx-auto">
+              <p className="text-xs text-[#8C7A9E] font-serif mt-1 max-w-md mx-auto">
                 Schedule a deep focus block for your MBA assignments, case studies, or quiz prep.
               </p>
             </div>
             <button
               onClick={() => handleOpenAdd(selectedDay === 'All' ? todayName : selectedDay)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#d4af37] text-[#141210] font-serif font-bold text-xs shadow-star-glow hover:brightness-110 transition-all hover:scale-105"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#C7B6E8] via-[#F3D8E5] to-[#C99B9B] text-[#30243D] font-serif font-bold text-xs shadow-star-glow hover:brightness-110 transition-all hover:scale-105"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Schedule Study Block</span>
@@ -719,14 +719,14 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
 
       {/* Add / Edit Study Block Modal */}
       {(showAddModal || editingTask) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0a0908]/85 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-lg p-6 rounded-3xl bg-[#181512] border border-[#d4af37]/40 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-[#d4af37]/20">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1528]/85 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-lg p-6 rounded-3xl bg-[#241A30] border border-[#C99B9B]/40 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-4 border-b border-[#C7B6E8]/20">
               <div className="flex items-center gap-2.5">
-                <span className="p-2 rounded-xl bg-[#2a241f] text-[#d4af37] border border-[#d4af37]/30">
+                <span className="p-2 rounded-xl bg-[#30243D] text-[#C7B6E8] border border-[#C7B6E8]/30">
                   <Calendar className="w-4 h-4" />
                 </span>
-                <h3 className="font-serif font-bold text-lg text-[#f5efe6]">
+                <h3 className="font-serif font-bold text-lg text-[#FFF7ED]">
                   {editingTask ? 'Edit Study Block' : 'Schedule Study Block'}
                 </h3>
               </div>
@@ -735,7 +735,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                   setShowAddModal(false);
                   setEditingTask(null);
                 }} 
-                className="p-1.5 rounded-xl text-[#a09485] hover:text-[#f5efe6] hover:bg-[#221e1a]"
+                className="p-1.5 rounded-xl text-[#8C7A9E] hover:text-[#FFF7ED] hover:bg-[#30243D]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -744,7 +744,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
             <form onSubmit={handleSubmitTask} className="space-y-4 pt-4">
               {/* Title input */}
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-[#c8bcad] mb-1.5">
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#8C7A9E] mb-1.5">
                   Focus Topic / Task Title *
                 </label>
                 <input
@@ -753,20 +753,20 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
                   placeholder="e.g. Microeconomics: Marginal Revenue & Deadweight Loss"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#12100e] border border-[#d4af37]/30 text-[#f5efe6] text-xs placeholder:text-[#6a6053] focus:outline-none focus:border-[#d4af37] transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs placeholder:text-[#8C7A9E]/60 focus:outline-none focus:border-[#C7B6E8] transition-all"
                 />
               </div>
 
               {/* Subject & Day */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#c8bcad] mb-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-[#8C7A9E] mb-1.5">
                     Subject *
                   </label>
                   <select
                     value={formSubject}
                     onChange={(e) => setFormSubject(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#12100e] border border-[#d4af37]/30 text-[#f5efe6] text-xs focus:outline-none focus:border-[#d4af37]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs focus:outline-none focus:border-[#C7B6E8]"
                   >
                     {availableSubjectOptions.map(subj => (
                       <option key={subj} value={subj}>{subj}</option>
@@ -775,13 +775,13 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#c8bcad] mb-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-[#8C7A9E] mb-1.5">
                     Day of Week *
                   </label>
                   <select
                     value={formDay}
                     onChange={(e) => setFormDay(e.target.value as StudyPlanTask['day'])}
-                    className="w-full px-3 py-2 rounded-xl bg-[#12100e] border border-[#d4af37]/30 text-[#f5efe6] text-xs focus:outline-none focus:border-[#d4af37]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs focus:outline-none focus:border-[#C7B6E8]"
                   >
                     {DAYS.map(d => (
                       <option key={d} value={d}>
@@ -794,7 +794,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
 
               {/* Time slot & Presets */}
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-[#c8bcad] mb-1.5">
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#8C7A9E] mb-1.5">
                   Time Slot
                 </label>
                 <input
@@ -802,7 +802,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                   value={formTimeSlot}
                   onChange={(e) => setFormTimeSlot(e.target.value)}
                   placeholder="e.g. 08:00 PM - 09:30 PM"
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#12100e] border border-[#d4af37]/30 text-[#f5efe6] text-xs focus:outline-none focus:border-[#d4af37]"
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs focus:outline-none focus:border-[#C7B6E8]"
                 />
                 {/* Presets */}
                 <div className="flex flex-wrap gap-1.5 mt-2">
@@ -813,8 +813,8 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                       onClick={() => setFormTimeSlot(preset)}
                       className={`text-[10px] px-2 py-0.5 rounded-lg border transition-all ${
                         formTimeSlot === preset
-                          ? 'bg-[#d4af37] text-[#141210] font-bold border-[#d4af37]'
-                          : 'bg-[#221e1a] text-[#a09485] hover:text-[#f5efe6] border-[#342d27]'
+                          ? 'bg-gradient-to-r from-[#C7B6E8] to-[#F3D8E5] text-[#30243D] font-bold border-[#F3D8E5]'
+                          : 'bg-[#1E1528] text-[#8C7A9E] hover:text-[#FFF7ED] border-[#C7B6E8]/20'
                       }`}
                     >
                       {preset}
@@ -826,7 +826,7 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
               {/* Duration & Category */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#c8bcad] mb-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-[#8C7A9E] mb-1.5">
                     Duration (Minutes)
                   </label>
                   <input
@@ -836,18 +836,18 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                     step={15}
                     value={formDuration}
                     onChange={(e) => setFormDuration(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-[#12100e] border border-[#d4af37]/30 text-[#f5efe6] text-xs focus:outline-none focus:border-[#d4af37]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs focus:outline-none focus:border-[#C7B6E8]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#c8bcad] mb-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-[#8C7A9E] mb-1.5">
                     Category
                   </label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#12100e] border border-[#d4af37]/30 text-[#f5efe6] text-xs focus:outline-none focus:border-[#d4af37]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs focus:outline-none focus:border-[#C7B6E8]"
                   >
                     <option value="Deep Focus">Deep Focus</option>
                     <option value="Case Study">Case Study</option>
@@ -862,13 +862,13 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
               {/* Priority & Exam Prep Toggle */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#c8bcad] mb-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-[#8C7A9E] mb-1.5">
                     Priority
                   </label>
                   <select
                     value={formPriority}
                     onChange={(e) => setFormPriority(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#12100e] border border-[#d4af37]/30 text-[#f5efe6] text-xs focus:outline-none focus:border-[#d4af37]"
+                    className="w-full px-3 py-2 rounded-xl bg-[#1E1528] border border-[#C7B6E8]/30 text-[#FFF7ED] text-xs focus:outline-none focus:border-[#C7B6E8]"
                   >
                     <option value="normal">Normal</option>
                     <option value="medium">Medium</option>
@@ -882,9 +882,9 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
                       type="checkbox"
                       checked={formIsExamPrep}
                       onChange={(e) => setFormIsExamPrep(e.target.checked)}
-                      className="w-4 h-4 rounded accent-[#d4af37]"
+                      className="w-4 h-4 rounded accent-[#C7B6E8]"
                     />
-                    <span className="text-xs text-[#f5efe6] font-medium">
+                    <span className="text-xs text-[#FFF7ED] font-medium">
                       Mark as Exam Prep Focus
                     </span>
                   </label>
@@ -892,21 +892,21 @@ export const StudyPlannerView: React.FC<StudyPlannerViewProps> = ({
               </div>
 
               {/* Modal Buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-[#d4af37]/20">
+              <div className="flex justify-end gap-3 pt-4 border-t border-[#C7B6E8]/20">
                 <button
                   type="button"
                   onClick={() => {
                     setShowAddModal(false);
                     setEditingTask(null);
                   }}
-                  className="px-4 py-2 rounded-xl bg-[#221e1a] text-xs text-[#c8bcad] hover:text-[#f5efe6] transition-colors"
+                  className="px-4 py-2 rounded-xl bg-[#1E1528] text-xs text-[#8C7A9E] hover:text-[#FFF7ED] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8972e] text-[#141210] font-serif font-bold text-xs shadow-star-glow hover:brightness-110 transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#C7B6E8] via-[#F3D8E5] to-[#C99B9B] text-[#30243D] font-serif font-bold text-xs shadow-star-glow hover:brightness-110 transition-all disabled:opacity-50"
                 >
                   {isSubmitting ? 'Saving...' : editingTask ? 'Update Study Block ✨' : 'Schedule Study Block ✨'}
                 </button>

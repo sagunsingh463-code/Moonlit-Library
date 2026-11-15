@@ -25,7 +25,7 @@ export const SkyBackground: React.FC<SkyBackgroundProps> = ({ reduceMotion = fal
 
     window.addEventListener('resize', handleResize);
 
-    // Generate stars
+    // Generate delicate dreamy stars
     const starCount = Math.min(180, Math.floor((width * height) / 8000));
     const stars = Array.from({ length: starCount }, () => ({
       x: Math.random() * width,
@@ -33,7 +33,9 @@ export const SkyBackground: React.FC<SkyBackgroundProps> = ({ reduceMotion = fal
       radius: Math.random() * 1.5 + 0.4,
       alpha: Math.random() * 0.8 + 0.2,
       speed: (Math.random() * 0.02 + 0.005) * (Math.random() > 0.5 ? 1 : -1),
-      color: Math.random() > 0.3 ? '#FFE8A3' : (Math.random() > 0.5 ? '#E1D9F8' : '#F4ABC4')
+      color: Math.random() > 0.4 
+        ? '#FFF7ED' // Cream
+        : (Math.random() > 0.5 ? '#C7B6E8' : (Math.random() > 0.5 ? '#F3D8E5' : '#E8DDF8')) // Dusty lavender, pastel pink, soft lilac
     }));
 
     // Floating shooting star state
@@ -52,32 +54,32 @@ export const SkyBackground: React.FC<SkyBackgroundProps> = ({ reduceMotion = fal
 
       const isLight = document.documentElement.classList.contains('light-theme');
 
-      // Background gradient (Deep night space in dark mode vs soft pastel daydream sky in light mode)
+      // Background gradient (Deep Plum sanctuary sky in dark mode vs soft cream & pastel pink in light mode)
       const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
       if (isLight) {
-        bgGrad.addColorStop(0, '#EDF2FC');
-        bgGrad.addColorStop(0.4, '#F4F0FA');
-        bgGrad.addColorStop(0.8, '#F8F4FD');
-        bgGrad.addColorStop(1, '#EAE4F7');
+        bgGrad.addColorStop(0, '#FAF5F8');
+        bgGrad.addColorStop(0.4, '#FDF2F7');
+        bgGrad.addColorStop(0.8, '#F6EFF9');
+        bgGrad.addColorStop(1, '#EDE5F5');
       } else {
-        bgGrad.addColorStop(0, '#060814');
-        bgGrad.addColorStop(0.4, '#0B0E1E');
-        bgGrad.addColorStop(0.8, '#10162F');
-        bgGrad.addColorStop(1, '#161D3E');
+        bgGrad.addColorStop(0, '#1E1528');
+        bgGrad.addColorStop(0.4, '#241832');
+        bgGrad.addColorStop(0.8, '#2B1E3B');
+        bgGrad.addColorStop(1, '#30243D');
       }
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Lavender & rose celestial nebulas
+      // Dusty lavender & pastel pink celestial nebulas
       const nebula1 = ctx.createRadialGradient(width * 0.75, height * 0.2, 20, width * 0.75, height * 0.2, 450);
-      nebula1.addColorStop(0, 'rgba(117, 78, 208, 0.12)');
-      nebula1.addColorStop(0.6, 'rgba(186, 171, 245, 0.04)');
+      nebula1.addColorStop(0, 'rgba(199, 182, 232, 0.14)');
+      nebula1.addColorStop(0.6, 'rgba(232, 221, 248, 0.05)');
       nebula1.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = nebula1;
       ctx.fillRect(0, 0, width, height);
 
       const nebula2 = ctx.createRadialGradient(width * 0.2, height * 0.6, 20, width * 0.2, height * 0.6, 400);
-      nebula2.addColorStop(0, 'rgba(244, 171, 196, 0.07)');
+      nebula2.addColorStop(0, 'rgba(243, 216, 229, 0.1)');
       nebula2.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = nebula2;
       ctx.fillRect(0, 0, width, height);
@@ -91,8 +93,8 @@ export const SkyBackground: React.FC<SkyBackgroundProps> = ({ reduceMotion = fal
           }
         }
         const cloudGrad = ctx.createRadialGradient(cloud.x, cloud.y, 10, cloud.x, cloud.y, cloud.radius);
-        cloudGrad.addColorStop(0, `rgba(186, 171, 245, ${cloud.opacity})`);
-        cloudGrad.addColorStop(0.7, `rgba(186, 171, 245, ${cloud.opacity * 0.3})`);
+        cloudGrad.addColorStop(0, `rgba(232, 221, 248, ${cloud.opacity * 1.2})`);
+        cloudGrad.addColorStop(0.7, `rgba(199, 182, 232, ${cloud.opacity * 0.4})`);
         cloudGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = cloudGrad;
         ctx.beginPath();
